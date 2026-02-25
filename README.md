@@ -1,24 +1,52 @@
-# Industrial E-Logbook & Asset Registry Platform 🏭⚙️
+# PlantLog-MERN: Industrial E-Logbook & Asset Registry 🏭⚙️
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![React](https://img.shields.io/badge/React-18-blue)
-![Node.js](https://img.shields.io/badge/Node.js-18-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![React](https://img.shields.io/badge/React-18-blue)](#)
+[![Node.js](https://img.shields.io/badge/Node.js-18-green)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](#)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](#)
+[![License](https://img.shields.io/badge/License-MIT-green)](#)
 
-A production-ready, highly scalable, and containerized **MERN Stack** application designed for industrial environments to manage asset registries and track maintenance logs. 
+A production-ready, highly scalable, and containerized **MERN Stack** application designed specifically for industrial environments. PlantLog-MERN helps manufacturing plants and factories manage their asset registries and track maintenance, operations, and incident logs with precision.
 
-Built from the ground up with a focus on modern UI/UX, robust state management, and strict TypeScript integration.
+---
+
+## 📸 Application Demo
+
+See the full platform in action! This walkthrough demonstrates secure authentication, the real-time statistical dashboard, the comprehensive asset registry, and detailed maintenance logging capabilities.
+
+https://github.com/user-attachments/assets/demo.mp4  *(Note: Replace with standard GitHub video upload when published)*
+
+> 💡 **Tip:** You can view the raw `.mp4` demo video located at `docs/demo.mp4` in this repository.
+
+---
 
 ## 🌟 Key Features
 
-*   **Asset Management**: Register, track, and manage industrial machinery, vehicles, and equipment.
-*   **Maintenance Logs**: Detailed chronological logging of maintenance, operations, incident reports, and safety inspections.
-*   **Real-time Dashboard**: Overview of system status and quick access to operational metrics.
+*   **Asset Management**: Register, track, and manage industrial machinery, vehicles, and precision equipment.
+*   **Maintenance Logs**: Detailed chronological logging of maintenance, daily operations, critical incident reports, and safety inspections.
+*   **Real-time Dashboard**: Actionable overview of system status and quick access to operational metrics.
 *   **Role-Based Access Control (RBAC)**: Secure authentication and authorization (Admin vs. Operator views).
 *   **Fully Containerized**: Seamlessly run the entire stack (Frontend, Backend, Database) using Docker Compose.
 *   **Modern UI**: Built with React, Tailwind CSS, and Lucide React icons for a premium user experience.
+
+---
+
+## 🖼️ System Walkthrough
+
+### 1. Unified Dashboard
+A high-level overview providing instant insights into system health, total active assets, and pending maintenance tasks.
+![Dashboard View](docs/dashboard.png)
+
+### 2. Asset Registry
+A comprehensive catalog of all industrial equipment, complete with dynamic filtering, real-time status badges, and precise location tracking.
+![Asset Registry View](docs/assets.png)
+
+### 3. Maintenance & Incident Logs
+Detailed, chronological records of all factory floor activities, enabling rapid response to incidents and proactive maintenance tracking.
+![Maintenance Logs View](docs/logs.png)
+
+---
 
 ## 🛠️ Technology Stack
 
@@ -28,7 +56,6 @@ Built from the ground up with a focus on modern UI/UX, robust state management, 
 *   **State Management**: Zustand (Persisted Auth Store, Asset Store, Log Store)
 *   **Styling**: Tailwind CSS
 *   **Icons**: Lucide React
-*   **Routing**: React Router DOM v6
 *   **HTTP Client**: Axios (with Interceptors)
 
 ### Backend (Server)
@@ -36,39 +63,14 @@ Built from the ground up with a focus on modern UI/UX, robust state management, 
 *   **Framework**: Express.js
 *   **Language**: TypeScript
 *   **Database**: MongoDB (via Mongoose ODM)
-*   **Authentication**: JSON Web Tokens (JWT) & bcryptjs
+*   **Authentication**: JSON Web Tokens (JWT) & `bcryptjs`
 *   **Security**: Helmet, CORS
 
 ### Infrastructure
 *   **Containerization**: Docker & Docker Compose
 *   **Web Server**: Nginx (for serving the optimized frontend build)
 
-## 🏗️ Project Architecture
-
-```
-industrial-elogbook/
-├── backend/               # Node.js Express API
-│   ├── src/
-│   │   ├── controllers/   # Business logic
-│   │   ├── middlewares/   # Auth & Error handling
-│   │   ├── models/        # Mongoose schemas (Asset, LogEntry, User)
-│   │   ├── routes/        # API endpoints
-│   │   ├── utils/         # Helpers (e.g., JWT generator)
-│   │   └── app.ts         # Express server setup
-│   ├── Dockerfile         # Multi-stage build for backend
-│   └── package.json
-├── frontend/              # React Vite Application
-│   ├── src/
-│   │   ├── components/    # Reusable UI (Layout, Modals)
-│   │   ├── pages/         # Route views (Dashboard, Assets, Logs, Login)
-│   │   ├── services/      # Axios API configuration
-│   │   ├── store/         # Zustand state slices
-│   │   └── App.tsx        # App entry
-│   ├── nginx.conf         # Nginx production config
-│   ├── Dockerfile         # Multi-stage build (Node builder -> Nginx server)
-│   └── package.json
-└── docker-compose.yml     # Orchestration for MongoDB, Backend, and Frontend
-```
+---
 
 ## 🚀 Getting Started
 
@@ -80,8 +82,8 @@ industrial-elogbook/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/industrial-elogbook.git
-   cd industrial-elogbook
+   git clone https://github.com/senanurcetin/PlantLog-MERN.git
+   cd PlantLog-MERN
    ```
 
 2. **Start the application using Docker Compose:**
@@ -93,10 +95,12 @@ industrial-elogbook/
    *   **Frontend**: `http://localhost:8081`
    *   **Backend API**: `http://localhost:5000/api`
 
-### Default Credentials
-To access the pre-seeded admin account (if you ran the seed script):
+### Default Admin Credentials
+To access the pre-seeded admin account (if you ran the included seed script):
 *   **Email**: `senanur.cetin.work@gmail.com`
 *   **Password**: `senanur123.`
+
+---
 
 ## 🛡️ Security & Best Practices
 *   **Passwords**: Hashed securely using `bcryptjs` before storage.
@@ -108,4 +112,4 @@ To access the pre-seeded admin account (if you ran the seed script):
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
-*Architected and developed as a complete Full-Stack solution.*
+*Architected and developed as a complete Full-Stack industrial solution.*
