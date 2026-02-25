@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------
+  # Database Service (MongoDB)
+  # ----------------------------------------
+  mongodb:
+    image: mongo:6.0
+    container_name: elogbook_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - elogbook_network
+
+  # ----------------------------------------
+  # Backend Service (Node.js API)
+  # ----------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: elogbook_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/industrial_elogbook
+      # In production, these should be passed via actual environment variables or a secure secret manager
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey_replace_in_production}
+      - JWT_EXPIRE=30d
+    depends_on:
+      - mongodb
+    networks:
+      - elogbook_network
+
+  # ----------------------------------------
+  # Frontend Service (React / Nginx)
+  # ----------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Pass the backend URL to Vite during the build stage
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: elogbook_frontend
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - elogbook_network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  elogbook_network:
+    driver: bridge
