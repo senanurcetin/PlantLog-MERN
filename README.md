@@ -1,115 +1,87 @@
-# PlantLog-MERN: Industrial E-Logbook & Asset Registry 🏭⚙️
+# PlantLog-MERN
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
-[![React](https://img.shields.io/badge/React-18-blue)](#)
-[![Node.js](https://img.shields.io/badge/Node.js-18-green)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](#)
-[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](#)
-[![License](https://img.shields.io/badge/License-MIT-green)](#)
+PlantLog-MERN is a full-stack industrial operations platform for asset registration, maintenance logging, and shift-level incident tracking. It packages a React frontend, Node/Express backend, and MongoDB deployment model into a portfolio-ready operations product.
 
-A production-ready, highly scalable, and containerized **MERN Stack** application designed specifically for industrial environments. PlantLog-MERN helps manufacturing plants and factories manage their asset registries and track maintenance, operations, and incident logs with precision.
+![PlantLog dashboard](docs/dashboard.png)
 
----
+## Why this project exists
 
-## 📸 Application Demo
+Many plants still split maintenance history, incident notes, and asset data across spreadsheets, paper logs, and disconnected internal tools. PlantLog-MERN demonstrates how a modern operations platform can centralize those workflows for supervisors, technicians, and plant managers.
 
-See the full platform in action! This walkthrough demonstrates secure authentication, the real-time statistical dashboard, the comprehensive asset registry, and detailed maintenance logging capabilities.
+## What it does
 
-https://github.com/user-attachments/assets/demo.mp4  *(Note: Replace with standard GitHub video upload when published)*
+- Maintains a centralized industrial asset registry.
+- Tracks maintenance, operational, and incident logs in a structured workflow.
+- Supports role-based access patterns for administrators and operators.
+- Separates frontend and backend concerns for a realistic product architecture.
+- Ships with Docker-based local orchestration for end-to-end evaluation.
 
-> 💡 **Tip:** You can view the raw `.mp4` demo video located at `docs/demo.mp4` in this repository.
+## Architecture snapshot
 
----
+- **Frontend:** React, TypeScript, Vite, Zustand, Tailwind CSS
+- **Backend:** Node.js, Express, TypeScript, Mongoose
+- **Data layer:** MongoDB
+- **Infrastructure:** Docker and Docker Compose
 
-## 🌟 Key Features
+## Product walkthrough
 
-*   **Asset Management**: Register, track, and manage industrial machinery, vehicles, and precision equipment.
-*   **Maintenance Logs**: Detailed chronological logging of maintenance, daily operations, critical incident reports, and safety inspections.
-*   **Real-time Dashboard**: Actionable overview of system status and quick access to operational metrics.
-*   **Role-Based Access Control (RBAC)**: Secure authentication and authorization (Admin vs. Operator views).
-*   **Fully Containerized**: Seamlessly run the entire stack (Frontend, Backend, Database) using Docker Compose.
-*   **Modern UI**: Built with React, Tailwind CSS, and Lucide React icons for a premium user experience.
+### Dashboard
 
----
+Operational KPIs, status summaries, and system health are surfaced in one overview page.
 
-## 🖼️ System Walkthrough
+### Asset registry
 
-### 1. Unified Dashboard
-A high-level overview providing instant insights into system health, total active assets, and pending maintenance tasks.
-![Dashboard View](docs/dashboard.png)
+![PlantLog asset registry](docs/assets.png)
 
-### 2. Asset Registry
-A comprehensive catalog of all industrial equipment, complete with dynamic filtering, real-time status badges, and precise location tracking.
-![Asset Registry View](docs/assets.png)
+### Maintenance and incident logs
 
-### 3. Maintenance & Incident Logs
-Detailed, chronological records of all factory floor activities, enabling rapid response to incidents and proactive maintenance tracking.
-![Maintenance Logs View](docs/logs.png)
+![PlantLog logs](docs/logs.png)
 
----
-
-## 🛠️ Technology Stack
-
-### Frontend (Client)
-*   **Framework**: React (Vite)
-*   **Language**: TypeScript
-*   **State Management**: Zustand (Persisted Auth Store, Asset Store, Log Store)
-*   **Styling**: Tailwind CSS
-*   **Icons**: Lucide React
-*   **HTTP Client**: Axios (with Interceptors)
-
-### Backend (Server)
-*   **Environment**: Node.js
-*   **Framework**: Express.js
-*   **Language**: TypeScript
-*   **Database**: MongoDB (via Mongoose ODM)
-*   **Authentication**: JSON Web Tokens (JWT) & `bcryptjs`
-*   **Security**: Helmet, CORS
-
-### Infrastructure
-*   **Containerization**: Docker & Docker Compose
-*   **Web Server**: Nginx (for serving the optimized frontend build)
-
----
-
-## 🚀 Getting Started
+## Local setup
 
 ### Prerequisites
-*   [Docker](https://docs.docker.com/get-docker/) installed and running.
-*   [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
-### Installation & Running
+- Node.js 20+
+- npm
+- Docker and Docker Compose
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/senanurcetin/PlantLog-MERN.git
-   cd PlantLog-MERN
-   ```
+### Environment files
 
-2. **Start the application using Docker Compose:**
-   ```bash
-   docker-compose up -d --build
-   ```
+```bash
+copy frontend\\.env.example frontend\\.env
+copy backend\\.env.example backend\\.env
+```
 
-3. **Access the Application:**
-   *   **Frontend**: `http://localhost:8081`
-   *   **Backend API**: `http://localhost:5000/api`
+Use `cp` instead of `copy` on macOS or Linux.
 
-### Default Admin Credentials
-To access the pre-seeded admin account (if you ran the included seed script):
-*   **Email**: `senanur.cetin.work@gmail.com`
-*   **Password**: `senanur123.`
+### Install and run with Docker
 
----
+```bash
+docker-compose up -d --build
+```
 
-## 🛡️ Security & Best Practices
-*   **Passwords**: Hashed securely using `bcryptjs` before storage.
-*   **Tokens**: Secure JWT-based authentication on protected routes.
-*   **Interceptors**: Axios interceptors automatically handle token injection and `401 Unauthorized` responses.
-*   **TypeScript**: Strict typing across both backend and frontend to catch errors at compile-time.
+### Run without Docker
 
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+cd backend
+npm install
+npm run build
 
----
-*Architected and developed as a complete Full-Stack industrial solution.*
+cd ..\\frontend
+npm install
+npm run build
+```
+
+## Repository highlights
+
+- `frontend/src/services/api.ts` centralizes API access for the client.
+- `backend/src` contains the Express and MongoDB application layer.
+- `docs/` contains UI captures and demo collateral.
+
+## Portfolio note
+
+This repository is intended as a realistic B2B operations software concept. It demonstrates full-stack product structure and workflow design more than polished production hardening.
+
+## License
+
+MIT
