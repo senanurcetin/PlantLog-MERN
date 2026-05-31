@@ -6,6 +6,8 @@ PlantLog-MERN is a full-stack industrial operations platform for asset registrat
 
 Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/#projects)
 
+Portfolio role: `archive proof`
+
 ## Why this project exists
 
 Many plants still split maintenance history, incident notes, and asset data across spreadsheets, paper logs, and disconnected internal tools. PlantLog-MERN demonstrates how a modern operations platform can centralize those workflows for supervisors, technicians, and plant managers.
@@ -82,7 +84,7 @@ npm run build
 
 ## Portfolio note
 
-This repository is intended as a realistic B2B operations software concept. It demonstrates full-stack product structure and workflow design more than polished production hardening.
+This repository is archive proof for full-stack industrial operations software. It demonstrates product structure and workflow design more than polished production hardening.
 
 ## License
 
