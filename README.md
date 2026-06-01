@@ -8,6 +8,10 @@ Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/#projects)
 
 Portfolio role: `archive proof`
 
+## Why it sits in supporting evidence
+
+PlantLog-MERN remains valuable as full-stack industrial workflow proof, but it is secondary to the main Data + AI reading path. Its role is to show operations-product execution and industrial workflow structure rather than lead with measurable ML evaluation.
+
 ## Why this project exists
 
 Many plants still split maintenance history, incident notes, and asset data across spreadsheets, paper logs, and disconnected internal tools. PlantLog-MERN demonstrates how a modern operations platform can centralize those workflows for supervisors, technicians, and plant managers.
