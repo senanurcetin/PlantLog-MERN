@@ -1,0 +1,54 @@
+version: 2.1
+
+# Independent read-only checks of both packages. The backend is compiled but
+# never started or connected to MongoDB. No deployment credentials required.
+jobs:
+  frontend-build:
+    docker:
+      - image: cimg/node:20.19
+    resource_class: medium
+    working_directory: ~/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - plantlog-frontend-npm-v1-{{ checksum "frontend/package-lock.json" }}
+            - plantlog-frontend-npm-v1-
+      - run:
+          name: Install frontend from lockfile
+          command: cd frontend && npm ci --no-audit --no-fund
+      - save_cache:
+          key: plantlog-frontend-npm-v1-{{ checksum "frontend/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Frontend TypeScript and Vite production build
+          command: cd frontend && npm run build
+
+  backend-build:
+    docker:
+      - image: cimg/node:20.19
+    resource_class: medium
+    working_directory: ~/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - plantlog-backend-npm-v1-{{ checksum "backend/package-lock.json" }}
+            - plantlog-backend-npm-v1-
+      - run:
+          name: Install backend from lockfile
+          command: cd backend && npm ci --no-audit --no-fund
+      - save_cache:
+          key: plantlog-backend-npm-v1-{{ checksum "backend/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Backend TypeScript compilation
+          command: cd backend && npm run build
+
+workflows:
+  verify:
+    jobs:
+      - frontend-build
+      - backend-build
