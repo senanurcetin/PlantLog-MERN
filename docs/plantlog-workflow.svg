@@ -5,7 +5,7 @@
 <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
 <rect x="60" y="53" width="223" height="34" rx="17" fill="#244C54" stroke="#599C93"/><text x="171" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" letter-spacing="1.4" font-weight="700" fill="#B7F4D7">INDUSTRIAL OPERATIONS</text>
 <text x="60" y="183" font-family="Arial,sans-serif" font-weight="800" font-size="82" fill="#FFFFFF">PlantLog</text>
-<text x="60" y="258" font-family="Arial,sans-serif" font-weight="700" font-size="39" fill="#B9F4D6">Assets. Maintenance. Shift logs.</text>
+<text x="60" y="258" font-family="Arial,sans-serif" font-weight="700" font-size="32" fill="#B9F4D6">Assets. Maintenance. Shift logs.</text>
 <text x="60" y="325" font-family="Arial,sans-serif" font-size="22" fill="#C0D7DF">One traceable workflow for equipment</text><text x="60" y="358" font-family="Arial,sans-serif" font-size="22" fill="#C0D7DF">status and operational handovers.</text>
 <rect x="60" y="422" width="134" height="51" rx="14" fill="#1E4850" stroke="#41767A"/><text x="127" y="455" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#EAFFF6" text-anchor="middle">REACT</text>
 <rect x="207" y="422" width="140" height="51" rx="14" fill="#1E4850" stroke="#41767A"/><text x="277" y="455" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#EAFFF6" text-anchor="middle">EXPRESS</text>
