@@ -1,95 +1,114 @@
-# PlantLog-MERN
+# PlantLog — Industrial Asset & Maintenance Logbook
 
-PlantLog-MERN is a full-stack industrial operations platform for asset registration, maintenance logging, and shift-level incident tracking. It packages a React frontend, Node/Express backend, and MongoDB deployment model into a portfolio-ready operations product.
+**React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
-![PlantLog dashboard](docs/dashboard.png)
+A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
 
-Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/#projects)
+![PlantLog operations dashboard](docs/dashboard.png)
 
-Portfolio role: `archive proof`
+**Explore:** [Portfolio project](https://senanur-cetin.vercel.app/#projects) · [Asset registry](docs/assets.png) · [Maintenance log](docs/logs.png)
 
-## Why it sits in supporting evidence
+## Problem and approach
 
-PlantLog-MERN remains valuable as full-stack industrial workflow proof, but it is secondary to the main Data + AI reading path. Its role is to show operations-product execution and industrial workflow structure rather than lead with measurable ML evaluation.
+In many facilities, asset lists, shift handovers and maintenance histories live in separate spreadsheets or paper registers. PlantLog demonstrates a unified web workflow for tracking equipment and operational events, with a REST API backed by MongoDB.
 
-## Why this project exists
+## Features
 
-Many plants still split maintenance history, incident notes, and asset data across spreadsheets, paper logs, and disconnected internal tools. PlantLog-MERN demonstrates how a modern operations platform can centralize those workflows for supervisors, technicians, and plant managers.
+- **Asset registry:** central equipment list and status-oriented views.
+- **Maintenance and incident records:** structured operational logs for review and handover.
+- **Authentication:** JWT-backed API authentication and role-oriented application flows.
+- **Operator dashboard:** overview interface for operational status and recent activity.
+- **Separated services:** React/Vite frontend, Express API and MongoDB database.
 
-## What it does
+## Architecture
 
-- Maintains a centralized industrial asset registry.
-- Tracks maintenance, operational, and incident logs in a structured workflow.
-- Supports role-based access patterns for administrators and operators.
-- Separates frontend and backend concerns for a realistic product architecture.
-- Ships with Docker-based local orchestration for end-to-end evaluation.
-
-## Architecture snapshot
-
-- **Frontend:** React, TypeScript, Vite, Zustand, Tailwind CSS
-- **Backend:** Node.js, Express, TypeScript, Mongoose
-- **Data layer:** MongoDB
-- **Infrastructure:** Docker and Docker Compose
-
-## Product walkthrough
-
-### Dashboard
-
-Operational KPIs, status summaries, and system health are surfaced in one overview page.
-
-### Asset registry
-
-![PlantLog asset registry](docs/assets.png)
-
-### Maintenance and incident logs
-
-![PlantLog logs](docs/logs.png)
-
-## Local setup
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-- Docker and Docker Compose
-
-### Environment files
-
-```bash
-copy frontend\\.env.example frontend\\.env
-copy backend\\.env.example backend\\.env
+```mermaid
+flowchart LR
+    A[React + Vite UI] -->|REST + JWT| B[Express API]
+    B --> C[(MongoDB)]
+    D[Docker Compose] -. runs .-> A
+    D -. runs .-> B
+    D -. runs .-> C
 ```
 
-Use `cp` instead of `copy` on macOS or Linux.
+| Component | Implementation | Location |
+|---|---|---|
+| Web UI | React 18, TypeScript, Vite, Zustand, Tailwind | `frontend/` |
+| API | Node.js, Express, TypeScript, Mongoose | `backend/` |
+| Persistence | MongoDB 6 | Compose service `mongodb` |
+| Deployment demo | Docker Compose / Nginx | `docker-compose.yml` |
 
-### Install and run with Docker
+## Getting started
+
+### Option A — Docker Compose (local demo)
+
+**Requirements:** Docker Engine or Docker Desktop with Compose, and an available port 8081, 5000 and 27017.
 
 ```bash
-docker-compose up -d --build
+git clone https://github.com/senanurcetin/PlantLog-MERN.git
+cd PlantLog-MERN
+
+# Set a strong, unique local JWT secret before running the stack.
+# Linux/macOS:
+export JWT_SECRET="replace-with-a-long-random-secret"
+docker compose up --build -d
 ```
 
-### Run without Docker
+On PowerShell, set `$env:JWT_SECRET="replace-with-a-long-random-secret"` instead.
+
+- Web application: `http://localhost:8081`
+- REST API: `http://localhost:5000/api`
+- MongoDB: `localhost:27017` (local development only)
+
+Stop the stack with `docker compose down`; add `-v` **only** if you intentionally want to delete the database volume.
+
+### Option B — Run services locally
+
+**Requirements:** Node.js 20+, npm, and a running local MongoDB instance.
 
 ```bash
 cd backend
 npm install
-npm run build
-
-cd ..\\frontend
-npm install
-npm run build
+cp .env.example .env
+# Edit .env and set MONGO_URI and a strong JWT_SECRET
+npm run dev
 ```
 
-## Repository highlights
+Start the frontend in a separate terminal from the repository root:
 
-- `frontend/src/services/api.ts` centralizes API access for the client.
-- `backend/src` contains the Express and MongoDB application layer.
-- `docs/` contains UI captures and demo collateral.
+```bash
+cd frontend
+npm install
+cp .env.example .env
+# VITE_API_URL defaults to http://localhost:5000/api
+npm run dev
+```
 
-## Portfolio note
+PowerShell users can replace `cp` with `Copy-Item`.
 
-This repository is archive proof for full-stack industrial operations software. It demonstrates product structure and workflow design more than polished production hardening.
+## Validation
+
+```bash
+cd backend && npm run build
+cd ../frontend && npm run build
+```
+
+The repository exposes build scripts but does **not** currently provide a documented automated backend test suite. Do not interpret a successful build as end-to-end functional or security validation.
+
+## Security and limitations
+
+- **Development configuration only:** the supplied Compose file exposes MongoDB on the host and provides an insecure fallback JWT secret. Set `JWT_SECRET` explicitly, restrict the database port and remove defaults before any external deployment.
+- **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
+- **Authentication hardening:** assess session storage, authorization boundaries, audit retention and password policies before handling real operational records.
+- **Demo assets:** screenshots show project interfaces and are not evidence of live equipment integration.
+
+## Repository map
+
+- `backend/src/` — API, persistence and authentication
+- `frontend/src/` — user interface and API client
+- `docker-compose.yml` — local three-service orchestration
+- `docs/` — product screenshots and examples
 
 ## License
 
-MIT
+[MIT](LICENSE)
