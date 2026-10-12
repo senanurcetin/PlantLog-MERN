@@ -1,5 +1,7 @@
 # PlantLog — Industrial Asset & Maintenance Logbook
 
+**Technical reviewer brief:** [System evidence, reproducibility and operational limits](docs/hiring-summary.md).
+
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
 > Designed workflow overview; not a live plant dashboard screenshot. The historical interface captures below predate the dashboard update that replaced hard-coded counts and the placeholder activity panel with API-backed metrics and recent logs.
