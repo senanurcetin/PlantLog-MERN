@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">PlantLog industrial asset and maintenance logbook</title>
+<desc id="desc">Concept overview showing equipment registration, maintenance logging, and shift handover. An illustration, not an application screenshot or evidence of live plant telemetry.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0A1927"/><stop offset="1" stop-color="#173D43"/></linearGradient><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#A3D8C8" stroke-opacity=".08"/></pattern></defs>
+<rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+<rect x="60" y="53" width="223" height="34" rx="17" fill="#244C54" stroke="#599C93"/><text x="171" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" letter-spacing="1.4" font-weight="700" fill="#B7F4D7">INDUSTRIAL OPERATIONS</text>
+<text x="60" y="183" font-family="Arial,sans-serif" font-weight="800" font-size="82" fill="#FFFFFF">PlantLog</text>
+<text x="60" y="258" font-family="Arial,sans-serif" font-weight="700" font-size="39" fill="#B9F4D6">Assets. Maintenance. Shift logs.</text>
+<text x="60" y="325" font-family="Arial,sans-serif" font-size="22" fill="#C0D7DF">One traceable workflow for equipment</text><text x="60" y="358" font-family="Arial,sans-serif" font-size="22" fill="#C0D7DF">status and operational handovers.</text>
+<rect x="60" y="422" width="134" height="51" rx="14" fill="#1E4850" stroke="#41767A"/><text x="127" y="455" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#EAFFF6" text-anchor="middle">REACT</text>
+<rect x="207" y="422" width="140" height="51" rx="14" fill="#1E4850" stroke="#41767A"/><text x="277" y="455" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#EAFFF6" text-anchor="middle">EXPRESS</text>
+<rect x="360" y="422" width="153" height="51" rx="14" fill="#1E4850" stroke="#41767A"/><text x="436" y="455" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#EAFFF6" text-anchor="middle">MONGODB</text>
+<text x="60" y="556" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.3" fill="#9DBBC2">WORKFLOW CONCEPT  /  REAL APP SCREENSHOTS BELOW</text>
+<g transform="translate(725 88)">
+<rect width="420" height="450" rx="24" fill="#102933" stroke="#4B7C79" stroke-width="2"/>
+<text x="29" y="49" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#E5FFF6">OPERATIONS WORKFLOW</text>
+<g font-family="Arial,sans-serif" fill="#E8FCF7"><rect x="31" y="83" width="357" height="90" rx="16" fill="#1B4850" stroke="#548782"/><circle cx="77" cy="129" r="22" fill="#70C9B0"/><path d="M64 128H90M77 115V142" stroke="#0D3C3A" stroke-width="4"/><text x="117" y="122" font-size="22" font-weight="700">Asset registry</text><text x="117" y="148" font-size="15" fill="#AACBCD">Equipment and status</text>
+<path d="M209 179V201m-6 -7 6 7 6 -7" fill="none" stroke="#84D6BA" stroke-width="3"/>
+<rect x="31" y="206" width="357" height="90" rx="16" fill="#1B4850" stroke="#548782"/><circle cx="77" cy="251" r="22" fill="#E9BA80"/><path d="M65 251H89M77 239V263" stroke="#55391F" stroke-width="4"/><text x="117" y="245" font-size="22" font-weight="700">Maintenance log</text><text x="117" y="272" font-size="15" fill="#AACBCD">Traceable tasks and incidents</text>
+<path d="M209 302V324m-6 -7 6 7 6 -7" fill="none" stroke="#84D6BA" stroke-width="3"/>
+<rect x="31" y="329" width="357" height="90" rx="16" fill="#1B4850" stroke="#548782"/><circle cx="77" cy="374" r="22" fill="#8CAFD8"/><path d="M66 374H88M66 366H88M66 382H82" stroke="#203D5B" stroke-width="3"/><text x="117" y="367" font-size="22" font-weight="700">Shift handover</text><text x="117" y="395" font-size="15" fill="#AACBCD">Operational review trail</text></g></g>
+</svg>
