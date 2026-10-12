@@ -1,5 +1,10 @@
 # PlantLog — Industrial Asset & Maintenance Logbook
 
+![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
+
+> Designed workflow overview; not a live plant dashboard screenshot. The historical interface captures below predate the dashboard update that replaced hard-coded counts and the placeholder activity panel with API-backed metrics and recent logs.
+
+
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
 A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
