@@ -31,14 +31,14 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="space-y-6">
-            <header className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-6 plantlog-dashboard">
+            <header className="plantlog-hero bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-2">Operations overview</p>
                     <h1 className="text-2xl font-bold text-gray-900">Welcome back{user?.name ? `, ${user.name}` : ''}</h1>
                     <p className="text-gray-600 mt-1">Asset status and maintenance activity from your registry.</p>
                 </div>
-                <div className="sm:text-right">
+                <div className="plantlog-registry-status sm:text-right">
                     <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Registry health</p>
                     <div className="flex sm:justify-end items-center mt-2 gap-2">
                         <span className={`h-2.5 w-2.5 rounded-full ${hasError ? 'bg-red-500' : loading ? 'bg-amber-500' : maintenanceCount || unresolvedLogs ? 'bg-amber-500' : 'bg-emerald-500'}`} />
@@ -59,7 +59,7 @@ const Dashboard = () => {
                 {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (
-                        <div key={stat.name} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-start gap-4">
+                        <div key={stat.name} className="plantlog-kpi bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-start gap-4">
                             <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}><Icon className="h-6 w-6" aria-hidden="true" /></div>
                             <div>
                                 <p className="text-sm text-gray-600">{stat.name}</p>
@@ -71,7 +71,7 @@ const Dashboard = () => {
             </section>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-                <section className="xl:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <section className="plantlog-activity xl:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between gap-3">
                         <div>
                             <h2 className="font-bold text-gray-900 text-lg">Recent log activity</h2>
@@ -114,7 +114,7 @@ const Dashboard = () => {
                     )}
                 </section>
 
-                <section className="bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between">
+                <section className="plantlog-workflow bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between">
                     <div>
                         <p className="text-xs uppercase font-semibold tracking-widest text-emerald-300">Asset workflow</p>
                         <h2 className="text-xl font-bold mt-3">Keep the equipment register current</h2>
