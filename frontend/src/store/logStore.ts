@@ -25,7 +25,7 @@ interface LogState {
     isLoading: boolean;
     error: string | null;
     fetchLogs: (assetId?: string) => Promise<void>;
-    addLog: (logData: any) => Promise<void>;
+    addLog: (logData: { assetId: string; type: string; title: string; description: string; status: string }) => Promise<void>;
     updateLogStatus: (id: string, status: string) => Promise<void>;
 }
 
@@ -37,7 +37,7 @@ export const useLogStore = create<LogState>((set) => ({
     fetchLogs: async (assetId?: string) => {
         set({ isLoading: true, error: null });
         try {
-            const url = assetId ? `/logs?assetId=${assetId}` : '/logs';
+            const url = assetId ? `/logs?assetId=${encodeURIComponent(assetId)}` : '/logs';
             const response = await api.get(url);
             set({ logs: response.data, isLoading: false });
         } catch (error: any) {
@@ -67,6 +67,7 @@ export const useLogStore = create<LogState>((set) => ({
             }));
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to update log' });
+            throw error;
         }
     }
 }));

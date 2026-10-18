@@ -30,6 +30,9 @@ jobs:
       - name: Validate synthetic demo data
         run: npm run test:demo
 
+      - name: Test registry filters
+        run: npm run test:registry
+
       - name: Build frontend
         run: npm run build
 
