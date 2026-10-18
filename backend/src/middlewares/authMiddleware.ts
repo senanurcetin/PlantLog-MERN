@@ -1,49 +1,40 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
+import { getJwtSecret } from '../utils/jwtSecret';
 
 export interface AuthRequest extends Request {
     user?: IUser;
 }
 
-export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            // Get token from header
-            token = req.headers.authorization.split(' ')[1];
-
-            // Verify token
-            const decoded = jwt.verify(
-                token,
-                process.env.JWT_SECRET || 'supersecretjwtkey_replace_in_production'
-            ) as { id: string };
-
-            // Get user from the token
-            const user = await User.findById(decoded.id).select('-password');
-            if (!user) {
-                res.status(401);
-                throw new Error('Not authorized, user not found');
-            }
-
-            req.user = user;
-            next();
-        } catch (error) {
-            console.error(error);
-            res.status(401);
-            next(new Error('Not authorized, token failed'));
-        }
-    }
-
-    if (!token) {
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    const match = /^Bearer (\S+)$/.exec(req.headers.authorization || '');
+    if (!match) {
         res.status(401);
-        next(new Error('Not authorized, no token'));
+        next(new Error('Not authorized, no valid bearer token'));
+        return;
+    }
+    try {
+        const decoded = jwt.verify(match[1], getJwtSecret());
+        if (typeof decoded === 'string' || typeof decoded.id !== 'string') {
+            throw new Error('Invalid token payload');
+        }
+        const user = await User.findById(decoded.id).select('-password');
+        if (!user || !user.isActive) {
+            res.status(401);
+            next(new Error('Not authorized, account unavailable'));
+            return;
+        }
+        req.user = user;
+        next();
+    } catch {
+        res.status(401);
+        next(new Error('Not authorized, token failed'));
     }
 };
 
-export const admin = (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (req.user && req.user.role === 'admin') {
+export const admin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (req.user?.role === 'admin') {
         next();
     } else {
         res.status(403);

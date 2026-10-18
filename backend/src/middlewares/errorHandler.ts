@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-
-    res.status(statusCode);
-    res.json({
-        message: err.message,
-        stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+interface ApiError extends Error {
+    statusCode?: number;
+    code?: number;
+}
+export const errorHandler = (err: ApiError, _req: Request, res: Response, _next: NextFunction): void => {
+    let statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
+    if (err.name === 'CastError' || err.name === 'ValidationError') statusCode = 400;
+    if (err.code === 11000) statusCode = 409;
+    res.status(statusCode).json({
+        message: statusCode >= 500 ? 'Internal server error' : err.message,
+        ...(process.env.NODE_ENV !== 'production' ? { stack: err.stack } : {}),
     });
 };

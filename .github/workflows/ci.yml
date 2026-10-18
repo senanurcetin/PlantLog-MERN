@@ -52,3 +52,6 @@ jobs:
 
       - name: Build backend
         run: npm run build
+
+      - name: Test backend security policies
+        run: npm test

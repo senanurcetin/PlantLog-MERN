@@ -44,8 +44,8 @@ jobs:
           paths:
             - ~/.npm
       - run:
-          name: Backend TypeScript compilation
-          command: cd backend && npm run build
+          name: Backend TypeScript compilation and security regression tests
+          command: cd backend && npm test
 
 workflows:
   verify:

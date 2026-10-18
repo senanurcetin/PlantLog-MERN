@@ -7,13 +7,13 @@ PlantLog is a React/Vite frontend, an Express/TypeScript API and a MongoDB datab
 ```bash
 cd backend
 npm ci
-npm run build
+npm test
 cd ../frontend
 npm ci
 npm run build
 ```
 
-There is no documented end-to-end test suite; building does not prove authentication or authorization security. Include manual verification steps and test evidence for changes affecting login, assets, maintenance or incident workflows.
+Security policy unit tests run alongside the backend build, but there is not yet a database-backed API integration or end-to-end test suite. Include manual verification steps and test evidence for changes affecting login, assets, maintenance or incident workflows.
 
 ## Pull requests
 

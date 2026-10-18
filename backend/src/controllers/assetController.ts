@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import Asset from '../models/Asset';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { pickAssetUpdate } from '../utils/inputPolicy';
 
 // @desc    Get all assets
 // @route   GET /api/assets
@@ -83,9 +84,10 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('Asset not found');
         }
 
+        const fields = pickAssetUpdate(req.body);
         const updatedAsset = await Asset.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { $set: fields },
             { new: true, runValidators: true }
         );
 
