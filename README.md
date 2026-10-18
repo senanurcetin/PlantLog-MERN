@@ -49,23 +49,29 @@ flowchart LR
 
 ### Option A — Docker Compose (local demo)
 
-**Requirements:** Docker Engine or Docker Desktop with Compose, and an available port 8081, 5000 and 27017.
+**Requirements:** Docker Engine or Docker Desktop with Compose, and available ports 8081, 5000 and loopback-only 27017.
 
 ```bash
 git clone https://github.com/senanurcetin/PlantLog-MERN.git
 cd PlantLog-MERN
 
-# Set a strong, unique local JWT secret before running the stack.
-# Linux/macOS:
-export JWT_SECRET="replace-with-a-long-random-secret"
+# Generate a strong random secret before starting the stack.
+# Linux/macOS (OpenSSL):
+export JWT_SECRET="$(openssl rand -hex 32)"
 docker compose up --build -d
 ```
 
-On PowerShell, set `$env:JWT_SECRET="replace-with-a-long-random-secret"` instead.
+On PowerShell, generate a random key using:
+
+```powershell
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+$env:JWT_SECRET = [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
+```
 
 - Web application: `http://localhost:8081`
 - REST API: `http://localhost:5000/api`
-- MongoDB: `localhost:27017` (local development only)
+- MongoDB: `127.0.0.1:27017` (bound to the local machine only)
 
 Stop the stack with `docker compose down`; add `-v` **only** if you intentionally want to delete the database volume.
 
@@ -96,17 +102,17 @@ PowerShell users can replace `cp` with `Copy-Item`.
 ## Validation
 
 ```bash
-cd backend && npm run build
-cd ../frontend && npm run build
+cd backend && npm ci && npm test
+cd ../frontend && npm ci && npm run build
 ```
 
-The repository exposes build scripts but does **not** currently provide a documented automated backend test suite. Do not interpret a successful build as end-to-end functional or security validation.
+The backend includes Node built-in policy regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. These tests are **not** a replacement for database-backed API integration or end-to-end security tests.
 
 ## Security and limitations
 
-- **Development configuration only:** the supplied Compose file exposes MongoDB on the host and provides an insecure fallback JWT secret. Set `JWT_SECRET` explicitly, restrict the database port and remove defaults before any external deployment.
+- **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is still mapped to the host; use TLS and access controls before any external deployment.
 - **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
-- **Authentication hardening:** assess session storage, authorization boundaries, audit retention and password policies before handling real operational records.
+- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor; privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Rate limiting, token storage, formal access reviews and audit retention still need further work.
 - **Demo assets:** screenshots show project interfaces and are not evidence of live equipment integration.
 
 ## Repository map
