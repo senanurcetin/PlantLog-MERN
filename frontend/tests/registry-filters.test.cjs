@@ -50,7 +50,7 @@ test('CSV export includes selected records with header and correct quoting', () 
     assert.match(csv, /^"ID","Created At","Type","Status"/);
     assert.match(csv, /"Hydraulic leak"/);
     assert.match(csv, /"Conveyor serviced"/);
-    assert.equal(csv.split('\\r\\n').length, 4);
+    assert.equal(csv.split('\r\n').length, 4);
 });
 test('CSV export escapes formula-prefixed and quote-containing content', () => {
     const csv = logsToCsv([{ ...logs[0], title: '=HYPERLINK("bad","click")',
