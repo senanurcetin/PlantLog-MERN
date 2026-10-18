@@ -1,8 +1,10 @@
 import { Response, NextFunction } from 'express';
 import LogEntry from '../models/LogEntry';
 import Asset from '../models/Asset';
+import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { pickLogUpdate } from '../utils/inputPolicy';
+import { canEditLog } from '../utils/authorization';
 
 // @desc    Get all log entries (optionally filtered by asset inside query)
 // @route   GET /api/logs
@@ -10,6 +12,10 @@ import { pickLogUpdate } from '../utils/inputPolicy';
 export const getLogs = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { assetId } = req.query;
+        if (assetId !== undefined && (typeof assetId !== 'string' || !mongoose.isValidObjectId(assetId))) {
+            res.status(400);
+            throw new Error('Invalid asset ID');
+        }
         const filter = assetId ? { asset: assetId } : {};
 
         const logs = await LogEntry.find(filter)
@@ -40,6 +46,11 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
             throw new Error('User not authenticated');
         }
 
+        if (!mongoose.isValidObjectId(assetId)) {
+            res.status(400);
+            throw new Error('Invalid asset ID');
+        }
+
         // Verify asset exists
         const asset = await Asset.findById(assetId);
         if (!asset) {
@@ -68,6 +79,10 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
 // @access  Private
 export const updateLogEntry = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400);
+            throw new Error('Invalid log ID');
+        }
         const log = await LogEntry.findById(req.params.id);
 
         if (!log) {
@@ -76,7 +91,7 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
         }
 
         // Checking if it's the author or admin/supervisor
-        if (log.author.toString() !== req.user?.id && req.user?.role === 'operator') {
+        if (!canEditLog(req.user?.role, log.author.toString(), req.user?.id)) {
             res.status(403);
             throw new Error('Not authorized to update this log entry');
         }

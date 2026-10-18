@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 import { getJwtSecret } from '../utils/jwtSecret';
+import { canManageAssets } from '../utils/authorization';
 
 export interface AuthRequest extends Request {
     user?: IUser;
@@ -40,4 +41,14 @@ export const admin = (req: AuthRequest, res: Response, next: NextFunction): void
         res.status(403);
         next(new Error('Not authorized as an admin'));
     }
+};
+
+/** Asset status and metadata changes require privileged maintenance roles. */
+export const assetManager = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (!canManageAssets(req.user?.role)) {
+        res.status(403);
+        next(new Error('Supervisor or administrator role required'));
+        return;
+    }
+    next();
 };

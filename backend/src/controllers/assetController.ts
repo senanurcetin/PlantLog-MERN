@@ -1,7 +1,10 @@
 import { Response, NextFunction } from 'express';
 import Asset from '../models/Asset';
+import LogEntry from '../models/LogEntry';
+import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { pickAssetUpdate } from '../utils/inputPolicy';
+import { canManageAssets } from '../utils/authorization';
 
 // @desc    Get all assets
 // @route   GET /api/assets
@@ -20,6 +23,10 @@ export const getAssets = async (req: AuthRequest, res: Response, next: NextFunct
 // @access  Private
 export const getAsset = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400);
+            throw new Error('Invalid asset ID');
+        }
         const asset = await Asset.findById(req.params.id).populate('createdBy', 'name email');
 
         if (!asset) {
@@ -77,6 +84,14 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
 // @access  Private
 export const updateAsset = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+        if (!canManageAssets(req.user?.role)) {
+            res.status(403);
+            throw new Error('Supervisor or administrator role required');
+        }
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400);
+            throw new Error('Invalid asset ID');
+        }
         const asset = await Asset.findById(req.params.id);
 
         if (!asset) {
@@ -102,6 +117,14 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
 // @access  Private (Admin or Supervisor)
 export const deleteAsset = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+        if (!canManageAssets(req.user?.role)) {
+            res.status(403);
+            throw new Error('Supervisor or administrator role required');
+        }
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400);
+            throw new Error('Invalid asset ID');
+        }
         const asset = await Asset.findById(req.params.id);
 
         if (!asset) {
@@ -109,9 +132,10 @@ export const deleteAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('Asset not found');
         }
 
-        if (req.user?.role !== 'admin' && req.user?.role !== 'supervisor') {
-            res.status(403);
-            throw new Error('Not authorized to delete assets');
+        // Preserve the maintenance trail; removing an asset with history would orphan logs.
+        if (await LogEntry.exists({ asset: asset._id })) {
+            res.status(409);
+            throw new Error('Asset has maintenance history; decommission it instead of deleting it');
         }
 
         await asset.deleteOne();

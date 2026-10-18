@@ -118,7 +118,7 @@ The backend includes Node built-in policy regression tests for registration role
 
 - **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is still mapped to the host; use TLS and access controls before any external deployment.
 - **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
-- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor; privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Rate limiting, token storage, formal access reviews and audit retention still need further work.
+- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor. Any authenticated user can add assets or create log entries; only supervisors and administrators may change asset metadata/status or remove assets, and an asset with logs cannot be deleted (decommission it instead). Operators may edit only their own logs. Privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Rate limiting, token storage, formal access reviews and audit retention still need further work.
 - **Demo assets:** the public demo's fixture is fictional, and screenshots show project interfaces rather than live equipment integration.
 
 ## Repository map
