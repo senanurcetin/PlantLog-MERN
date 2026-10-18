@@ -10,10 +10,10 @@ const source = fs.readFileSync(filename, 'utf8');
 const compiled = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText;
-const exports = {};
+const compiledExports = {};
 const code = new Function('exports', compiled);
-code(exports);
-const { filterAssets, filterLogs } = exports;
+code(compiledExports);
+const { filterAssets, filterLogs } = compiledExports;
 
 const assets = [
     { _id: 'a', name: 'Hydraulic Press', serialNumber: 'HP-001', category: 'machinery',
