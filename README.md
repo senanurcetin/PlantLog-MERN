@@ -105,6 +105,8 @@ npm run dev
 
 PowerShell users can replace `cp` with `Copy-Item`.
 
+Once the backend and MongoDB are running, visit `http://localhost:5173/register` to create an **operator** account (minimum 12-character password). The local Compose frontend uses `http://localhost:8081/register`. Operators can create assets and maintenance records but cannot change asset metadata or delete assets. There is deliberately **no public privilege escalation flow**: supervisor and administrator roles require trusted out-of-band provisioning. Never expose the development registration endpoint publicly without access controls and rate limiting.
+
 ## Validation
 
 ```bash
