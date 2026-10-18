@@ -13,7 +13,7 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 ![PlantLog operations dashboard](docs/dashboard.png)
 
-**Explore the zero-login demo:** [Public sample dashboard](/demo) (route available when hosting the frontend) · [Demo guide](docs/demo-guide.md)
+**Explore the zero-login demo:** open the `/demo` route on a running frontend, or follow the [demo guide](docs/demo-guide.md).
 
 **Explore:** [Portfolio project](https://senanur-cetin.vercel.app/#projects) · [Asset registry](docs/assets.png) · [Maintenance log](docs/logs.png)
 
