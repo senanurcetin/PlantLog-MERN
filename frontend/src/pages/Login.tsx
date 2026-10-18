@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { Settings, Lock, Mail } from 'lucide-react';
@@ -90,6 +90,11 @@ const Login = () => {
                         </button>
                     </div>
                 </form>
+                <div className="border-t border-gray-200 pt-6 text-center">
+                    <p className="text-sm text-gray-600">Reviewing the project? No account is required.</p>
+                    <Link to="/demo" className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-800 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600">Explore read-only demo →</Link>
+                    <p className="mt-2 text-xs text-gray-500">Synthetic records · No live plant data</p>
+                </div>
             </div>
         </div>
     );
