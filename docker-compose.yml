@@ -9,7 +9,7 @@ services:
     container_name: elogbook_mongo
     restart: always
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -31,8 +31,8 @@ services:
       - PORT=5000
       - MONGO_URI=mongodb://mongodb:27017/industrial_elogbook
       # In production, these should be passed via actual environment variables or a secure secret manager
-      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey_replace_in_production}
-      - JWT_EXPIRE=30d
+      - "JWT_SECRET=${JWT_SECRET:?Set a unique JWT_SECRET of at least 32 characters}"
+      - JWT_EXPIRE=7d
     depends_on:
       - mongodb
     networks:

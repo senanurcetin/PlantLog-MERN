@@ -3,18 +3,14 @@ import User from '../models/User';
 import generateToken from '../utils/generateToken';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { sanitizeRegistration } from '../utils/inputPolicy';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { name, email, password, role } = req.body;
-
-        if (!name || !email || !password) {
-            res.status(400);
-            throw new Error('Please add all required fields');
-        }
+        const { name, email, password, role } = sanitizeRegistration(req.body);
 
         // Check if user exists
         const userExists = await User.findOne({ email });

@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import LogEntry from '../models/LogEntry';
 import Asset from '../models/Asset';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { pickLogUpdate } from '../utils/inputPolicy';
 
 // @desc    Get all log entries (optionally filtered by asset inside query)
 // @route   GET /api/logs
@@ -80,9 +81,10 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
             throw new Error('Not authorized to update this log entry');
         }
 
+        const fields = pickLogUpdate(req.body);
         const updatedLog = await LogEntry.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { $set: fields },
             { new: true, runValidators: true }
         );
 
