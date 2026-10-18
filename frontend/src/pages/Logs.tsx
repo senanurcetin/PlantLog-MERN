@@ -1,13 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useLogStore } from '../store/logStore';
 import { useAssetStore } from '../store/assetStore';
 import { Plus, Search, FileText } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { filterLogs } from '../utils/registryFilters';
 
 const Logs = () => {
     const { logs, isLoading, fetchLogs, addLog, updateLogStatus } = useLogStore();
     const { assets, fetchAssets } = useAssetStore();
     const { user } = useAuthStore();
+    const [params] = useSearchParams();
+    const activeAssetId = params.get('assetId') || undefined;
+    const [query, setQuery] = useState('');
+    const [typeFilter, setTypeFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [submitError, setSubmitError] = useState('');
+    const filteredLogs = useMemo(() => filterLogs(logs, query, typeFilter, statusFilter), [logs, query, typeFilter, statusFilter]);
 
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -19,16 +28,21 @@ const Logs = () => {
     });
 
     useEffect(() => {
-        fetchLogs();
-        fetchAssets();
-    }, [fetchLogs, fetchAssets]);
+        void fetchLogs(activeAssetId);
+        void fetchAssets();
+    }, [fetchLogs, fetchAssets, activeAssetId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await addLog(formData);
-        setShowModal(false);
-        setFormData({ assetId: '', type: 'operation', title: '', description: '', status: 'open' });
-        fetchLogs(); // refresh to get populated data
+        setSubmitError('');
+        try {
+            await addLog(formData);
+            await fetchLogs(activeAssetId);
+            setShowModal(false);
+            setFormData({ assetId: '', type: 'operation', title: '', description: '', status: 'open' });
+        } catch {
+            setSubmitError(useLogStore.getState().error || 'Unable to save log entry');
+        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -50,42 +64,59 @@ const Logs = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header Actions */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex w-full sm:w-auto relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Search logs..."
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white"
-                    />
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <label className="relative">
+                        <span className="sr-only">Search logs</span>
+                        <Search className="absolute inset-y-0 left-3 my-auto h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <input type="search" value={query} onChange={(event) => setQuery(event.target.value)}
+                            placeholder="Search logs, equipment or author..."
+                            className="w-full sm:w-64 rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm" />
+                    </label>
+                    <label><span className="sr-only">Filter logs by type</span>
+                        <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm">
+                            <option value="all">All types</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="incident">Incident</option>
+                            <option value="inspection">Inspection</option>
+                            <option value="operation">Operation</option>
+                        </select>
+                    </label>
+                    <label><span className="sr-only">Filter logs by status</span>
+                        <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm">
+                            <option value="all">All statuses</option>
+                            <option value="open">Open</option>
+                            <option value="acknowledged">Acknowledged</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </label>
                 </div>
-
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setShowModal(true)}
-                        className="flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Log Entry
-                    </button>
-                </div>
+                <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: activeAssetId || '' })); setShowModal(true); }}
+                    className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                    <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> New Log Entry
+                </button>
             </div>
-
+            {activeAssetId && <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+                Showing the maintenance history for {assets.find((asset) => asset._id === activeAssetId)?.name || 'selected equipment'}.
+                <Link to="/logs" className="ml-2 font-semibold underline">Show all logs</Link>
+            </div>}
+            {error && !showModal && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {error} <button type="button" onClick={() => void fetchLogs(activeAssetId)} className="ml-2 font-semibold underline">Retry</button>
+            </div>}
             {/* Logs List */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 {isLoading ? (
                     <div className="p-10 text-center text-gray-500">Loading logs...</div>
-                ) : logs.length === 0 ? (
+                ) : filteredLogs.length === 0 ? (
                     <div className="p-10 text-center text-gray-500 flex flex-col items-center">
                         <FileText className="h-12 w-12 text-gray-300 mb-3" />
-                        <p>No log entries found.</p>
+                        <p>No log entries match the current filters.</p>
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {logs.map((log) => (
+                        {filteredLogs.map((log) => (
                             <li key={log._id} className="p-6 hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3">
@@ -95,9 +126,9 @@ const Logs = () => {
                                         </span>
                                     </div>
                                     <div className="flex gap-2">
-                                        {log.status === 'open' && (user?.role === 'admin' || user?._id === log.author._id) && (
+                                        {log.status === 'open' && (user?.role === 'admin' || user?.role === 'supervisor' || user?._id === log.author?._id) && (
                                             <button
-                                                onClick={() => updateLogStatus(log._id, 'resolved')}
+                                                onClick={() => { void updateLogStatus(log._id, 'resolved').catch(() => undefined); }}
                                                 className="text-xs font-medium text-primary-600 hover:text-primary-800"
                                             >
                                                 Mark Resolved
@@ -126,12 +157,15 @@ const Logs = () => {
                 )}
             </div>
 
+            <p className="text-xs text-gray-500" aria-live="polite">Showing {filteredLogs.length} of {logs.length} loaded log entries.</p>
+
             {/* Add Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Create Log Entry</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {submitError && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{submitError}</p>}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Asset</label>
                                 <select required value={formData.assetId} onChange={e => setFormData({ ...formData, assetId: e.target.value })} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm border p-2">
@@ -160,7 +194,7 @@ const Logs = () => {
                             </div>
                             <div className="mt-6 flex justify-end gap-3">
                                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-                                <button type="submit" disabled={!formData.assetId} className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50">Save Log Entry</button>
+                                <button type="submit" disabled={!formData.assetId || isLoading} className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50">{isLoading ? 'Saving…' : 'Save Log Entry'}</button>
                             </div>
                         </form>
                     </div>
