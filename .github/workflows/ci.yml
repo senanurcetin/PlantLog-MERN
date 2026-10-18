@@ -27,6 +27,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Validate synthetic demo data
+        run: npm run test:demo
+
       - name: Build frontend
         run: npm run build
 

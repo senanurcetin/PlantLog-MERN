@@ -10,6 +10,7 @@ npm ci
 npm test
 cd ../frontend
 npm ci
+npm run test:demo
 npm run build
 ```
 

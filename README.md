@@ -13,6 +13,8 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 ![PlantLog operations dashboard](docs/dashboard.png)
 
+**Explore the zero-login demo:** open the `/demo` route on a running frontend, or follow the [demo guide](docs/demo-guide.md).
+
 **Explore:** [Portfolio project](https://senanur-cetin.vercel.app/#projects) · [Asset registry](docs/assets.png) · [Maintenance log](docs/logs.png)
 
 ## Problem and approach
@@ -44,6 +46,10 @@ flowchart LR
 | API | Node.js, Express, TypeScript, Mongoose | `backend/` |
 | Persistence | MongoDB 6 | Compose service `mongodb` |
 | Deployment demo | Docker Compose / Nginx | `docker-compose.yml` |
+
+## Public, read-only demo
+
+The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs and drill into per-asset history. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
 
 ## Getting started
 
@@ -103,7 +109,7 @@ PowerShell users can replace `cp` with `Copy-Item`.
 
 ```bash
 cd backend && npm ci && npm test
-cd ../frontend && npm ci && npm run build
+cd ../frontend && npm ci && npm run test:demo && npm run build
 ```
 
 The backend includes Node built-in policy regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. These tests are **not** a replacement for database-backed API integration or end-to-end security tests.
@@ -113,7 +119,7 @@ The backend includes Node built-in policy regression tests for registration role
 - **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is still mapped to the host; use TLS and access controls before any external deployment.
 - **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
 - **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor; privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Rate limiting, token storage, formal access reviews and audit retention still need further work.
-- **Demo assets:** screenshots show project interfaces and are not evidence of live equipment integration.
+- **Demo assets:** the public demo's fixture is fictional, and screenshots show project interfaces rather than live equipment integration.
 
 ## Repository map
 

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Login from './pages/Login';
+import Demo from './pages/Demo';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
 import Logs from './pages/Logs';
@@ -13,6 +14,7 @@ function App() {
             <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
+                <Route path="/demo" element={<Demo />} />
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>

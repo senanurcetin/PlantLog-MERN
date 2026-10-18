@@ -1,0 +1,204 @@
+{
+  "context": {
+    "dataset": "Synthetic portfolio demonstration",
+    "snapshot": "2026-10-18",
+    "facility": "Northworks Demo Facility",
+    "notice": "All identifiers, events, personnel and readings are fictional. No operational data or PLC connections."
+  },
+  "assets": [
+    {
+      "id": "A01",
+      "name": "CNC Milling Cell 01",
+      "serialNumber": "DEMO-CNC-001",
+      "category": "machinery",
+      "status": "operational",
+      "location": "Machining / Bay A",
+      "criticality": "high"
+    },
+    {
+      "id": "A02",
+      "name": "Hydraulic Press HP-200",
+      "serialNumber": "DEMO-HYD-002",
+      "category": "machinery",
+      "status": "operational",
+      "location": "Forming / Bay B",
+      "criticality": "high"
+    },
+    {
+      "id": "A03",
+      "name": "Conveyor Line C-12",
+      "serialNumber": "DEMO-CNV-003",
+      "category": "equipment",
+      "status": "maintenance",
+      "location": "Assembly / Line 2",
+      "criticality": "high"
+    },
+    {
+      "id": "A04",
+      "name": "Forklift FL-09",
+      "serialNumber": "DEMO-FLT-004",
+      "category": "vehicle",
+      "status": "operational",
+      "location": "Warehouse / Dock",
+      "criticality": "medium"
+    },
+    {
+      "id": "A05",
+      "name": "Robot Arm R-310",
+      "serialNumber": "DEMO-RBT-005",
+      "category": "machinery",
+      "status": "decommissioned",
+      "location": "Welding / Cell 4",
+      "criticality": "high"
+    },
+    {
+      "id": "A06",
+      "name": "Air Compressor AC-75",
+      "serialNumber": "DEMO-CMP-006",
+      "category": "equipment",
+      "status": "operational",
+      "location": "Utilities / Plant 1",
+      "criticality": "medium"
+    },
+    {
+      "id": "A07",
+      "name": "Welding Station W-08",
+      "serialNumber": "DEMO-WLD-007",
+      "category": "equipment",
+      "status": "operational",
+      "location": "Welding / Cell 1",
+      "criticality": "medium"
+    },
+    {
+      "id": "A08",
+      "name": "Packaging Unit P-21",
+      "serialNumber": "DEMO-PKG-008",
+      "category": "machinery",
+      "status": "maintenance",
+      "location": "Packing / Line 3",
+      "criticality": "medium"
+    }
+  ],
+  "logs": [
+    {
+      "id": "L012",
+      "assetId": "A03",
+      "type": "incident",
+      "status": "open",
+      "title": "Conveyor tracking drift beyond inspection limit",
+      "description": "Illustrative shift inspection identified lateral belt drift. Maintenance inspection requested before restart.",
+      "date": "2026-10-18T06:40:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L011",
+      "assetId": "A08",
+      "type": "maintenance",
+      "status": "open",
+      "title": "Packaging actuator requires service",
+      "description": "Actuator cycle inconsistency recorded in synthetic handover notes. Equipment tagged for review.",
+      "date": "2026-10-17T14:15:00Z",
+      "reportedBy": "Demo Technician"
+    },
+    {
+      "id": "L010",
+      "assetId": "A01",
+      "type": "inspection",
+      "status": "acknowledged",
+      "title": "Spindle vibration trend flagged",
+      "description": "Illustrative vibration sample exceeded internal demonstration threshold. Follow-up inspection pending.",
+      "date": "2026-10-17T09:25:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L009",
+      "assetId": "A06",
+      "type": "operation",
+      "status": "resolved",
+      "title": "Air-system shift check completed",
+      "description": "Sample pressure check and inspection completed with no findings.",
+      "date": "2026-10-16T17:10:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L008",
+      "assetId": "A05",
+      "type": "incident",
+      "status": "acknowledged",
+      "title": "Robot joint drive fault recorded",
+      "description": "Equipment is intentionally marked decommissioned in the sample register; no live fault exists.",
+      "date": "2026-10-16T12:00:00Z",
+      "reportedBy": "Demo Technician"
+    },
+    {
+      "id": "L007",
+      "assetId": "A02",
+      "type": "maintenance",
+      "status": "resolved",
+      "title": "Hydraulic filter replacement completed",
+      "description": "Scheduled synthetic service event closed after filter and visual leak inspection.",
+      "date": "2026-10-15T11:30:00Z",
+      "reportedBy": "Demo Technician"
+    },
+    {
+      "id": "L006",
+      "assetId": "A04",
+      "type": "inspection",
+      "status": "resolved",
+      "title": "Forklift pre-shift safety checks",
+      "description": "Illustrative checklist completed; unit cleared in sample data.",
+      "date": "2026-10-15T05:40:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L005",
+      "assetId": "A07",
+      "type": "operation",
+      "status": "resolved",
+      "title": "Welding cell shift summary",
+      "description": "Demonstration batch event recorded for traceability without production linkage.",
+      "date": "2026-10-14T18:00:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L004",
+      "assetId": "A03",
+      "type": "maintenance",
+      "status": "open",
+      "title": "Belt alignment service work logged",
+      "description": "Synthetic corrective action documented for the sample conveyor.",
+      "date": "2026-10-14T08:20:00Z",
+      "reportedBy": "Demo Technician"
+    },
+    {
+      "id": "L003",
+      "assetId": "A01",
+      "type": "maintenance",
+      "status": "resolved",
+      "title": "CNC coolant and lubrication service",
+      "description": "Routine sample maintenance cycle logged and closed.",
+      "date": "2026-10-13T10:00:00Z",
+      "reportedBy": "Demo Technician"
+    },
+    {
+      "id": "L002",
+      "assetId": "A08",
+      "type": "inspection",
+      "status": "resolved",
+      "title": "Packaging guard inspection",
+      "description": "Sample guard and sensor inspection completed with follow-up observation.",
+      "date": "2026-10-12T15:10:00Z",
+      "reportedBy": "Demo Operator"
+    },
+    {
+      "id": "L001",
+      "assetId": "A02",
+      "type": "operation",
+      "status": "resolved",
+      "title": "Press line handover",
+      "description": "Illustrative shift handover captured for the register.",
+      "date": "2026-10-11T18:15:00Z",
+      "reportedBy": "Demo Operator"
+    }
+  ]
+}
