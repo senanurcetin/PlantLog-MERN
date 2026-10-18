@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAssets, getAsset, createAsset, updateAsset, deleteAsset } from '../controllers/assetController';
-import { protect, admin } from '../middlewares/authMiddleware';
+import { protect, assetManager } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.route('/')
 
 router.route('/:id')
     .get(protect, getAsset)
-    .put(protect, updateAsset)
-    .delete(protect, deleteAsset);
+    .put(protect, assetManager, updateAsset)
+    .delete(protect, assetManager, deleteAsset);
 
 export default router;

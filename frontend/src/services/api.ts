@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 // Create Axios Instance
 const api = axios.create({
@@ -11,19 +12,8 @@ const api = axios.create({
 // Request Interceptor: Attach JWT Token to headers
 api.interceptors.request.use(
     (config) => {
-        // In Phase 4 we will tie this to Zustand storage, for now checking localStorage
-        const authState = localStorage.getItem('auth-storage');
-        if (authState) {
-            try {
-                const parsedState = JSON.parse(authState);
-                const token = parsedState?.state?.token;
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`;
-                }
-            } catch (error) {
-                console.error('Failed to parse auth state from localStorage', error);
-            }
-        }
+        const token = useAuthStore.getState().token;
+        if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
     (error) => {
@@ -37,10 +27,12 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
-        if (error.response && error.response.status === 401) {
-            // Clear storage and optionally redirect to login if token expires
-            localStorage.removeItem('auth-storage');
-            window.location.href = '/login';
+        // Incorrect credentials are a form error, not an expired authenticated session.
+        const requestUrl = String(error.config?.url || '');
+        const isLoginRequest = requestUrl.includes('/auth/login');
+        if (error.response?.status === 401 && !isLoginRequest) {
+            useAuthStore.getState().logout();
+            if (window.location.pathname !== '/login') window.location.assign('/login');
         }
         return Promise.reject(error);
     }

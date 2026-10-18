@@ -42,6 +42,7 @@ export const useAssetStore = create<AssetState>((set) => ({
             set((state) => ({ assets: [response.data, ...state.assets], isLoading: false }));
         } catch (error: any) {
             set({ isLoading: false, error: error.response?.data?.message || 'Failed to add asset' });
+            throw error;
         }
     },
 
@@ -53,6 +54,7 @@ export const useAssetStore = create<AssetState>((set) => ({
             }));
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to delete asset' });
+            throw error;
         }
     }
 }));

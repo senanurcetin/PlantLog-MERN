@@ -14,7 +14,7 @@ npm run test:demo
 npm run build
 ```
 
-Security policy unit tests run alongside the backend build, but there is not yet a database-backed API integration or end-to-end test suite. Include manual verification steps and test evidence for changes affecting login, assets, maintenance or incident workflows.
+Security policy unit tests run alongside the backend build. The separate `npm run test:integration` command requires MongoDB on local port 27017 and runs the HTTP API lifecycle in an isolated, short-lived test database. Browser end-to-end tests are still needed. Include manual verification steps and test evidence for changes affecting login, assets, maintenance or incident workflows.
 
 ## Pull requests
 

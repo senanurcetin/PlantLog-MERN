@@ -25,6 +25,9 @@ jobs:
           name: Validate synthetic demo records
           command: cd frontend && npm run test:demo
       - run:
+          name: Test registry search filters
+          command: cd frontend && npm run test:registry
+      - run:
           name: Frontend TypeScript and Vite production build
           command: cd frontend && npm run build
 
