@@ -13,7 +13,7 @@ const compiled = ts.transpileModule(source, {
 const compiledExports = {};
 const code = new Function('exports', compiled);
 code(compiledExports);
-const { filterAssets, filterLogs } = compiledExports;
+const { filterAssets, filterLogs, logsToCsv } = compiledExports;
 
 const assets = [
     { _id: 'a', name: 'Hydraulic Press', serialNumber: 'HP-001', category: 'machinery',
@@ -43,4 +43,19 @@ test('log selectors compose search, type and status filters', () => {
     assert.deepEqual(filterLogs(logs, 'hydraulic', 'incident', 'open').map(x => x._id), ['l1']);
     assert.deepEqual(filterLogs(logs, 'Demo technician', 'maintenance', 'resolved').map(x => x._id), ['l2']);
     assert.deepEqual(filterLogs(logs, 'Conveyor', 'incident', 'all'), []);
+});
+
+test('CSV export includes selected records with header and correct quoting', () => {
+    const csv = logsToCsv(logs);
+    assert.match(csv, /^"ID","Created At","Type","Status"/);
+    assert.match(csv, /"Hydraulic leak"/);
+    assert.match(csv, /"Conveyor serviced"/);
+    assert.equal(csv.split('\r\n').length, 4);
+});
+test('CSV export escapes formula-prefixed and quote-containing content', () => {
+    const csv = logsToCsv([{ ...logs[0], title: '=HYPERLINK("bad","click")',
+        description: '  +danger', asset: { name: '@risk', serialNumber: 'ABC' } }]);
+    assert.ok(csv.includes('"' + "'=HYPERLINK(\"\"bad\"\",\"\"click\"\")" + '"'));
+    assert.ok(csv.includes('"' + "'  +danger" + '"'));
+    assert.ok(csv.includes('"' + "'@risk" + '"'));
 });

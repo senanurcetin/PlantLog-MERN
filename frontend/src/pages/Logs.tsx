@@ -4,7 +4,7 @@ import { useLogStore } from '../store/logStore';
 import { useAssetStore } from '../store/assetStore';
 import { Plus, Search, FileText } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { filterLogs } from '../utils/registryFilters';
+import { filterLogs, logsToCsv } from '../utils/registryFilters';
 
 const Logs = () => {
     const { logs, isLoading, error, fetchLogs, addLog, updateLogStatus } = useLogStore();
@@ -43,6 +43,19 @@ const Logs = () => {
         } catch {
             setSubmitError(useLogStore.getState().error || 'Unable to save log entry');
         }
+    };
+
+    const downloadFilteredLogs = () => {
+        if (filteredLogs.length === 0) return;
+        const csv = logsToCsv(filteredLogs);
+        const objectUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = `plantlog-maintenance-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objectUrl);
     };
 
     const getStatusBadge = (status: string) => {
@@ -93,10 +106,16 @@ const Logs = () => {
                         </select>
                     </label>
                 </div>
-                <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: activeAssetId || '' })); setShowModal(true); }}
+                <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={downloadFilteredLogs} disabled={filteredLogs.length === 0}
+                        className="inline-flex items-center justify-center rounded-lg border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50">
+                        Export filtered CSV
+                    </button>
+                    <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: activeAssetId || '' })); setShowModal(true); }}
                     className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
                     <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> New Log Entry
-                </button>
+                    </button>
+                </div>
             </div>
             {activeAssetId && <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
                 Showing the maintenance history for {assets.find((asset) => asset._id === activeAssetId)?.name || 'selected equipment'}.

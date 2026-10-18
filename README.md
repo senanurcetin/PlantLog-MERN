@@ -23,8 +23,8 @@ In many facilities, asset lists, shift handovers and maintenance histories live 
 
 ## Features
 
-- **Asset registry:** central equipment list and status-oriented views.
-- **Maintenance and incident records:** structured operational logs for review and handover.
+- **Asset registry:** central equipment list, searchable status views and supervisor/admin status updates.
+- **Maintenance and incident records:** structured operational logs for review and handover, plus filtered CSV export with formula-safe cell encoding.
 - **Authentication:** JWT-backed API authentication and role-oriented application flows.
 - **Operator dashboard:** overview interface for operational status and recent activity.
 - **Separated services:** React/Vite frontend, Express API and MongoDB database.
