@@ -17,6 +17,7 @@ interface AssetState {
     error: string | null;
     fetchAssets: () => Promise<void>;
     addAsset: (assetData: Partial<Asset>) => Promise<void>;
+    updateAsset: (id: string, data: { status: string }) => Promise<Asset>;
     deleteAsset: (id: string) => Promise<void>;
 }
 
@@ -42,6 +43,20 @@ export const useAssetStore = create<AssetState>((set) => ({
             set((state) => ({ assets: [response.data, ...state.assets], isLoading: false }));
         } catch (error: any) {
             set({ isLoading: false, error: error.response?.data?.message || 'Failed to add asset' });
+            throw error;
+        }
+    },
+
+    updateAsset: async (id, data) => {
+        set({ error: null });
+        try {
+            const response = await api.put<Asset>(`/assets/${encodeURIComponent(id)}`, data);
+            set((state) => ({ assets: state.assets.map((asset) =>
+                asset._id === id ? response.data : asset,
+            ) }));
+            return response.data;
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to update asset' });
             throw error;
         }
     },

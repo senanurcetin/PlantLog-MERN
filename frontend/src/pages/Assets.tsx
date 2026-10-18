@@ -3,13 +3,19 @@ import { Link } from 'react-router-dom';
 import { useAssetStore, type Asset } from '../store/assetStore';
 import { Plus, Search } from 'lucide-react';
 import { filterAssets } from '../utils/registryFilters';
+import { useAuthStore } from '../store/authStore';
 
 const Assets = () => {
-    const { assets, isLoading, error, fetchAssets, addAsset } = useAssetStore();
+    const { assets, isLoading, error, fetchAssets, addAsset, updateAsset } = useAssetStore();
+    const user = useAuthStore((state) => state.user);
+    const canManageAssets = user?.role === 'admin' || user?.role === 'supervisor';
     const [query, setQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
     const [submitError, setSubmitError] = useState('');
+    const [editStatus, setEditStatus] = useState('operational');
+    const [statusSaving, setStatusSaving] = useState(false);
+    const [statusError, setStatusError] = useState('');
     const filteredAssets = useMemo(() => filterAssets(assets, query, statusFilter), [assets, query, statusFilter]);
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -117,7 +123,7 @@ const Assets = () => {
                                             {asset.location}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button type="button" onClick={() => setSelectedAsset(asset)} className="text-primary-600 font-semibold hover:text-primary-900 hover:underline">View</button>
+                                            <button type="button" onClick={() => { setSelectedAsset(asset); setEditStatus(asset.status); setStatusError(''); }} className="text-primary-600 font-semibold hover:text-primary-900 hover:underline">View</button>
                                         </td>
                                     </tr>
                                 ))
@@ -142,6 +148,37 @@ const Assets = () => {
                         <div><dt className="text-gray-500">Category</dt><dd className="mt-1 font-semibold capitalize">{selectedAsset.category}</dd></div>
                         <div><dt className="text-gray-500">Status</dt><dd className="mt-1">{getStatusBadge(selectedAsset.status)}</dd></div>
                     </dl>
+                    {canManageAssets && (
+                        <form className="mt-5 rounded-lg bg-slate-50 p-4" onSubmit={async (event) => {
+                            event.preventDefault();
+                            setStatusSaving(true);
+                            setStatusError('');
+                            try {
+                                const updated = await updateAsset(selectedAsset._id, { status: editStatus });
+                                setSelectedAsset(updated);
+                            } catch {
+                                setStatusError(useAssetStore.getState().error || 'Unable to update equipment status');
+                            } finally {
+                                setStatusSaving(false);
+                            }
+                        }}>
+                            <label htmlFor="asset-status-edit" className="block text-sm font-semibold text-gray-800">Equipment status</label>
+                            <p className="mt-1 text-xs text-gray-500">Supervisor / administrator action. Use decommissioned instead of deleting equipment with history.</p>
+                            {statusError && <p role="alert" className="mt-2 text-sm text-red-700">{statusError}</p>}
+                            <div className="mt-3 flex flex-wrap gap-3">
+                                <select id="asset-status-edit" value={editStatus} onChange={(event) => setEditStatus(event.target.value)}
+                                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm">
+                                    <option value="operational">Operational</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="decommissioned">Decommissioned</option>
+                                </select>
+                                <button type="submit" disabled={statusSaving || editStatus === selectedAsset.status}
+                                    className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50">
+                                    {statusSaving ? 'Saving…' : 'Update status'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
                     <Link to={`/logs?assetId=${encodeURIComponent(selectedAsset._id)}`}
                         className="mt-5 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">
                         View maintenance history →

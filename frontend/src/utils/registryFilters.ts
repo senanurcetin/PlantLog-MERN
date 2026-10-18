@@ -22,3 +22,19 @@ export const filterLogs = (
         log.asset?.name, log.asset?.serialNumber, log.author?.name,
     ].some((value) => includes(value, query)),
 );
+
+/** CSV escaping includes spreadsheet formula protection for untrusted log fields. */
+const csvCell = (input: string | undefined): string => {
+    const text = input || '';
+    const protectedValue = /^\s*[=+\-@]/.test(text) ? "'" + text : text;
+    return '"' + protectedValue.replace(/"/g, '""') + '"';
+};
+
+export const logsToCsv = (logs: LogEntry[]): string => {
+    const header = ['ID', 'Created At', 'Type', 'Status', 'Asset', 'Serial Number', 'Title', 'Description', 'Author'];
+    const lines = logs.map((log) => [
+        log._id, log.createdAt, log.type, log.status, log.asset?.name,
+        log.asset?.serialNumber, log.title, log.description, log.author?.name,
+    ].map(csvCell).join(','));
+    return [header.map(csvCell).join(','), ...lines].join('\r\n') + '\r\n';
+};
