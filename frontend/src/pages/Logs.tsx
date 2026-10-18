@@ -7,7 +7,7 @@ import { useAuthStore } from '../store/authStore';
 import { filterLogs } from '../utils/registryFilters';
 
 const Logs = () => {
-    const { logs, isLoading, fetchLogs, addLog, updateLogStatus } = useLogStore();
+    const { logs, isLoading, error, fetchLogs, addLog, updateLogStatus } = useLogStore();
     const { assets, fetchAssets } = useAssetStore();
     const { user } = useAuthStore();
     const [params] = useSearchParams();
