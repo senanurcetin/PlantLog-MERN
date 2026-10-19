@@ -251,7 +251,22 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(resolved.data.statusHistory.length, 4);
     assert.ok(resolved.data.resolvedAt);
     assert.equal(resolved.data.statusHistory[3].to, 'resolved');
-    assert.equal((await api('PUT', '/logs/' + logId, reviewer, { status: 'open' })).status, 400);
+    for (const forbidden of [
+        { status: 'open' },
+        { status: 'resolved' },
+        { title: 'Changed after close' },
+        { description: 'Rewritten evidence' },
+        { type: 'operation' },
+        { metrics: { temperature: 999 } },
+    ]) {
+        const edit = await api('PUT', '/logs/' + logId, reviewer, forbidden);
+        assert.equal(edit.status, 409, JSON.stringify(edit.data));
+    }
+    const preserved = await api('GET', '/logs?assetId=' + assetId, operator);
+    const originalResolved = preserved.data.find((entry) => entry._id === logId);
+    assert.equal(originalResolved.title, 'Synthetic belt fault');
+    assert.equal(originalResolved.status, 'resolved');
+    assert.equal(originalResolved.statusHistory.length, 4);
 
     const summary = await api('GET', '/analytics/maintenance?days=30', operator);
     assert.equal(summary.status, 200, JSON.stringify(summary.data));

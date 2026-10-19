@@ -103,6 +103,13 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
             throw new Error('Not authorized to update this log entry');
         }
 
+        // Resolution closes the evidence record. Corrections require a new
+        // log rather than silently rewriting a historical title or outcome.
+        if (log.status === 'resolved') {
+            res.status(409);
+            throw new Error('Resolved log entries are immutable; create a new record for corrections');
+        }
+
         const fields = pickLogUpdate(req.body);
         const patch: Record<string, unknown> = { $set: fields, $inc: { __v: 1 } };
         if (fields.status !== undefined) {
