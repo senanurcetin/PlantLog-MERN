@@ -164,3 +164,33 @@ test('asset creation rejects forged owner, operator payloads and non-operational
         { ...valid, name: 'n'.repeat(121) }, { ...valid, serialNumber: 'n'.repeat(101) },
     ]) assert.throws(() => sanitizeAssetCreation(body), InvalidPayloadError);
 });
+
+test('asset patch validation refuses implicit casts and invalid dates', () => {
+    assert.deepEqual(pickAssetUpdate({
+        name: '  Hydraulic Press  ', status: 'maintenance', purchaseDate: '2024-02-29',
+    }), {
+        name: 'Hydraulic Press', status: 'maintenance',
+        purchaseDate: new Date('2024-02-29T00:00:00.000Z'),
+    });
+    for (const body of [
+        { name: { $ne: null } }, { location: 123 }, { serialNumber: '' },
+        { name: 'X'.repeat(121) }, { category: 'fictitious' },
+        { status: ['operational'] }, { purchaseDate: '2025-02-29' },
+        { purchaseDate: 1723 }, { purchaseDate: '2024-06-01T12:00:00Z' },
+    ]) assert.throws(() => pickAssetUpdate(body), InvalidPayloadError);
+});
+
+test('log patch validation enforces types, lengths, and normalized text', () => {
+    assert.deepEqual(pickLogUpdate({
+        title: '  Safety inspection  ', type: 'inspection',
+        description: '  Inspect sensor  ',
+    }), {
+        title: 'Safety inspection', type: 'inspection',
+        description: 'Inspect sensor',
+    });
+    for (const body of [
+        { title: { $gt: '' } }, { title: ' ' }, { description: [] },
+        { description: 'D'.repeat(10001) }, { type: { $ne: null } },
+        { type: 'fault' }, { status: 123 }, { status: 'closed' },
+    ]) assert.throws(() => pickLogUpdate(body), InvalidPayloadError);
+});
