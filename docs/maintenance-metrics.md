@@ -67,3 +67,13 @@ the analytics cohort.
 This demonstrator does not infer downtime, failure probability, service
 priority, MTTR, or MTBF from these counts. For large production histories
 use a paginated/aggregated backend and a documented retention policy.
+
+## Recorded case intake trend
+
+The maintenance cohort response includes `intakeBuckets`, an array of 1–7
+equal-duration UTC windows that together cover the chosen rolling period.
+Each bucket counts **newly created** incident and maintenance records, regardless
+of whether the case has subsequently been resolved. A record on the reporting
+endpoint falls into the final bucket; counts reconcile to `records`. The
+periods are defined by elapsed UTC time, not local calendar midnights.
+These counts are workload intake, **not failure rate, downtime, or MTBF**.

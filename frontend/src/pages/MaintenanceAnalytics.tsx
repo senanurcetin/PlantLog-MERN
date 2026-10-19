@@ -13,6 +13,7 @@ interface MaintenanceSummary {
     eligibleResolved: number;
     averageHoursToResolve: number | null;
     medianHoursToResolve: number | null;
+    intakeBuckets: Array<{ from: string; to: string; incident: number; maintenance: number }>;
     byType: Record<'incident' | 'maintenance', {
         records: number;
         unresolved: number;
@@ -170,6 +171,50 @@ const MaintenanceAnalytics = () => {
                                 Every unresolved case belongs to exactly one age bucket. Records with unverifiable report timestamps are marked unknown rather than estimated.
                             </p>
                         </div>
+                    </section>
+
+                    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+                        aria-label="New incident and maintenance log intake trend">
+                        <h2 className="text-lg font-bold text-slate-900">New maintenance / incident records over time</h2>
+                        <p className="mt-2 text-sm text-slate-600">
+                            Creation-date counts in {summary.intakeBuckets.length} equal-duration UTC periods.
+                            These are recorded case volumes, not failure rates or equipment downtime.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-slate-700">
+                            <span><span className="mr-1 inline-block h-3 w-3 rounded-sm bg-teal-700" /> Incident</span>
+                            <span><span className="mr-1 inline-block h-3 w-3 rounded-sm bg-sky-500" /> Maintenance</span>
+                        </div>
+                        <ol className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
+                            {summary.intakeBuckets.map((bucket) => {
+                                const largest = Math.max(1, ...summary.intakeBuckets.map(
+                                    value => value.incident + value.maintenance,
+                                ));
+                                const height = 90 * (bucket.incident + bucket.maintenance) / largest;
+                                return <li key={bucket.from} className="min-w-0 rounded-lg bg-slate-50 p-3">
+                                    <p className="text-xs font-semibold text-slate-700">
+                                        {dateLabel(bucket.from)} – {dateLabel(bucket.to)}
+                                    </p>
+                                    <div className="mt-4 flex h-24 flex-col justify-end" aria-hidden="true">
+                                        <div className="flex w-full flex-col overflow-hidden rounded-md"
+                                            style={{ height: Math.max(0, height) }}>
+                                            <div className="bg-teal-700" style={{
+                                                flex: bucket.incident, minHeight: bucket.incident ? 2 : 0,
+                                            }} />
+                                            <div className="bg-sky-500" style={{
+                                                flex: bucket.maintenance, minHeight: bucket.maintenance ? 2 : 0,
+                                            }} />
+                                        </div>
+                                    </div>
+                                    <p className="mt-3 text-xs tabular-nums text-slate-600">
+                                        {bucket.incident} incidents · {bucket.maintenance} maintenance
+                                    </p>
+                                </li>;
+                            })}
+                        </ol>
+                        <p className="mt-3 text-xs text-slate-500">
+                            Total interval counts equal {summary.records} qualifying records.
+                            Resolving an entry later does not change its original creation period.
+                        </p>
                     </section>
 
                     <EquipmentCasePanel days={days} reload={reload} />

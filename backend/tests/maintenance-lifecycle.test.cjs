@@ -112,3 +112,36 @@ test('cohort membership follows createdAt, not report timestamps', () => {
     assert.equal(result.records, 0);
     assert.equal(result.unresolvedAge.under24Hours, 0);
 });
+
+test('rolling intake buckets partition the created-at cohort without inventing rates', () => {
+    const end = new Date('2026-10-19T12:00:00.000Z');
+    const start = new Date('2026-10-12T12:00:00.000Z');
+    const result = summarizeMaintenance([
+        { type: 'incident', status: 'open', createdAt: start },
+        { type: 'maintenance', status: 'open',
+            createdAt: new Date('2026-10-16T12:00:00.000Z') },
+        { type: 'incident', status: 'open', createdAt: end },
+        { type: 'operation', status: 'open', createdAt: end },
+        { type: 'incident', status: 'open',
+            createdAt: new Date('2026-10-11T12:00:00.000Z') },
+    ], 7, end);
+    assert.equal(result.intakeBuckets.length, 7);
+    assert.equal(result.intakeBuckets[0].incident, 1);
+    assert.equal(result.intakeBuckets[4].maintenance, 1);
+    assert.equal(result.intakeBuckets[6].incident, 1);
+    assert.equal(result.intakeBuckets.reduce(
+        (sum, row) => sum + row.incident + row.maintenance, 0,
+    ), result.records);
+});
+
+test('one-day cohorts have one bucket and empty cohorts have zero counts', () => {
+    const end = new Date('2026-10-19T12:00:00.000Z');
+    const empty = summarizeMaintenance([], 1, end);
+    assert.equal(empty.intakeBuckets.length, 1);
+    assert.equal(empty.intakeBuckets[0].incident, 0);
+    assert.equal(empty.intakeBuckets[0].maintenance, 0);
+    const only = summarizeMaintenance([{
+        type: 'incident', status: 'open', createdAt: end,
+    }], 1, end);
+    assert.equal(only.intakeBuckets[0].incident, 1);
+});
