@@ -95,6 +95,18 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(privileged.status, 400, JSON.stringify(privileged.data));
 
+    for (const invalid of [
+        { name: 'Invalid email', email: 'email-without-at', password },
+        { name: 'Invalid email', email: 'operator@invalid', password },
+        { name: 'Long password', email: 'long' + suffix + '@example.com',
+            password: 'X'.repeat(73) },
+        { name: 'Unexpected field', email: 'spoof' + suffix + '@example.com',
+            password, isActive: true },
+    ]) {
+        const response = await api('POST', '/auth/register', null, invalid);
+        assert.equal(response.status, 400, JSON.stringify(response.data));
+    }
+
     const registrationA = await api('POST', '/auth/register', null, {
         name: 'Demo Operator', email: emailA, password,
     });
@@ -170,7 +182,13 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(allAssets.status, 200);
     assert.equal(allAssets.data.filter(asset => asset.serialNumber === 'FORGED-' + suffix).length, 0);
 
-    assert.equal((await api('GET', '/assets/' + assetId, operator)).status, 200);
+    const assetDetail = await api('GET', '/assets/' + assetId, operator);
+    assert.equal(assetDetail.status, 200);
+    assert.equal(assetDetail.data.createdBy.name, 'Demo Operator');
+    assert.equal(assetDetail.data.createdBy.email, undefined);
+    const assetListing = await api('GET', '/assets', reviewer);
+    assert.equal(assetListing.status, 200);
+    assert.equal(assetListing.data.find(asset => asset._id === assetId).createdBy.email, undefined);
     assert.equal((await api('PUT', '/assets/' + assetId, operator, { status: 'maintenance' })).status, 403);
     assert.equal((await api('DELETE', '/assets/' + assetId, operator)).status, 403);
 
@@ -205,6 +223,8 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     const filtered = await api('GET', '/logs?assetId=' + assetId, operator);
     assert.equal(filtered.status, 200);
     assert.equal(filtered.data.length, 1);
+    assert.equal(filtered.data[0].author.name, 'Demo Operator');
+    assert.equal(filtered.data[0].author.email, undefined);
     assert.equal((await api('PUT', '/logs/' + logId, reviewer, { status: 'resolved' })).status, 403);
     const acknowledged = await api('PUT', '/logs/' + logId, operator, { status: 'acknowledged' });
     assert.equal(acknowledged.status, 200, JSON.stringify(acknowledged.data));

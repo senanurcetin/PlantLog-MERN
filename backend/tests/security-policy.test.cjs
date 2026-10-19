@@ -21,6 +21,34 @@ test('invalid registration bodies and weak passwords are rejected', () => {
     assert.throws(() => sanitizeRegistration({ name: 'Demo', email: 'a@b.co',
         password: '123456' }), InvalidPayloadError);
 });
+test('registration and login share email validity requirements', () => {
+    for (const email of ['missing-at-sign', 'not@valid', ' bad name@example.org ',
+        'x'.repeat(255) + '@example.org', '', 42]) {
+        assert.throws(() => sanitizeRegistration({
+            name: 'Valid Person', email, password: 'valid-demo-password-123',
+        }), InvalidPayloadError);
+    }
+    assert.equal(sanitizeRegistration({
+        name: 'Valid Person', email: ' PERSON@Example.Org ',
+        password: 'valid-demo-password-123',
+    }).email, 'person@example.org');
+});
+
+test('registration refuses unrecognized attributes and bcrypt-truncated passwords', () => {
+    const valid = {
+        name: 'Valid Person', email: 'person@example.org',
+        password: 'valid-demo-password-123',
+    };
+    for (const bad of [
+        { ...valid, isActive: true }, { ...valid, _id: 'spoof' },
+        { ...valid, role: 'supervisor' }, { ...valid, 'role.kind': 'admin' },
+        { ...valid, password: 'X'.repeat(73) },
+        { ...valid, password: 'é'.repeat(40) },
+        { ...valid, name: 'A'.repeat(101) },
+    ]) assert.throws(() => sanitizeRegistration(bad), InvalidPayloadError);
+    assert.equal(sanitizeRegistration(valid).role, 'operator');
+});
+
 test('asset update allows valid status and location', () => {
     assert.deepEqual(pickAssetUpdate({ status: 'maintenance', location: 'Bay 1' }),
         { status: 'maintenance', location: 'Bay 1' });

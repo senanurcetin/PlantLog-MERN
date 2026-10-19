@@ -22,6 +22,10 @@ const Register = () => {
             setError('Enter a name with at least 2 characters.');
             return;
         }
+        if (new TextEncoder().encode(password).length > 72) {
+            setError('Password must not exceed 72 UTF-8 bytes.');
+            return;
+        }
         if (password.length < 12) {
             setError('Password must contain at least 12 characters.');
             return;
@@ -84,14 +88,14 @@ const Register = () => {
                     </div>
                     <div>
                         <label htmlFor="register-password" className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-                        <input id="register-password" type="password" required minLength={12} autoComplete="new-password"
+                        <input id="register-password" type="password" required minLength={12} maxLength={72} autoComplete="new-password"
                             value={password} onChange={(event) => setPassword(event.target.value)}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
                             placeholder="At least 12 characters" />
                     </div>
                     <div>
                         <label htmlFor="register-confirm" className="block text-sm font-semibold text-slate-700 mb-2">Confirm password</label>
-                        <input id="register-confirm" type="password" required minLength={12} autoComplete="new-password"
+                        <input id="register-confirm" type="password" required minLength={12} maxLength={72} autoComplete="new-password"
                             value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
                             placeholder="Repeat password" />
