@@ -46,3 +46,24 @@ The authenticated analytics response also reports type-level cohorts for `incide
 The `unresolvedAge` counts classify **unresolved** cases with a verified server-recorded opening event into `under24Hours`, `from24To72Hours`, or `over72Hours` based on `to - reportedAt`. Missing, inconsistent or out-of-cohort opening timestamps are assigned to `unknownStart` rather than being estimated from a modification timestamp. Age is **time since reporting**, not equipment downtime, an SLA breach or time spent actively repairing.
 
 Cohort membership is determined from `createdAt`, consistent with the MongoDB query and the advertised creation-date population. For trusted event metrics, `reportedAt` and its corresponding `statusHistory` opening event are validated separately. These breakdowns describe recorded cases only and do not estimate failure frequency or reliability.
+
+## Equipment-level open case workload (authenticated)
+
+`GET /api/analytics/equipment?days=30` summarizes incident and maintenance
+records that **were created within the selected rolling window and are still
+unresolved**. It is not an all-time outstanding backlog, a reliability ranking,
+or a predictive failure-risk score. Existing assets are ordered by open case
+count, then incident count and serial number; the first ten are shown.
+
+The response includes `totalOpenCases`, `linkedOpenCases`,
+`missingAssetCases`, `displayedOpenCases`, `remainingOpenCases`,
+`totalEquipment`, and `displayedEquipment`. Every open case is accounted for:
+`totalOpenCases = displayedOpenCases + remainingOpenCases + missingAssetCases`.
+Deleted/unlinked asset references remain visible in the missing-asset total.
+Equipment names/statuses come from current registry entries, not log texts.
+Detail links lead to full per-equipment histories, including records outside
+the analytics cohort.
+
+This demonstrator does not infer downtime, failure probability, service
+priority, MTTR, or MTBF from these counts. For large production histories
+use a paginated/aggregated backend and a documented retention policy.
