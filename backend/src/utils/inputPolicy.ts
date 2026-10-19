@@ -131,7 +131,7 @@ export const sanitizeAssetCreation = (input: unknown) => {
     let purchaseDate: Date | undefined;
     if (fields.purchaseDate !== undefined) {
         const supplied = fields.purchaseDate;
-        if (typeof supplied !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(supplied)) {
+        if (typeof supplied !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(supplied)) {
             throw new InvalidPayloadError('purchaseDate must be an ISO calendar date (YYYY-MM-DD)');
         }
         purchaseDate = new Date(supplied + 'T00:00:00.000Z');
