@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAssetStore, type Asset } from '../store/assetStore';
-import { Plus, Search } from 'lucide-react';
-import { filterAssets } from '../utils/registryFilters';
+import { Plus, Search, Download } from 'lucide-react';
+import { filterAssets, assetsToCsv } from '../utils/registryFilters';
 import { useAuthStore } from '../store/authStore';
 
 const Assets = () => {
@@ -41,11 +41,25 @@ const Assets = () => {
         }
     };
 
+    const exportFilteredAssets = () => {
+        if (filteredAssets.length === 0 || error || isLoading) return;
+        const csv = assetsToCsv(filteredAssets);
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const element = document.createElement('a');
+        element.href = url;
+        element.download = 'plantlog-assets-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(element);
+        element.click();
+        element.remove();
+        URL.revokeObjectURL(url);
+    };
+
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'operational': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Operational</span>;
             case 'maintenance': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Maintenance</span>;
-            default: return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Offline</span>;
+            case 'decommissioned': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Decommissioned</span>;
+            default: return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Unknown status</span>;
         }
     };
 
@@ -71,10 +85,17 @@ const Assets = () => {
                         </select>
                     </label>
                 </div>
-                <button type="button" onClick={() => { setSubmitError(''); setShowModal(true); }}
-                    className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-                    <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> Add Asset
-                </button>
+                <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={exportFilteredAssets}
+                        disabled={isLoading || filteredAssets.length === 0 || Boolean(error)}
+                        className="inline-flex items-center justify-center rounded-lg border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50">
+                        <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Export filtered assets CSV
+                    </button>
+                    <button type="button" onClick={() => { setSubmitError(''); setShowModal(true); }}
+                        className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                        <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> Add Asset
+                    </button>
+                </div>
             </div>
             {error && !showModal && (
                 <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">

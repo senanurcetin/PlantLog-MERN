@@ -39,6 +39,16 @@ export const logsToCsv = (logs: LogEntry[]): string => {
     return [header.map(csvCell).join(','), ...lines].join('\r\n') + '\r\n';
 };
 
+/** Filtered asset snapshot with formula-safe spreadsheet encoding. */
+export const assetsToCsv = (assets: Asset[]): string => {
+    const header = ['ID', 'Name', 'Serial Number', 'Category', 'Status', 'Location', 'Created At'];
+    const rows = assets.map((asset) => [
+        asset._id, asset.name, asset.serialNumber, asset.category,
+        asset.status, asset.location, asset.createdAt,
+    ].map(csvCell).join(','));
+    return [header.map(csvCell).join(','), ...rows].join('\r\n') + '\r\n';
+};
+
 /**
  * An operational log is not automatically an outstanding maintenance task.
  * Only unresolved incident/maintenance cases contribute to the attention KPI.
