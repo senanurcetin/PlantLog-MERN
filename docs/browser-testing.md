@@ -16,4 +16,15 @@ node --test tests/browser-smoke.test.cjs
 
 If a browser assertion fails, the test writes `test-artifacts/browser-smoke-failure.png`, which CI uploads only on failure.
 
-This does **not** verify live authenticated API workflows in a browser. Those are currently exercised as HTTP/MongoDB integration tests; browser-based full-stack onboarding remains a separate acceptance goal in [issue #9](https://github.com/senanurcetin/PlantLog-MERN/issues/9).
+## Authenticated end-to-end workflow
+
+The same CI job also runs `tests/fullstack-onboarding.test.cjs` against a **temporary local MongoDB service** and an actual Express backend. It uses one randomly generated operator account and a randomly named database. It signs up, creates an equipment record, logs an incident, acknowledges/starts/resolves that incident, verifies analytical eligibility, views its asset history, signs out and confirms incorrect login credentials display an inline error. It never uses an external service or real credentials.
+
+Run locally only with disposable MongoDB on loopback port 27017 after installing and building `backend/` and `frontend/`, plus installing the pinned Playwright browser dependencies shown above:
+
+```bash
+cd frontend
+node --test tests/fullstack-onboarding.test.cjs
+```
+
+The test spawns local Vite preview and Express processes, generates its own JWT test secret, and removes the isolated database. It does not verify multi-user race conditions, site accessibility conformance, or remote deployment. No external production use is authorized by these tests.
