@@ -146,6 +146,11 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(createdAsset.status, 201, JSON.stringify(createdAsset.data));
     const assetId = createdAsset.data._id;
+    assert.equal(createdAsset.data.statusHistory.length, 1);
+    assert.equal(createdAsset.data.statusHistory[0].from, null);
+    assert.equal(createdAsset.data.statusHistory[0].to, 'operational');
+    assert.equal(createdAsset.data.statusHistory[0].changedBy, registrationA.data._id);
+
     for (const injected of [
         { createdBy: registrationB.data._id },
         { status: 'maintenance' },
@@ -221,6 +226,26 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     const elevated = await api('PUT', '/assets/' + assetId, reviewer, { status: 'maintenance' });
     assert.equal(elevated.status, 200, JSON.stringify(elevated.data));
     assert.equal(elevated.data.status, 'maintenance');
+    assert.equal(elevated.data.statusHistory.length, 2);
+    assert.equal(elevated.data.statusHistory[1].from, 'operational');
+    assert.equal(elevated.data.statusHistory[1].to, 'maintenance');
+    assert.equal(elevated.data.statusHistory[1].changedBy._id, registrationB.data._id);
+    assert.ok(Date.parse(elevated.data.statusHistory[1].changedAt) > 0);
+    const sameStatus = await api('PUT', '/assets/' + assetId, reviewer, { status: 'maintenance' });
+    assert.equal(sameStatus.status, 200);
+    assert.equal(sameStatus.data.statusHistory.length, 2);
+    assert.equal((await api('PUT', '/assets/' + assetId, reviewer,
+        { statusHistory: [] })).status, 400);
+    assert.equal((await api('PUT', '/assets/' + assetId, reviewer,
+        { status: 'nonsense' })).status, 400);
+    const restored = await api('PUT', '/assets/' + assetId, reviewer, { status: 'operational' });
+    assert.equal(restored.status, 200, JSON.stringify(restored.data));
+    assert.equal(restored.data.statusHistory.length, 3);
+    const assetDetails = await api('GET', '/assets/' + assetId, operator);
+    assert.equal(assetDetails.status, 200);
+    assert.equal(assetDetails.data.statusHistory.length, 3);
+    assert.equal(assetDetails.data.statusHistory[2].changedBy._id, registrationB.data._id);
+
     const resolved = await api('PUT', '/logs/' + logId, reviewer, { status: 'resolved' });
     assert.equal(resolved.status, 200, JSON.stringify(resolved.data));
     assert.equal(resolved.data.statusHistory.length, 4);
@@ -253,6 +278,13 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(legacySummary.data.legacyOrIncomplete, 1);
     const preventedDelete = await api('DELETE', '/assets/' + assetId, reviewer);
     assert.equal(preventedDelete.status, 409, JSON.stringify(preventedDelete.data));
+    const retired = await api('PUT', '/assets/' + assetId, reviewer, { status: 'decommissioned' });
+    assert.equal(retired.status, 200, JSON.stringify(retired.data));
+    assert.equal(retired.data.statusHistory.length, 4);
+    assert.equal(retired.data.statusHistory[3].from, 'operational');
+    assert.equal((await api('PUT', '/assets/' + assetId, reviewer,
+        { status: 'operational' })).status, 400);
+
 
     const disposable = await api('POST', '/assets', reviewer, {
         name: 'Unused fixture', serialNumber: 'SPARE-' + suffix,

@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import api from '../services/api';
 
+export interface AssetStatusEvent {
+    from: string | null;
+    to: string;
+    changedAt: string;
+    changedBy?: { _id: string; name: string; role: string } | string;
+}
+
 export interface Asset {
     _id: string;
     name: string;
@@ -9,6 +16,7 @@ export interface Asset {
     status: string;
     location: string;
     createdAt: string;
+    statusHistory?: AssetStatusEvent[];
 }
 
 interface AssetState {
