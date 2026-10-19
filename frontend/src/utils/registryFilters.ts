@@ -38,3 +38,13 @@ export const logsToCsv = (logs: LogEntry[]): string => {
     ].map(csvCell).join(','));
     return [header.map(csvCell).join(','), ...lines].join('\r\n') + '\r\n';
 };
+
+/**
+ * An operational log is not automatically an outstanding maintenance task.
+ * Only unresolved incident/maintenance cases contribute to the attention KPI.
+ */
+export const countOpenMaintenanceCases = (logs: LogEntry[]): number =>
+    logs.filter((log) =>
+        (log.type === 'incident' || log.type === 'maintenance') &&
+        log.status !== 'resolved',
+    ).length;

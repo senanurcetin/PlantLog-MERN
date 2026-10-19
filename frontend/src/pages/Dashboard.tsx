@@ -4,6 +4,7 @@ import { Activity, AlertTriangle, CheckCircle, Clock, ExternalLink, Wrench } fro
 import { useAuthStore } from '../store/authStore';
 import { useAssetStore } from '../store/assetStore';
 import { useLogStore } from '../store/logStore';
+import { countOpenMaintenanceCases } from '../utils/registryFilters';
 
 const Dashboard = () => {
     const user = useAuthStore((state) => state.user);
@@ -15,7 +16,7 @@ const Dashboard = () => {
         void fetchLogs();
     }, [fetchAssets, fetchLogs]);
 
-    const unresolvedLogs = logs.filter((log) => log.status !== 'resolved').length;
+    const openMaintenanceCases = countOpenMaintenanceCases(logs);
     const maintenanceCount = assets.filter((asset) => asset.status === 'maintenance').length;
     const operationalCount = assets.filter((asset) => asset.status === 'operational').length;
     const recentLogs = [...logs]
@@ -23,11 +24,12 @@ const Dashboard = () => {
         .slice(0, 5);
     const loading = assetsLoading || logsLoading;
     const hasError = Boolean(assetsError || logsError);
+    const emptyRegistry = !loading && !hasError && assets.length === 0;
     const stats = [
-        { name: 'Total Assets', value: assetsLoading ? '—' : assets.length, icon: Activity, color: 'text-blue-700', bg: 'bg-blue-50' },
-        { name: 'Unresolved Logs', value: logsLoading ? '—' : unresolvedLogs, icon: Clock, color: 'text-amber-700', bg: 'bg-amber-50' },
-        { name: 'In Maintenance', value: assetsLoading ? '—' : maintenanceCount, icon: Wrench, color: 'text-orange-700', bg: 'bg-orange-50' },
-        { name: 'Operational', value: assetsLoading ? '—' : operationalCount, icon: CheckCircle, color: 'text-emerald-700', bg: 'bg-emerald-50' },
+        { name: 'Total Assets', value: assetsLoading || assetsError ? '—' : assets.length, icon: Activity, color: 'text-blue-700', bg: 'bg-blue-50' },
+        { name: 'Open maintenance cases', value: logsLoading || logsError ? '—' : openMaintenanceCases, icon: Clock, color: 'text-amber-700', bg: 'bg-amber-50' },
+        { name: 'In Maintenance', value: assetsLoading || assetsError ? '—' : maintenanceCount, icon: Wrench, color: 'text-orange-700', bg: 'bg-orange-50' },
+        { name: 'Operational', value: assetsLoading || assetsError ? '—' : operationalCount, icon: CheckCircle, color: 'text-emerald-700', bg: 'bg-emerald-50' },
     ];
 
     return (
@@ -36,14 +38,14 @@ const Dashboard = () => {
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-2">Operations overview</p>
                     <h1 className="text-2xl font-bold text-gray-900">Welcome back{user?.name ? `, ${user.name}` : ''}</h1>
-                    <p className="text-gray-600 mt-1">Asset status and maintenance activity from your registry.</p>
+                    <p className="text-gray-600 mt-1">Asset status and maintenance activity from your registry. Routine operation logs are not counted as open maintenance cases.</p>
                 </div>
                 <div className="plantlog-registry-status sm:text-right">
                     <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Registry health</p>
                     <div className="flex sm:justify-end items-center mt-2 gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full ${hasError ? 'bg-red-500' : loading ? 'bg-amber-500' : maintenanceCount || unresolvedLogs ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                        <span className={`h-2.5 w-2.5 rounded-full ${hasError ? 'bg-red-500' : loading ? 'bg-amber-500' : emptyRegistry ? 'bg-slate-400' : maintenanceCount || openMaintenanceCases ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                         <span className="font-semibold text-sm text-gray-800">
-                            {hasError ? 'Data unavailable' : loading ? 'Loading live records' : maintenanceCount || unresolvedLogs ? 'Items need review' : 'No open maintenance flags'}
+                            {hasError ? 'Data unavailable' : loading ? 'Loading live records' : emptyRegistry ? 'No assets registered' : maintenanceCount || openMaintenanceCases ? 'Maintenance items need review' : 'No open maintenance cases'}
                         </span>
                     </div>
                 </div>
