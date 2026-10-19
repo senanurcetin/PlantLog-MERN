@@ -107,7 +107,7 @@ const Register = () => {
                         <p>This account can register equipment and log events. Only supervisors and administrators can edit equipment metadata or decommission assets.</p>
                     </div>
                     <button type="submit" disabled={submitting}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#0e6663] px-4 py-3 text-sm font-bold text-white hover:bg-[#0c514f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60">
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#096FAD] px-4 py-3 text-sm font-bold text-white hover:bg-[#075A8D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60">
                         <UserPlus size={18} aria-hidden="true" />{submitting ? 'Creating account…' : 'Create operator account'}
                     </button>
                     <p className="text-center text-sm text-slate-600">

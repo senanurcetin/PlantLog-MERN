@@ -92,9 +92,9 @@ const Login = () => {
                     </div>
                 </form>
                 <div className="border-t border-gray-200 pt-6 text-center">
-                    <p className="text-sm text-gray-600">New to the full application? <Link to="/register" className="font-bold text-teal-700 hover:underline">Create an operator account</Link></p>
+                    <p className="text-sm text-gray-600">New to the full application? <Link to="/register" className="font-bold text-blue-700 hover:underline">Create an operator account</Link></p>
                     <p className="mt-4 text-sm text-gray-600">Reviewing the project? No account is required.</p>
-                    <Link to="/demo" className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-800 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600">Explore read-only demo →</Link>
+                    <Link to="/demo" className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-blue-700 px-4 py-3 text-sm font-semibold text-blue-800 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">Explore read-only demo →</Link>
                     <p className="mt-2 text-xs text-gray-500">Synthetic records · No live plant data</p>
                 </div>
             </div>
