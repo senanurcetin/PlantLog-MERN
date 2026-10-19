@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -22,9 +22,17 @@ app.use(cors({
     maxAge: 600,
 }));
 
-// Body parsing
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// JSON-only write API: no HTML forms or ambiguous URL-encoded object graphs.
+// Keep the payload ceiling comfortably above a documented log description,
+// but below the default 100 KB Express parser limit.
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && !req.is('application/json')) {
+        res.status(415).json({ message: 'API write requests require application/json' });
+        return;
+    }
+    next();
+});
+app.use(express.json({ limit: '32kb', strict: true }));
 
 // Basic Health Check Route
 app.get('/api/health', (req: Request, res: Response) => {
