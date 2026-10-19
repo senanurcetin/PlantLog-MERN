@@ -16,6 +16,7 @@ const Logs = () => {
     const [typeFilter, setTypeFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
     const [submitError, setSubmitError] = useState('');
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
     const filteredLogs = useMemo(() => filterLogs(logs, query, typeFilter, statusFilter), [logs, query, typeFilter, statusFilter]);
 
     const [showModal, setShowModal] = useState(false);
@@ -45,6 +46,17 @@ const Logs = () => {
         }
     };
 
+    const transition = async (id: string, status: string) => {
+        setUpdatingId(id);
+        try {
+            await updateLogStatus(id, status);
+        } catch {
+            // Store error banner displays the failure; preserve current record.
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
     const downloadFilteredLogs = () => {
         if (filteredLogs.length === 0) return;
         const csv = logsToCsv(filteredLogs);
@@ -61,6 +73,7 @@ const Logs = () => {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'resolved': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Resolved</span>;
+            case 'in_progress': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">In progress</span>;
             case 'acknowledged': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Acknowledged</span>;
             default: return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Open</span>;
         }
@@ -102,6 +115,7 @@ const Logs = () => {
                             <option value="all">All statuses</option>
                             <option value="open">Open</option>
                             <option value="acknowledged">Acknowledged</option>
+                            <option value="in_progress">In progress</option>
                             <option value="resolved">Resolved</option>
                         </select>
                     </label>
@@ -145,13 +159,18 @@ const Logs = () => {
                                         </span>
                                     </div>
                                     <div className="flex gap-2">
-                                        {log.status === 'open' && (user?.role === 'admin' || user?.role === 'supervisor' || user?._id === log.author?._id) && (
-                                            <button
-                                                onClick={() => { void updateLogStatus(log._id, 'resolved').catch(() => undefined); }}
-                                                className="text-xs font-medium text-primary-600 hover:text-primary-800"
-                                            >
-                                                Mark Resolved
-                                            </button>
+                                        {log.status !== 'resolved' && (user?.role === 'admin' || user?.role === 'supervisor' || user?._id === log.author?._id) && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {log.status === 'open' && <button type="button" disabled={updatingId === log._id}
+                                                    onClick={() => void transition(log._id, 'acknowledged')}
+                                                    className="text-xs font-semibold text-teal-700 hover:underline disabled:opacity-50">Acknowledge</button>}
+                                                {log.status === 'acknowledged' && <button type="button" disabled={updatingId === log._id}
+                                                    onClick={() => void transition(log._id, 'in_progress')}
+                                                    className="text-xs font-semibold text-blue-700 hover:underline disabled:opacity-50">Start work</button>}
+                                                <button type="button" disabled={updatingId === log._id}
+                                                    onClick={() => void transition(log._id, 'resolved')}
+                                                    className="text-xs font-semibold text-primary-600 hover:underline disabled:opacity-50">Mark resolved</button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -170,6 +189,18 @@ const Logs = () => {
                                 <div className="text-xs text-gray-500 flex items-center">
                                     <span>Logged by: <span className="font-medium text-gray-700">{log.author?.name || 'Unknown'}</span> ({log.author?.role})</span>
                                 </div>
+                                <details className="mt-3 rounded-lg border border-gray-100 bg-slate-50 p-3 text-xs text-gray-700">
+                                    <summary className="cursor-pointer font-semibold text-teal-800">Status history ({log.statusHistory?.length || 0} recorded events)</summary>
+                                    {log.statusHistory?.length ? <ol className="mt-3 space-y-2">
+                                        {log.statusHistory.map((event, index) => (
+                                            <li key={index} className="border-l-2 border-teal-200 pl-3">
+                                                <span className="capitalize font-semibold">{event.from || 'Created'} → {event.to.replace('_', ' ')}</span>
+                                                <span className="ml-2 text-gray-500">{new Date(event.changedAt).toLocaleString()}</span>
+                                                {typeof event.changedBy === 'object' && event.changedBy?.name && <span className="ml-2 text-gray-500">by {event.changedBy.name}</span>}
+                                            </li>
+                                        ))}
+                                    </ol> : <p className="mt-2 text-amber-800">Legacy record; event timestamps were not reconstructed.</p>}
+                                </details>
                             </li>
                         ))}
                     </ul>

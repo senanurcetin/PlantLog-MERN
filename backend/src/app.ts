@@ -6,6 +6,7 @@ import { errorHandler } from './middlewares/errorHandler';
 import authRoutes from './routes/authRoutes';
 import assetRoutes from './routes/assetRoutes';
 import logEntryRoutes from './routes/logEntryRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/logs', logEntryRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Global Error Handler Integration
 app.use(errorHandler);

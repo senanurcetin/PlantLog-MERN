@@ -89,6 +89,16 @@ const Demo = () => {
                 </div>
             </div>
             <p className="mt-3 text-xs text-slate-500">Logged by {log.reportedBy} · {log.id}</p>
+            {log.statusHistory.length > 0 && <details className="mt-3 rounded-lg bg-slate-50 px-3 py-3 text-xs text-slate-700">
+                <summary className="cursor-pointer font-semibold text-teal-800">Example status timeline ({log.statusHistory.length} events)</summary>
+                <ol className="mt-3 space-y-2">
+                    {log.statusHistory.map((event, index) => <li key={index} className="border-l-2 border-teal-200 pl-3">
+                        <span className="font-semibold capitalize">{event.from || 'Created'} → {event.to.replace('_', ' ')}</span>
+                        <span className="ml-2 text-slate-500">{displayDate(event.changedAt)} · {event.changedBy}</span>
+                    </li>)}
+                </ol>
+            </details>}
+
         </li>
     );
 

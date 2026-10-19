@@ -7,6 +7,7 @@ import Demo from './pages/Demo';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
 import Logs from './pages/Logs';
+import MaintenanceAnalytics from './pages/MaintenanceAnalytics';
 import Layout from './components/Layout';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/assets" element={<Assets />} />
                         <Route path="/logs" element={<Logs />} />
+                        <Route path="/analytics" element={<MaintenanceAnalytics />} />
                         {/* Add more protected routes here in Phase 4 */}
                     </Route>
                 </Route>

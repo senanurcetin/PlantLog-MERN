@@ -44,3 +44,20 @@ test('all status and type categories are represented for filtering', () => {
     assert.deepEqual(new Set(fixture.logs.map(l => l.type)),
         new Set(['operation', 'maintenance', 'incident', 'inspection']));
 });
+
+test('illustrative status histories are internally ordered and agree with current status', () => {
+    const withEvents = fixture.logs.filter(log => log.statusHistory.length > 0);
+    assert.ok(withEvents.length >= 3);
+    for (const log of withEvents) {
+        assert.equal(log.statusHistory[0].to, 'open');
+        assert.equal(log.statusHistory[0].changedAt, log.date);
+        assert.equal(log.statusHistory[log.statusHistory.length - 1].to, log.status);
+        for (let i = 1; i < log.statusHistory.length; i++) {
+            const previous = log.statusHistory[i - 1];
+            const current = log.statusHistory[i];
+            assert.equal(current.from, previous.to);
+            assert.ok(Date.parse(current.changedAt) >= Date.parse(previous.changedAt));
+            assert.ok(Date.parse(current.changedAt) <= Date.parse(fixture.context.snapshot + 'T23:59:59Z'));
+        }
+    }
+});

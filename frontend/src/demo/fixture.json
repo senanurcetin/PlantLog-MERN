@@ -88,7 +88,15 @@
       "title": "Conveyor tracking drift beyond inspection limit",
       "description": "Illustrative shift inspection identified lateral belt drift. Maintenance inspection requested before restart.",
       "date": "2026-10-18T06:40:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": [
+        {
+          "from": null,
+          "to": "open",
+          "changedAt": "2026-10-18T06:40:00Z",
+          "changedBy": "Demo Operator"
+        }
+      ]
     },
     {
       "id": "L011",
@@ -98,7 +106,8 @@
       "title": "Packaging actuator requires service",
       "description": "Actuator cycle inconsistency recorded in synthetic handover notes. Equipment tagged for review.",
       "date": "2026-10-17T14:15:00Z",
-      "reportedBy": "Demo Technician"
+      "reportedBy": "Demo Technician",
+      "statusHistory": []
     },
     {
       "id": "L010",
@@ -108,7 +117,21 @@
       "title": "Spindle vibration trend flagged",
       "description": "Illustrative vibration sample exceeded internal demonstration threshold. Follow-up inspection pending.",
       "date": "2026-10-17T09:25:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": [
+        {
+          "from": null,
+          "to": "open",
+          "changedAt": "2026-10-17T09:25:00Z",
+          "changedBy": "Demo Operator"
+        },
+        {
+          "from": "open",
+          "to": "acknowledged",
+          "changedAt": "2026-10-17T09:38:00Z",
+          "changedBy": "Demo Supervisor"
+        }
+      ]
     },
     {
       "id": "L009",
@@ -118,7 +141,8 @@
       "title": "Air-system shift check completed",
       "description": "Sample pressure check and inspection completed with no findings.",
       "date": "2026-10-16T17:10:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": []
     },
     {
       "id": "L008",
@@ -128,7 +152,8 @@
       "title": "Robot joint drive fault recorded",
       "description": "Equipment is intentionally marked decommissioned in the sample register; no live fault exists.",
       "date": "2026-10-16T12:00:00Z",
-      "reportedBy": "Demo Technician"
+      "reportedBy": "Demo Technician",
+      "statusHistory": []
     },
     {
       "id": "L007",
@@ -138,7 +163,33 @@
       "title": "Hydraulic filter replacement completed",
       "description": "Scheduled synthetic service event closed after filter and visual leak inspection.",
       "date": "2026-10-15T11:30:00Z",
-      "reportedBy": "Demo Technician"
+      "reportedBy": "Demo Technician",
+      "statusHistory": [
+        {
+          "from": null,
+          "to": "open",
+          "changedAt": "2026-10-15T11:30:00Z",
+          "changedBy": "Demo Technician"
+        },
+        {
+          "from": "open",
+          "to": "acknowledged",
+          "changedAt": "2026-10-15T12:10:00Z",
+          "changedBy": "Demo Operator"
+        },
+        {
+          "from": "acknowledged",
+          "to": "in_progress",
+          "changedAt": "2026-10-15T13:30:00Z",
+          "changedBy": "Demo Technician"
+        },
+        {
+          "from": "in_progress",
+          "to": "resolved",
+          "changedAt": "2026-10-15T15:05:00Z",
+          "changedBy": "Demo Technician"
+        }
+      ]
     },
     {
       "id": "L006",
@@ -148,7 +199,8 @@
       "title": "Forklift pre-shift safety checks",
       "description": "Illustrative checklist completed; unit cleared in sample data.",
       "date": "2026-10-15T05:40:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": []
     },
     {
       "id": "L005",
@@ -158,7 +210,8 @@
       "title": "Welding cell shift summary",
       "description": "Demonstration batch event recorded for traceability without production linkage.",
       "date": "2026-10-14T18:00:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": []
     },
     {
       "id": "L004",
@@ -168,7 +221,8 @@
       "title": "Belt alignment service work logged",
       "description": "Synthetic corrective action documented for the sample conveyor.",
       "date": "2026-10-14T08:20:00Z",
-      "reportedBy": "Demo Technician"
+      "reportedBy": "Demo Technician",
+      "statusHistory": []
     },
     {
       "id": "L003",
@@ -178,7 +232,8 @@
       "title": "CNC coolant and lubrication service",
       "description": "Routine sample maintenance cycle logged and closed.",
       "date": "2026-10-13T10:00:00Z",
-      "reportedBy": "Demo Technician"
+      "reportedBy": "Demo Technician",
+      "statusHistory": []
     },
     {
       "id": "L002",
@@ -188,7 +243,8 @@
       "title": "Packaging guard inspection",
       "description": "Sample guard and sensor inspection completed with follow-up observation.",
       "date": "2026-10-12T15:10:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": []
     },
     {
       "id": "L001",
@@ -198,7 +254,8 @@
       "title": "Press line handover",
       "description": "Illustrative shift handover captured for the register.",
       "date": "2026-10-11T18:15:00Z",
-      "reportedBy": "Demo Operator"
+      "reportedBy": "Demo Operator",
+      "statusHistory": []
     }
   ]
 }

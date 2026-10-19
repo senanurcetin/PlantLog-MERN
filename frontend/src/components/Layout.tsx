@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { LayoutDashboard, Database, ClipboardList, LogOut, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, Database, ClipboardList, BarChart3, LogOut, User as UserIcon } from 'lucide-react';
 
 const Layout = () => {
     const { user, logout } = useAuthStore();
@@ -16,6 +16,7 @@ const Layout = () => {
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Asset Registry', path: '/assets', icon: Database },
         { name: 'Maintenance Logs', path: '/logs', icon: ClipboardList },
+        { name: 'Maintenance Analytics', path: '/analytics', icon: BarChart3 },
     ];
 
     return (
