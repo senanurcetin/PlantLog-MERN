@@ -22,9 +22,66 @@ const pickAllowed = (input: unknown, allowed: readonly string[]): Record<string,
 const assetFields = ['name', 'serialNumber', 'category', 'status', 'location', 'purchaseDate'] as const;
 const logFields = ['type', 'title', 'description', 'status', 'metrics'] as const;
 const metricFields = ['temperature', 'pressure', 'hoursOperated'] as const;
-export const pickAssetUpdate = (body: unknown): Record<string, unknown> => pickAllowed(body, assetFields);
+const assetLimits: Record<string, number> = { name: 120, serialNumber: 100, location: 160 };
+const assetCategories = ['machinery', 'vehicle', 'equipment', 'other'];
+const assetStatuses = ['operational', 'maintenance', 'decommissioned'];
+const logTypes = ['operation', 'maintenance', 'incident', 'inspection'];
+const logStatuses = ['open', 'acknowledged', 'in_progress', 'resolved'];
+
+const parseCalendarDate = (value: unknown): Date => {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        throw new InvalidPayloadError('purchaseDate must be an ISO calendar date (YYYY-MM-DD)');
+    }
+    const date = new Date(value + 'T00:00:00.000Z');
+    if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
+        throw new InvalidPayloadError('Invalid calendar date');
+    }
+    return date;
+};
+
+/** Validate untrusted update types before Mongoose casts or saves them. */
+export const pickAssetUpdate = (body: unknown): Record<string, unknown> => {
+    const fields = pickAllowed(body, assetFields);
+    for (const [key, limit] of Object.entries(assetLimits)) {
+        if (fields[key] !== undefined) {
+            const value = fields[key];
+            if (typeof value !== 'string' || !value.trim() || value.trim().length > limit) {
+                throw new InvalidPayloadError(key + ' must be non-empty text of at most ' + limit + ' characters');
+            }
+            fields[key] = value.trim();
+        }
+    }
+    if (fields.category !== undefined &&
+        (typeof fields.category !== 'string' || !assetCategories.includes(fields.category))) {
+        throw new InvalidPayloadError('Unsupported asset category');
+    }
+    if (fields.status !== undefined &&
+        (typeof fields.status !== 'string' || !assetStatuses.includes(fields.status))) {
+        throw new InvalidPayloadError('Unsupported asset status');
+    }
+    if (fields.purchaseDate !== undefined) fields.purchaseDate = parseCalendarDate(fields.purchaseDate);
+    return fields;
+};
+
 export const pickLogUpdate = (body: unknown): Record<string, unknown> => {
     const fields = pickAllowed(body, logFields);
+    if (fields.type !== undefined &&
+        (typeof fields.type !== 'string' || !logTypes.includes(fields.type))) {
+        throw new InvalidPayloadError('Unsupported log type');
+    }
+    if (fields.status !== undefined &&
+        (typeof fields.status !== 'string' || !logStatuses.includes(fields.status))) {
+        throw new InvalidPayloadError('Unsupported log status');
+    }
+    for (const [key, limit] of [['title', 200], ['description', 10000]] as const) {
+        if (fields[key] !== undefined) {
+            const value = fields[key];
+            if (typeof value !== 'string' || !value.trim() || value.trim().length > limit) {
+                throw new InvalidPayloadError(key + ' must be non-empty text of at most ' + limit + ' characters');
+            }
+            fields[key] = value.trim();
+        }
+    }
     if (fields.metrics !== undefined) {
         const metrics = asRecord(fields.metrics);
         for (const [key, value] of Object.entries(metrics)) {
@@ -38,6 +95,7 @@ export const pickLogUpdate = (body: unknown): Record<string, unknown> => {
     }
     return fields;
 };
+
 /** Reject query selector objects and normalize case before calling MongoDB. */
 export const sanitizeLogin = (input: unknown) => {
     const body = asRecord(input);
@@ -132,17 +190,7 @@ export const sanitizeAssetCreation = (input: unknown) => {
     if (fields.status !== undefined && fields.status !== 'operational') {
         throw new InvalidPayloadError('New assets must start in operational status');
     }
-    let purchaseDate: Date | undefined;
-    if (fields.purchaseDate !== undefined) {
-        const supplied = fields.purchaseDate;
-        if (typeof supplied !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(supplied)) {
-            throw new InvalidPayloadError('purchaseDate must be an ISO calendar date (YYYY-MM-DD)');
-        }
-        purchaseDate = new Date(supplied + 'T00:00:00.000Z');
-        if (!Number.isFinite(purchaseDate.getTime()) ||
-            purchaseDate.toISOString().slice(0, 10) !== supplied) {
-            throw new InvalidPayloadError('Invalid calendar date');
-        }
-    }
+    const purchaseDate = fields.purchaseDate === undefined
+        ? undefined : parseCalendarDate(fields.purchaseDate);
     return { name, serialNumber, location, category, status: 'operational' as const, purchaseDate };
 };
