@@ -68,6 +68,18 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
             await page.getByRole('button', { name: 'Create operator account' }).click();
             await page.getByRole('heading', { name: 'Welcome back, Browser CI Operator' }).waitFor();
 
+            // A real phone viewport should show navigation without the desktop sidebar.
+            await page.setViewportSize({ width: 390, height: 844 });
+            const mobileNav = page.getByRole('navigation', { name: 'Mobile primary navigation' });
+            assert.equal(await mobileNav.isVisible(), true);
+            assert.equal(await page.getByRole('navigation', { name: 'Primary navigation' }).isVisible(), false);
+            await mobileNav.getByRole('link', { name: 'Asset Registry' }).click();
+            await page.getByRole('button', { name: 'Add Asset' }).waitFor();
+            await mobileNav.getByRole('link', { name: 'Maintenance Analytics' }).click();
+            await page.getByRole('heading', { name: 'Maintenance lifecycle insights' }).waitFor();
+
+            // Restore desktop width for the remaining authenticated workflow checks.
+            await page.setViewportSize({ width: 1280, height: 900 });
             await page.getByRole('link', { name: 'Asset Registry' }).click();
             await page.getByRole('button', { name: 'Add Asset' }).click();
             await page.getByRole('heading', { name: 'Register New Asset' }).waitFor();
