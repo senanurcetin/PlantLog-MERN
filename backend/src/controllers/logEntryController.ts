@@ -55,6 +55,10 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
             res.status(404);
             throw new Error('Asset not found');
         }
+        if (asset.status === 'decommissioned') {
+            res.status(409);
+            throw new Error('Cannot create new logs for decommissioned equipment');
+        }
 
         const now = new Date();
         const logEntry = await LogEntry.create({

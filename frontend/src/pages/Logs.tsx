@@ -18,6 +18,9 @@ const Logs = () => {
     const [submitError, setSubmitError] = useState('');
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const filteredLogs = useMemo(() => filterLogs(logs, query, typeFilter, statusFilter), [logs, query, typeFilter, statusFilter]);
+    const availableAssets = useMemo(
+        () => assets.filter((asset) => asset.status !== 'decommissioned'), [assets],
+    );
 
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -125,7 +128,7 @@ const Logs = () => {
                         className="inline-flex items-center justify-center rounded-lg border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50">
                         Export filtered CSV
                     </button>
-                    <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: activeAssetId || '' })); setShowModal(true); }}
+                    <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: availableAssets.some(a => a._id === activeAssetId) ? activeAssetId! : '' })); setShowModal(true); }}
                     className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
                     <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> New Log Entry
                     </button>
@@ -220,11 +223,15 @@ const Logs = () => {
                                 <label className="block text-sm font-medium text-gray-700">Asset</label>
                                 <select required value={formData.assetId} onChange={e => setFormData({ ...formData, assetId: e.target.value })} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm border p-2">
                                     <option value="" disabled>Select an Asset</option>
-                                    {assets.map(a => (
+                                    {availableAssets.map(a => (
                                         <option key={a._id} value={a._id}>{a.name} ({a.serialNumber})</option>
                                     ))}
                                 </select>
                             </div>
+                            {availableAssets.length === 0 &&
+                                <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                                    No active equipment is available for new entries. Existing maintenance history remains accessible.
+                                </p>}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Log Type</label>
                                 <select value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm border p-2">
