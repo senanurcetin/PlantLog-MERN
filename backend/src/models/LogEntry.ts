@@ -14,6 +14,7 @@ export interface ILogEntry extends Document {
     title: string;
     description: string;
     status: LogStatus;
+    __v: number;
     metrics?: {
         temperature?: number;
         pressure?: number;

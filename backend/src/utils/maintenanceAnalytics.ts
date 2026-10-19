@@ -6,6 +6,7 @@ export interface LifecycleEventLike {
 export interface LifecycleRecord {
     type: string;
     status: string;
+    createdAt?: Date | string | null;
     reportedAt?: Date | string | null;
     resolvedAt?: Date | string | null;
     statusHistory?: LifecycleEventLike[] | null;
@@ -29,8 +30,8 @@ export interface MaintenanceSummary {
 }
 
 /**
- * Cohort: incidents/maintenance logs reported inside [from, to].
- * Only server-recorded open->...->resolved histories qualify.
+ * Cohort: incident/maintenance records created inside [from, to].
+ * Only complete server-recorded open->...->resolved histories qualify.
  * Does not calculate machine repair time (MTTR) or MTBF.
  */
 export const summarizeMaintenance = (
@@ -40,7 +41,8 @@ export const summarizeMaintenance = (
     const start = end - periodDays * 86400000;
     const inCohort = rows.filter(row =>
         (row.type === 'incident' || row.type === 'maintenance') &&
-        milliseconds(row.reportedAt) >= start && milliseconds(row.reportedAt) <= end,
+        milliseconds(row.reportedAt ?? row.createdAt) >= start &&
+        milliseconds(row.reportedAt ?? row.createdAt) <= end,
     );
     let unresolved = 0;
     let legacyOrIncomplete = 0;
@@ -81,6 +83,6 @@ export const summarizeMaintenance = (
         eligibleResolved: durations.length,
         averageHoursToResolve: average, medianHoursToResolve: median,
         indicator: 'Time from log report to resolution (hours)',
-        interpretation: 'Calculated from complete server-recorded transitions for incident/maintenance entries reported within the selected window. Not machine downtime, MTTR or MTBF.',
+        interpretation: 'Calculated from complete server-recorded transitions for incident/maintenance entries created within the selected window. Not machine downtime, MTTR or MTBF.',
     };
 };

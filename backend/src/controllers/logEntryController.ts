@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { pickLogUpdate } from '../utils/inputPolicy';
 import { canEditLog } from '../utils/authorization';
+import { statusTransition, LogStatus } from '../utils/logLifecycle';
+import { InvalidPayloadError } from '../utils/inputPolicy';
 
 // @desc    Get all log entries (optionally filtered by asset inside query)
 // @route   GET /api/logs
@@ -21,6 +23,7 @@ export const getLogs = async (req: AuthRequest, res: Response, next: NextFunctio
         const logs = await LogEntry.find(filter)
             .populate('author', 'name email role')
             .populate('asset', 'name serialNumber')
+            .populate('statusHistory.changedBy', 'name role')
             .sort({ createdAt: -1 });
 
         res.status(200).json(logs);
@@ -35,6 +38,11 @@ export const getLogs = async (req: AuthRequest, res: Response, next: NextFunctio
 export const createLogEntry = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { assetId, type, title, description, status, metrics } = req.body;
+
+        // Creation begins an observed lifecycle. Clients cannot fabricate terminal history.
+        if (status !== undefined && status !== 'open') {
+            throw new InvalidPayloadError('A new log entry must start in open status');
+        }
 
         if (!assetId || !type || !title || !description) {
             res.status(400);
@@ -58,14 +66,19 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
             throw new Error('Asset not found');
         }
 
+        const now = new Date();
         const logEntry = await LogEntry.create({
             asset: assetId,
             author: req.user.id,
             type,
             title,
             description,
-            status: status || 'open',
+            status: 'open',
             metrics,
+            reportedAt: now,
+            statusHistory: [{
+                from: null, to: 'open', changedAt: now, changedBy: req.user.id,
+            }],
         });
 
         res.status(201).json(logEntry);
@@ -97,11 +110,37 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
         }
 
         const fields = pickLogUpdate(req.body);
-        const updatedLog = await LogEntry.findByIdAndUpdate(
-            req.params.id,
-            { $set: fields },
+        const patch: Record<string, unknown> = { $set: fields, $inc: { __v: 1 } };
+        if (fields.status !== undefined) {
+            if (typeof fields.status !== 'string') {
+                throw new InvalidPayloadError('Status must be a string');
+            }
+            const timestampField = statusTransition(log.status, fields.status as LogStatus);
+            if (timestampField) {
+                const changedAt = new Date();
+                (patch.$set as Record<string, unknown>)[timestampField] = changedAt;
+                patch.$push = {
+                    statusHistory: {
+                        from: log.status, to: fields.status, changedAt, changedBy: req.user!.id,
+                    },
+                };
+            }
+        }
+
+        // Atomic compare-and-set ensures concurrent editors cannot overwrite status
+        // transitions or append an event inconsistent with the prior state.
+        const updatedLog = await LogEntry.findOneAndUpdate(
+            { _id: log._id, __v: log.__v },
+            patch,
             { new: true, runValidators: true }
-        );
+        ).populate('author', 'name role')
+            .populate('asset', 'name serialNumber')
+            .populate('statusHistory.changedBy', 'name role');
+
+        if (!updatedLog) {
+            res.status(409);
+            throw new Error('Log was updated by another user; refresh and try again');
+        }
 
         res.status(200).json(updatedLog);
     } catch (error) {
