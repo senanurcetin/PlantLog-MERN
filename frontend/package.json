@@ -9,7 +9,7 @@
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "test:demo": "node --test tests/demo-data.test.cjs",
-        "test:registry": "node --test tests/registry-filters.test.cjs"
+        "test:registry": "node --test tests/registry-filters.test.cjs tests/session-store.test.cjs"
     },
     "dependencies": {
         "@heroicons/react": "^2.1.3",

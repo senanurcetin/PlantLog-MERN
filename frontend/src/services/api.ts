@@ -12,8 +12,17 @@ const api = axios.create({
 // Request Interceptor: Attach JWT Token to headers
 api.interceptors.request.use(
     (config) => {
-        const token = useAuthStore.getState().token;
-        if (token) config.headers.Authorization = `Bearer ${token}`;
+        const auth = useAuthStore.getState();
+        const token = auth.token;
+        // Keep the originating session identity local to the request config;
+        // no browser-visible header or server-side session marker is needed.
+        (config as typeof config & { _plantlogSessionEpoch?: number })._plantlogSessionEpoch =
+            auth.sessionEpoch;
+        const path = String(config.url || '');
+        // Public login/registration must not accidentally carry a former session.
+        const publicAuth = /^\/auth\/(?:login|register)(?:\?|$)/.test(path);
+        if (token && !publicAuth) config.headers.set('Authorization', `Bearer ${token}`);
+        else config.headers.delete('Authorization');
         return config;
     },
     (error) => {
@@ -27,12 +36,18 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
-        // Incorrect credentials are a form error, not an expired authenticated session.
+        // An earlier 401 must not log out a different/newer session.
+        // Only a request sent with the currently active bearer can expire it.
         const requestUrl = String(error.config?.url || '');
-        const isLoginRequest = requestUrl.includes('/auth/login');
-        if (error.response?.status === 401 && !isLoginRequest) {
+        const isPublicAuth = /^\/auth\/(?:login|register)(?:\?|$)/.test(requestUrl);
+        const authorization = error.config?.headers?.get?.('Authorization') ??
+            error.config?.headers?.Authorization;
+        const active = useAuthStore.getState();
+        if (error.response?.status === 401 && !isPublicAuth && active.token &&
+            authorization === `Bearer ${active.token}` &&
+            error.config?._plantlogSessionEpoch === active.sessionEpoch) {
             useAuthStore.getState().logout();
-            if (window.location.pathname !== '/login') window.location.assign('/login');
+            // ProtectedRoute redirects; avoid a hard reload and stale-page flash.
         }
         return Promise.reject(error);
     }

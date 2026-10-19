@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '../services/api';
+import { useAuthStore } from './authStore';
 
 export interface StatusEvent {
     from: string | null;
@@ -41,45 +42,74 @@ interface LogState {
     updateLogStatus: (id: string, status: string) => Promise<void>;
 }
 
+let logFetchVersion = 0;
+const currentSession = (epoch: number) => useAuthStore.getState().sessionEpoch === epoch;
+
 export const useLogStore = create<LogState>((set) => ({
     logs: [],
     isLoading: false,
     error: null,
 
     fetchLogs: async (assetId?: string) => {
-        set({ isLoading: true, error: null });
+        const epoch = useAuthStore.getState().sessionEpoch;
+        const version = ++logFetchVersion;
+        set({ logs: [], isLoading: true, error: null });
+        const stillCurrent = () => currentSession(epoch) && version === logFetchVersion;
         try {
             const url = assetId ? `/logs?assetId=${encodeURIComponent(assetId)}` : '/logs';
             const response = await api.get(url);
-            set({ logs: response.data, isLoading: false });
+            if (stillCurrent()) set({ logs: response.data, isLoading: false });
         } catch (error: any) {
-            set({ isLoading: false, error: error.response?.data?.message || 'Failed to fetch logs' });
+            if (stillCurrent()) set({
+                logs: [], isLoading: false,
+                error: error.response?.data?.message || 'Failed to fetch logs',
+            });
         }
     },
 
     addLog: async (logData) => {
+        const epoch = useAuthStore.getState().sessionEpoch;
         set({ isLoading: true, error: null });
         try {
             await api.post('/logs', logData);
-            // We might need to fetch logs again to get the populated asset/author data
-            set({ isLoading: false });
+            // The page reloads after save to receive populated actor and asset fields.
+            if (currentSession(epoch)) {
+                logFetchVersion++;
+                set({ isLoading: false });
+            }
         } catch (error: any) {
-            set({ isLoading: false, error: error.response?.data?.message || 'Failed to add log entry' });
+            if (currentSession(epoch)) {
+                set({ isLoading: false, error: error.response?.data?.message || 'Failed to add log entry' });
+            }
             throw error;
         }
     },
 
     updateLogStatus: async (id, status) => {
+        const epoch = useAuthStore.getState().sessionEpoch;
         try {
-            const response = await api.put(`/logs/${id}`, { status });
-            set((state) => ({
-                logs: state.logs.map((log) =>
-                    log._id === id ? response.data : log
-                ),
-            }));
+            const response = await api.put(`/logs/${encodeURIComponent(id)}`, { status });
+            if (currentSession(epoch)) {
+                logFetchVersion++;
+                set((state) => ({
+                    logs: state.logs.map((log) =>
+                        log._id === id ? response.data : log,
+                    ),
+                    isLoading: false,
+                }));
+            }
         } catch (error: any) {
-            set({ error: error.response?.data?.message || 'Failed to update log' });
+            if (currentSession(epoch)) {
+                set({ error: error.response?.data?.message || 'Failed to update log' });
+            }
             throw error;
         }
     }
 }));
+
+useAuthStore.subscribe((next, previous) => {
+    if (next.sessionEpoch !== previous.sessionEpoch) {
+        logFetchVersion++;
+        useLogStore.setState({ logs: [], isLoading: false, error: null });
+    }
+});
