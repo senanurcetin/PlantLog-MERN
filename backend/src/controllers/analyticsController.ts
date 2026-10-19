@@ -46,11 +46,19 @@ export const getEquipmentCases = async (
         }
         const now = new Date();
         const from = new Date(now.getTime() - days * 86400000);
-        const cases = await LogEntry.find({
+        const openFilter = {
             type: { $in: ['incident', 'maintenance'] },
             status: { $ne: 'resolved' },
-            createdAt: { $gte: from, $lte: now },
-        }).select('asset type status createdAt').lean();
+        };
+        // Show unresolved work outside this period without changing the
+        // creation-date cohort represented in the equipment ranking.
+        const [cases, olderOpenCases, undatedOpenCases, futureDatedOpenCases] = await Promise.all([
+            LogEntry.find({ ...openFilter, createdAt: { $gte: from, $lte: now } })
+                .select('asset type status createdAt').lean(),
+            LogEntry.countDocuments({ ...openFilter, createdAt: { $lt: from } }),
+            LogEntry.countDocuments({ ...openFilter, createdAt: null }),
+            LogEntry.countDocuments({ ...openFilter, createdAt: { $gt: now } }),
+        ]);
         const ids = [...new Set(cases.map(row => row.asset?.toString()).filter(
             (id): id is string => typeof id === 'string' && /^[a-f0-9]{24}$/i.test(id),
         ))];
@@ -61,7 +69,12 @@ export const getEquipmentCases = async (
             _id: String(asset._id), name: asset.name,
             serialNumber: asset.serialNumber, status: asset.status,
         }));
-        res.status(200).json(summarizeEquipmentCases(cases, descriptors, days, now));
+        res.status(200).json({
+            ...summarizeEquipmentCases(cases, descriptors, days, now),
+            olderOpenCases,
+            undatedOpenCases,
+            futureDatedOpenCases,
+        });
     } catch (error) {
         next(error);
     }

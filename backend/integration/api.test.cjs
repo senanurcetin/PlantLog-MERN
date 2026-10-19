@@ -321,6 +321,9 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     const caseSummary = await api('GET', '/analytics/equipment?days=30', operator);
     assert.equal(caseSummary.status, 200, JSON.stringify(caseSummary.data));
     assert.equal(caseSummary.data.totalOpenCases, 2);
+    assert.equal(caseSummary.data.olderOpenCases, 0);
+    assert.equal(caseSummary.data.undatedOpenCases, 0);
+    assert.equal(caseSummary.data.futureDatedOpenCases, 0);
     assert.equal(caseSummary.data.missingAssetCases, 0);
     assert.equal(caseSummary.data.items.length, 1);
     assert.equal(caseSummary.data.items[0].assetId, backlogAsset.data._id);
@@ -339,6 +342,29 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(missingAssetSummary.status, 200);
     assert.equal(missingAssetSummary.data.totalOpenCases, 3);
     assert.equal(missingAssetSummary.data.missingAssetCases, 1);
+    // Test-only fixtures manipulate timestamps without exposing a REST write path.
+    const olderCase = await LogEntry.create({
+        asset: backlogAsset.data._id, author: registrationA.data._id,
+        type: 'maintenance', status: 'open',
+        title: 'Old unresolved work', description: 'Fixture created outside reporting window',
+    });
+    await LogEntry.collection.updateOne({ _id: olderCase._id }, {
+        $set: { createdAt: new Date('2024-01-01T00:00:00.000Z') },
+    });
+    await LogEntry.collection.insertOne({
+        asset: new mongoose.Types.ObjectId(backlogAsset.data._id),
+        author: new mongoose.Types.ObjectId(registrationA.data._id),
+        type: 'incident', status: 'open',
+        title: 'Undated historical work',
+        description: 'Missing creation timestamp for regression test',
+    });
+    const outsidePeriod = await api('GET', '/analytics/equipment?days=30', operator);
+    assert.equal(outsidePeriod.status, 200, JSON.stringify(outsidePeriod.data));
+    assert.equal(outsidePeriod.data.totalOpenCases, 3);
+    assert.equal(outsidePeriod.data.olderOpenCases, 1);
+    assert.equal(outsidePeriod.data.undatedOpenCases, 1);
+    assert.equal(outsidePeriod.data.futureDatedOpenCases, 0);
+    assert.equal(outsidePeriod.data.items[0].openCases, 2);
     assert.equal(missingAssetSummary.data.displayedOpenCases +
         missingAssetSummary.data.remainingOpenCases +
         missingAssetSummary.data.missingAssetCases,

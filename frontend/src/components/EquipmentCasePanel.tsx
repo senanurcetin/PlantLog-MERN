@@ -13,6 +13,9 @@ interface EquipmentRow {
 }
 interface EquipmentResponse {
     totalOpenCases: number;
+    olderOpenCases: number;
+    undatedOpenCases: number;
+    futureDatedOpenCases: number;
     linkedOpenCases: number;
     missingAssetCases: number;
     displayedOpenCases: number;
@@ -67,10 +70,25 @@ const EquipmentCasePanel = ({ days, reload }: { days: number; reload: number }) 
                                 </div>
                             ))}
                         </div>
+                        {(data.olderOpenCases > 0 || data.undatedOpenCases > 0 ||
+                            data.futureDatedOpenCases > 0) && (
+                            <div role="status" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                                <p className="font-semibold">Open cases outside this reporting period</p>
+                                <p className="mt-1">
+                                    {data.olderOpenCases} cases created before the reporting window,
+                                    {' '}{data.undatedOpenCases} with missing creation dates,
+                                    and {data.futureDatedOpenCases} with future-dated timestamps.
+                                </p>
+                                <p className="mt-2 text-xs">
+                                    These unresolved cases are excluded from the period-specific equipment ranking,
+                                    not from the overall maintenance obligations.
+                                </p>
+                            </div>
+                        )}
                         {data.items.length === 0 ? (
                             <p role="status" className="mt-5 rounded-lg bg-slate-50 p-4 text-sm">
                                 {data.totalOpenCases === 0
-                                    ? 'No unresolved incident or maintenance cases were created in this period.'
+                                    ? 'No unresolved incident or maintenance cases were created in this period. Older cases, if present, are reported separately above.'
                                     : 'No existing equipment matches these cases. Missing links are counted above.'}
                             </p>
                         ) : <div className="mt-5 overflow-x-auto">
@@ -109,7 +127,9 @@ const EquipmentCasePanel = ({ days, reload }: { days: number; reload: number }) 
                         <p className="mt-2 text-xs text-slate-500">
                             Detail links show the full asset log, including older and resolved entries.
                         </p>
-                        <p className="mt-2 text-xs text-slate-500">{data.interpretation}</p>
+                        <p className="mt-2 text-xs text-slate-500">{data.interpretation}
+                            Outside-period counts come from separate queries and may change during concurrent edits.
+                        </p>
                     </> : null}
         </section>
     );
