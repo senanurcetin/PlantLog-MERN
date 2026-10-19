@@ -41,3 +41,11 @@ worked, and the browser emitted no JavaScript page errors. The resulting
 [current screenshots](nexus-demo-overview.png) are included in this repository.
 These checks were run against the publicly hosted Vercel frontend and do not
 represent live industrial system testing.
+
+The guest-only build was then rebuilt locally with
+`VITE_PUBLIC_DEMO_ONLY=true` and validated in Chrome: root and
+login/register/dashboard/analytics paths redirected to `/demo`, the
+official logo loaded and no HTTP API calls or page JavaScript exceptions
+were observed. The current documentation screenshots were recaptured
+from this **production-equivalent local build**. They are not evidence
+of a live backend.

@@ -43,10 +43,13 @@ The illustrative public logbook now includes a few **entirely fictional** status
 
 ## Verified NEXUS screenshot set — 19 October 2026
 
-Captured from the live production URL with actual Chrome at 1440 px desktop
-and 390 px mobile widths, after a public HTTP 200 response and an assertion that
-the official NEXUS wordmark loaded. No browser JavaScript exceptions were
-observed in that walkthrough.
+Captured with actual Chrome at 1440 px desktop and 390 px mobile widths
+from a local build using the same `VITE_PUBLIC_DEMO_ONLY=true` as Vercel production.
+The public URL was independently verified to respond HTTP 200, and the
+pre-flag public deployment passed an online real-browser navigation and logo
+check. The guest-only build additionally passed a local browser verification:
+`/`, `/login`, `/register`, `/dashboard`, and `/analytics` route to
+`/demo`; no API calls or browser JavaScript errors occurred.
 
 - [Overview](nexus-demo-overview.png)
 - [Assets](nexus-demo-assets.png)

@@ -8,7 +8,7 @@
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
-> The architecture diagram illustrates the workflow. The NEXUS screenshots below come from the **live, publicly accessible, read-only fixture demo** (19 October 2026), not an authenticated production plant dashboard. Earlier `docs/dashboard.png`, `docs/assets.png` and `docs/logs.png` remain as historical interface captures.
+> The architecture diagram illustrates the workflow. The NEXUS screenshots below come from the **verified production-equivalent, guest-only frontend build** (19 October 2026), not an authenticated production plant dashboard. Earlier `docs/dashboard.png`, `docs/assets.png` and `docs/logs.png` remain as historical interface captures.
 
 
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
