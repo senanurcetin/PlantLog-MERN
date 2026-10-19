@@ -24,9 +24,10 @@ In many facilities, asset lists, shift handovers and maintenance histories live 
 ## Features
 
 - **Asset registry:** central equipment list, searchable status views and supervisor/admin status updates.
-- **Maintenance and incident records:** structured operational logs for review and handover, plus filtered CSV export with formula-safe cell encoding.
+- **Maintenance and incident records:** structured operational logs, forward-only state transitions, server-stamped status history and filtered CSV export with formula-safe encoding.
 - **Authentication:** JWT-backed API authentication and role-oriented application flows.
 - **Operator dashboard:** overview interface for operational status and recent activity.
+- **Evidence-aware analytics:** authenticated \`/analytics\` view and \`/api/analytics/maintenance\` endpoint for report-to-resolution timing, with eligibility and exclusion counts. This is **not** MTTR or equipment uptime. See [metric definitions](docs/maintenance-metrics.md).
 - **Separated services:** React/Vite frontend, Express API and MongoDB database.
 
 ## Architecture
@@ -114,7 +115,7 @@ cd backend && npm ci && npm test
 cd ../frontend && npm ci && npm run test:demo && npm run build
 ```
 
-The backend includes Node built-in policy regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules and history-preserving deletion. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
+The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
 
 Run the MongoDB-backed test locally against a local MongoDB server listening on `127.0.0.1:27017` with `cd backend && npm ci && npm run test:integration`. It creates a randomly named **test-only local database** and deletes it after the test. The test does not accept a remote database URI.
 

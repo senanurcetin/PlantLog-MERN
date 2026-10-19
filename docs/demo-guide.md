@@ -34,3 +34,5 @@ Open `http://localhost:5173/demo`. The browser route is also accessible from the
 Deploy **only** the `frontend/` directory to a static host if demonstrating `/demo` without the API. Use the root directory `frontend`, build command `npm ci && npm run build`, and output directory `dist`. For Vercel, the included `frontend/vercel.json` provides SPA rewrites for the known application routes. Other hosts need an equivalent `/demo` -> `index.html` fallback. Other authenticated application views will not be functional without their own backend.
 
 **This route is a portfolio example, not a validated CMMS, safety system, digital twin or live telemetry source.**
+
+The illustrative public logbook now includes a few **entirely fictional** status timelines (e.g., synthetic hydraulic service), viewable by expanding an activity item. Dates and actors are invented. The authenticated `/analytics` page is a separate backend-backed feature; the public demo does not simulate MTTR/MTBF or claim a real asset uptime measurement.
