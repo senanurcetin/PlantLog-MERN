@@ -2,103 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+/* NEXUS Identity 2.0 — source: Drive / Logo / NEXUS_Identity_2_0.
+   Preserve the official cyan-blue-lavender-violet X gradient on dark surfaces. */
+:root {
+    --nexus-midnight: #0B0F19;
+    --nexus-navy: #061524;
+    --nexus-cyan: #00E0FF;
+    --nexus-blue: #4EA8FF;
+    --nexus-lavender: #8F9BFF;
+    --nexus-violet: #6E55C6;
+    --nexus-silver: #B9C5CE;
 }
-
-
-/* Industrial portfolio dashboard theme, scoped to the authenticated registry. */
+@layer base {
+    html { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+    body { background: #F3F6FC; color: #17233A; }
+    :focus-visible { outline-color: #4EA8FF; outline-offset: 3px; }
+}
+.nexus-shell {
+    background: radial-gradient(circle at 100% 0, rgba(143,155,255,.10), transparent 38%), #F3F6FC;
+}
+.nexus-sidebar, .nexus-topbar {
+    background: linear-gradient(142deg, #0B0F19 0%, #061524 69%, #171831 100%);
+}
+.nexus-sidebar-link { transition: background-color .2s ease, color .2s ease; }
+.nexus-sidebar-link:hover { background: rgba(78,168,255,.12); }
+.nexus-sidebar-selected {
+    color: #F7FAFF;
+    border: 1px solid rgba(78,168,255,.35);
+    background: linear-gradient(105deg, rgba(0,224,255,.17), rgba(110,85,198,.26));
+    box-shadow: inset 3px 0 #4EA8FF;
+}
+.nexus-topbar { border-bottom: 1px solid rgba(78,168,255,.19); }
+.nexus-content > div { max-width: 1536px; margin-inline: auto; }
+.nexus-auth {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 16% 12%, rgba(0,224,255,.17), transparent 33%),
+        radial-gradient(circle at 83% 76%, rgba(110,85,198,.24), transparent 38%),
+        linear-gradient(140deg, #0B0F19, #061524 70%, #171831);
+}
+.nexus-auth-card {
+    background: #fff; border: 1px solid rgba(143,155,255,.25);
+    box-shadow: 0 25px 70px rgba(0,0,0,.30);
+}
+.nexus-auth-heading {
+    background: linear-gradient(120deg, #0B0F19, #061524 72%, #242044);
+}
+.nexus-demo {
+    background:
+        radial-gradient(circle at 96% 2%, rgba(143,155,255,.13), transparent 35%),
+        #F3F6FC;
+}
+.nexus-hero {
+    border: 1px solid rgba(143,155,255,.28);
+    background:
+        radial-gradient(circle at 88% 2%, rgba(0,224,255,.15), transparent 38%),
+        radial-gradient(circle at 5% 100%, rgba(110,85,198,.25), transparent 42%),
+        linear-gradient(118deg, #0B0F19, #061524 64%, #211C48);
+    box-shadow: 0 20px 46px rgba(6,21,36,.17);
+}
+.nexus-kicker {
+    color: #8F9BFF; font-size: .7rem; font-weight: 750;
+    letter-spacing: .2em; text-transform: uppercase;
+}
+.nexus-action {
+    color: #0B0F19;
+    background: linear-gradient(100deg, #00E0FF, #4EA8FF 65%, #8F9BFF);
+    border: 1px solid rgba(0,224,255,.3);
+}
+.nexus-action:hover { filter: brightness(1.07); }
+.nexus-card {
+    border: 1px solid #DEE5F2;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(20,33,64,.045);
+}
+.nexus-brand-line {
+    height: 3px;
+    background: linear-gradient(90deg, #00E0FF, #4EA8FF, #8F9BFF, #6E55C6);
+}
+/* Existing authenticated dashboard components adopt the same identity. */
 .plantlog-dashboard .plantlog-hero {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #225963;
-  border-radius: 22px;
-  padding: clamp(1.4rem, 2.5vw, 2.1rem);
-  background:
-    radial-gradient(circle at 90% 0, rgba(99, 236, 192, .17), transparent 42%),
-    linear-gradient(115deg, #0a2535, #13515a 67%, #146666);
-  box-shadow: 0 22px 46px rgba(9, 46, 57, .17);
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(78,168,255,.3);
+    border-radius: 22px; padding: clamp(1.4rem,2.5vw,2.1rem);
+    background:
+        radial-gradient(circle at 90% 0, rgba(0,224,255,.17), transparent 42%),
+        linear-gradient(115deg, #0B0F19, #061524 66%, #211C48);
+    box-shadow: 0 22px 46px rgba(11,15,25,.17);
 }
 .plantlog-dashboard .plantlog-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: 35%;
-  pointer-events: none;
-  opacity: .1;
-  background: repeating-linear-gradient(90deg, transparent 0 24px, #c6fff0 25px 26px);
+    content: ''; position: absolute; inset: 0 0 0 auto; width: 35%;
+    pointer-events: none; opacity: .12;
+    background: repeating-linear-gradient(90deg,transparent 0 24px,#4EA8FF 25px 26px);
 }
 .plantlog-dashboard .plantlog-hero h1 {
-  color: #f3fffc; font-size: clamp(1.5rem, 2.3vw, 2.4rem);
-  letter-spacing: -.035em; line-height: 1.13;
+    color: #F3F8FF; font-size: clamp(1.5rem,2.3vw,2.4rem);
+    letter-spacing: -.035em; line-height: 1.13;
 }
-.plantlog-dashboard .plantlog-hero p {
-  color: #cee8e5;
-}
+.plantlog-dashboard .plantlog-hero p { color: #DCEEFF; }
 .plantlog-dashboard .plantlog-hero p:first-child {
-  color: #a8f5ce;
-  letter-spacing: .12em;
+    color: #8F9BFF; letter-spacing: .12em;
 }
 .plantlog-dashboard .plantlog-registry-status {
-  position: relative; z-index: 1; padding: .85rem 1rem;
-  border: 1px solid rgba(187, 242, 220, .2);
-  border-radius: 15px;
-  background: rgba(7, 43, 53, .45);
+    position: relative; z-index: 1; padding: .85rem 1rem;
+    border: 1px solid rgba(143,155,255,.28);
+    border-radius: 15px; background: rgba(6,21,36,.48);
 }
-.plantlog-dashboard .plantlog-registry-status span:not(.rounded-full) {
-  color: #e6fff6;
-}
+.plantlog-dashboard .plantlog-registry-status span:not(.rounded-full) { color: #EFF8FF; }
 .plantlog-dashboard .plantlog-kpi {
-  position: relative;
-  min-width: 0;
-  overflow: hidden;
-  min-height: 126px;
-  border: 1px solid #d6e9e5;
-  border-radius: 19px;
-  padding: clamp(1.05rem, 1.6vw, 1.35rem);
-  background: linear-gradient(165deg, #fff, #effaf7);
-  box-shadow: 0 15px 31px rgba(16, 89, 83, .08);
+    position: relative; min-width: 0; overflow: hidden; min-height: 126px;
+    border: 1px solid #DFE6F4; border-radius: 19px;
+    padding: clamp(1.05rem,1.6vw,1.35rem);
+    background: linear-gradient(165deg,#fff,#F0F5FF);
+    box-shadow: 0 15px 31px rgba(11,15,25,.07);
 }
 .plantlog-dashboard .plantlog-kpi::after {
-  content: ''; position: absolute; height: 4px; inset: auto 0 0;
-  background: linear-gradient(90deg, #2ab99a, #4fc4ba);
+    content: ''; position: absolute; height: 4px; inset: auto 0 0;
+    background: linear-gradient(90deg,#00E0FF,#4EA8FF,#8F9BFF,#6E55C6);
 }
 .plantlog-dashboard .plantlog-kpi p:last-child {
-  font-variant-numeric: tabular-nums;
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-variant-numeric: tabular-nums; font-size: clamp(1.6rem,2.5vw,2.2rem);
 }
 .plantlog-dashboard .plantlog-activity {
-  border-radius: 20px;
-  border: 1px solid #d8ebe6;
-  box-shadow: 0 17px 36px rgba(14, 82, 78, .075);
+    border-radius: 20px; border: 1px solid #DEE5F2;
+    box-shadow: 0 17px 36px rgba(11,15,25,.06);
 }
 .plantlog-dashboard .plantlog-activity > div:first-child {
-  background: linear-gradient(90deg, #fbfffd, #f0faf7);
+    background: linear-gradient(90deg,#FBFDFF,#EEF3FF);
 }
-.plantlog-dashboard .plantlog-activity li:hover {
-  background: #f7fcfa;
-}
+.plantlog-dashboard .plantlog-activity li:hover { background: #F5F8FF; }
 .plantlog-dashboard .plantlog-workflow {
-  border: 1px solid #295e62;
-  border-radius: 20px;
-  padding: clamp(1.4rem, 2.2vw, 2rem);
-  background:
-    radial-gradient(circle at 90% 0, rgba(59, 204, 177, .12), transparent 43%),
-    linear-gradient(154deg, #102738, #123d47);
-  box-shadow: 0 20px 44px rgba(8, 48, 54, .13);
+    border: 1px solid rgba(143,155,255,.28);
+    border-radius: 20px; padding: clamp(1.4rem,2.2vw,2rem);
+    background:
+        radial-gradient(circle at 90% 0,rgba(78,168,255,.15),transparent 43%),
+        linear-gradient(154deg,#0B0F19,#061524 65%,#211C48);
+    box-shadow: 0 20px 44px rgba(11,15,25,.14);
 }
 .plantlog-dashboard .plantlog-workflow > a {
-  border-radius: 12px;
-  background: #8ce9c0;
+    border-radius: 12px; background: #4EA8FF; color: #0B0F19;
 }
-.plantlog-dashboard a:focus-visible {
-  outline: 3px solid #25cda7;
-  outline-offset: 3px;
-}
+.plantlog-dashboard a:focus-visible { outline: 3px solid #4EA8FF; outline-offset: 3px; }
 @media (max-width: 639px) {
-  .plantlog-dashboard .plantlog-hero { padding: 1.4rem; }
-  .plantlog-dashboard .plantlog-kpi { min-height: 108px; }
-  .plantlog-dashboard .plantlog-registry-status { width: 100%; }
+    .plantlog-dashboard .plantlog-hero { padding: 1.4rem; }
+    .plantlog-dashboard .plantlog-kpi { min-height: 108px; }
+    .plantlog-dashboard .plantlog-registry-status { width: 100%; }
 }

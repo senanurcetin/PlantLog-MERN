@@ -88,7 +88,7 @@ const Assets = () => {
                 <div className="flex flex-wrap gap-2">
                     <button type="button" onClick={exportFilteredAssets}
                         disabled={isLoading || filteredAssets.length === 0 || Boolean(error)}
-                        className="inline-flex items-center justify-center rounded-lg border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50">
+                        className="inline-flex items-center justify-center rounded-lg border border-blue-700 bg-white px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50 disabled:opacity-50">
                         <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Export filtered assets CSV
                     </button>
                     <button type="button" onClick={() => { setSubmitError(''); setShowModal(true); }}
@@ -156,7 +156,7 @@ const Assets = () => {
 
             <p className="text-xs text-gray-500" aria-live="polite">Showing {filteredAssets.length} of {assets.length} registered assets.</p>
             {selectedAsset && (
-                <section aria-label="Selected asset details" className="rounded-xl border border-teal-200 bg-white p-6 shadow-sm">
+                <section aria-label="Selected asset details" className="rounded-xl border border-blue-200 bg-white p-6 shadow-sm">
                     <div className="flex flex-wrap justify-between items-start gap-3">
                         <div>
                             <h2 className="text-lg font-bold text-gray-900">{selectedAsset.name}</h2>
@@ -194,7 +194,7 @@ const Assets = () => {
                                     <option value="decommissioned">Decommissioned (final)</option>
                                 </select>
                                 <button type="submit" disabled={statusSaving || editStatus === selectedAsset.status}
-                                    className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50">
+                                    className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50">
                                     {statusSaving ? 'Saving…' : 'Update status'}
                                 </button>
                             </div>
@@ -212,7 +212,7 @@ const Assets = () => {
                                 {selectedAsset.statusHistory.map((event, index) => {
                                     const actor = typeof event.changedBy === 'object' && event.changedBy
                                         ? event.changedBy.name : 'Recorded user';
-                                    return <li key={index} className="border-l-2 border-teal-300 pl-3">
+                                    return <li key={index} className="border-l-2 border-blue-300 pl-3">
                                         <span className="font-medium capitalize">{event.from ?? 'Registered'} → {event.to}</span>
                                         <span className="block text-xs text-gray-500">
                                             {actor} · {new Date(event.changedAt).toLocaleString()}
@@ -225,7 +225,7 @@ const Assets = () => {
                         </p>}
                     </div>
                     <Link to={`/logs?assetId=${encodeURIComponent(selectedAsset._id)}`}
-                        className="mt-5 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">
+                        className="mt-5 inline-block rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
                         View maintenance history →
                     </Link>
                 </section>

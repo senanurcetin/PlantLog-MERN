@@ -75,9 +75,9 @@ const MaintenanceAnalytics = () => {
             <header className="rounded-2xl bg-gradient-to-r from-[#0c3543] to-[#16796b] px-6 py-8 text-white">
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
                     <div className="max-w-2xl">
-                        <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-teal-200"><Activity size={16} aria-hidden="true" /> Evidence-aware operations analytics</div>
+                        <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-blue-200"><Activity size={16} aria-hidden="true" /> Evidence-aware operations analytics</div>
                         <h1 className="text-2xl sm:text-3xl font-bold mt-3">Maintenance lifecycle insights</h1>
-                        <p className="mt-3 text-sm text-teal-50/90 leading-relaxed">Describe reported maintenance/incident records using server-recorded transitions. This page never estimates equipment downtime or failure intervals.</p>
+                        <p className="mt-3 text-sm text-blue-50/90 leading-relaxed">Describe reported maintenance/incident records using server-recorded transitions. This page never estimates equipment downtime or failure intervals.</p>
                     </div>
                     <label className="text-sm font-semibold">
                         Reporting cohort
@@ -106,16 +106,16 @@ const MaintenanceAnalytics = () => {
 
                     <section className="rounded-2xl bg-white border border-slate-200 shadow-sm p-6 sm:p-8">
                         <div className="flex items-start gap-3">
-                            <Clock3 className="h-6 w-6 shrink-0 text-teal-700" aria-hidden="true" />
+                            <Clock3 className="h-6 w-6 shrink-0 text-blue-700" aria-hidden="true" />
                             <div>
                                 <h2 className="text-lg font-bold">Time from report to resolution</h2>
                                 <p className="text-sm text-slate-600 mt-1">Only complete, server-stamped case histories. Not repair time or asset downtime.</p>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                            <div className="rounded-xl bg-teal-50 border border-teal-100 p-5">
+                            <div className="rounded-xl bg-blue-50 border border-blue-100 p-5">
                                 <p className="text-sm font-semibold text-slate-600">Mean report-to-resolution</p>
-                                <p className="text-2xl font-bold text-teal-900 mt-2 tabular-nums">{hours(summary.averageHoursToResolve)}</p>
+                                <p className="text-2xl font-bold text-blue-900 mt-2 tabular-nums">{hours(summary.averageHoursToResolve)}</p>
                             </div>
                             <div className="rounded-xl bg-slate-50 border border-slate-200 p-5">
                                 <p className="text-sm font-semibold text-slate-600">Median report-to-resolution</p>
@@ -141,7 +141,7 @@ const MaintenanceAnalytics = () => {
                                         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100"
                                             role="meter" aria-label={`${type} share of records`}
                                             aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(share)}>
-                                            <div className="h-full rounded-full bg-teal-600" style={{ width: `${share}%` }} />
+                                            <div className="h-full rounded-full bg-blue-600" style={{ width: `${share}%` }} />
                                         </div>
                                         <p className="mt-2 text-xs text-slate-600">
                                             {counts.unresolved} unresolved · {counts.eligibleResolved} timed resolutions · {counts.legacyOrIncomplete} incomplete resolutions
@@ -181,7 +181,7 @@ const MaintenanceAnalytics = () => {
                             These are recorded case volumes, not failure rates or equipment downtime.
                         </p>
                         <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-slate-700">
-                            <span><span className="mr-1 inline-block h-3 w-3 rounded-sm bg-teal-700" /> Incident</span>
+                            <span><span className="mr-1 inline-block h-3 w-3 rounded-sm bg-blue-700" /> Incident</span>
                             <span><span className="mr-1 inline-block h-3 w-3 rounded-sm bg-sky-500" /> Maintenance</span>
                         </div>
                         <ol className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
@@ -197,7 +197,7 @@ const MaintenanceAnalytics = () => {
                                     <div className="mt-4 flex h-24 flex-col justify-end" aria-hidden="true">
                                         <div className="flex w-full flex-col overflow-hidden rounded-md"
                                             style={{ height: Math.max(0, height) }}>
-                                            <div className="bg-teal-700" style={{
+                                            <div className="bg-blue-700" style={{
                                                 flex: bucket.incident, minHeight: bucket.incident ? 2 : 0,
                                             }} />
                                             <div className="bg-sky-500" style={{

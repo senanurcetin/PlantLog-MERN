@@ -67,6 +67,9 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
             await page.getByLabel('Confirm password').fill(password);
             await page.getByRole('button', { name: 'Create operator account' }).click();
             await page.getByRole('heading', { name: 'Welcome back, Browser CI Operator' }).waitFor();
+            const applicationLogo = page.getByRole('img', { name: 'NEXUS' }).first();
+            assert.equal(await applicationLogo.evaluate(img => img.complete && img.naturalWidth > 0), true,
+                'Official NEXUS identity must load on authenticated screens');
 
             // A real phone viewport should show navigation without the desktop sidebar.
             await page.setViewportSize({ width: 390, height: 844 });

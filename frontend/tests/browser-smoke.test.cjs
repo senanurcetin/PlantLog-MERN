@@ -42,6 +42,10 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(response.status(), 200);
         assert.equal(await page.getByRole('heading', { name: 'Know what needs attention.' }).isVisible(), true);
         assert.equal(await page.getByText('READ-ONLY PUBLIC DEMONSTRATION').isVisible(), true);
+        const demoLogo = page.getByRole('img', { name: 'NEXUS' }).first();
+        await demoLogo.waitFor();
+        assert.equal(await demoLogo.evaluate(img => img.complete && img.naturalWidth > 0), true,
+            'Official NEXUS wordmark must load in the public demo');
 
         await page.getByRole('button', { name: 'Asset registry' }).click();
         const searchAssets = page.getByRole('searchbox', { name: 'Search sample assets' });

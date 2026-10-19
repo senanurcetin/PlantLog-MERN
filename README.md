@@ -1,5 +1,9 @@
 # PlantLog — Industrial Asset & Maintenance Logbook
 
+**A NEXUS 2.0 portfolio project.** The public demo and authenticated screens use the original approved NEXUS SVG logo and the Midnight/Cyan/Blue/Lavender/Violet identity. [Brand source and implementation notes](docs/nexus-brand.md).
+
+![Official NEXUS 2.0 Midnight wordmark](frontend/src/assets/nexus-midnight.svg)
+
 **Technical reviewer brief:** [System evidence, reproducibility and operational limits](docs/hiring-summary.md).
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
