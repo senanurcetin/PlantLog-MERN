@@ -1,10 +1,13 @@
 import app from './app';
 import connectDB from './config/db';
+import { getJwtSecret } from './utils/jwtSecret';
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
+        // Fail fast instead of reporting a healthy API with unusable token signing.
+        getJwtSecret();
         // Connect to database
         await connectDB();
 

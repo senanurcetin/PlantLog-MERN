@@ -28,3 +28,5 @@ node --test tests/fullstack-onboarding.test.cjs
 ```
 
 The test spawns local Vite preview and Express processes, generates its own JWT test secret, and removes the isolated database. It does not verify multi-user race conditions, site accessibility conformance, or remote deployment. No external production use is authorized by these tests.
+
+Authenticated CI browser tests use backend defaults with a generated signing key and local MongoDB. Production-mode self-signup is disabled by default; the Docker Compose demo overrides this setting **only while the API stays bound to loopback**. See README for network and credential exposure limits.

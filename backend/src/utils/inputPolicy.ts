@@ -38,6 +38,22 @@ export const pickLogUpdate = (body: unknown): Record<string, unknown> => {
     }
     return fields;
 };
+/** Reject query selector objects and normalize case before calling MongoDB. */
+export const sanitizeLogin = (input: unknown) => {
+    const body = asRecord(input);
+    if (typeof body.email !== 'string' || typeof body.password !== 'string') {
+        throw new InvalidPayloadError('Email and password must be strings');
+    }
+    const email = body.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+        throw new InvalidPayloadError('A valid email is required');
+    }
+    if (!body.password || body.password.length > 1024) {
+        throw new InvalidPayloadError('Invalid password length');
+    }
+    return { email, password: body.password };
+};
+
 export const sanitizeRegistration = (input: unknown) => {
     const body = asRecord(input);
     if (body.role !== undefined && body.role !== 'operator') {

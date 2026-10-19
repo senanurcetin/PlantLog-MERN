@@ -3,13 +3,18 @@ import User from '../models/User';
 import generateToken from '../utils/generateToken';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { sanitizeRegistration } from '../utils/inputPolicy';
+import { sanitizeRegistration, sanitizeLogin } from '../utils/inputPolicy';
+import { isSelfRegistrationEnabled } from '../utils/registrationPolicy';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+        if (!isSelfRegistrationEnabled()) {
+            res.status(403);
+            throw new Error('Self-registration is disabled for this environment');
+        }
         const { name, email, password, role } = sanitizeRegistration(req.body);
 
         // Check if user exists
@@ -54,7 +59,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 // @access  Public
 export const loginUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = sanitizeLogin(req.body);
 
         // Check for user email
         const user = await User.findOne({ email }).select('+password');
@@ -62,7 +67,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         if (user && user.password && (await bcrypt.compare(password, user.password))) {
             if (!user.isActive) {
                 res.status(401);
-                throw new Error('User account is deactivated');
+                throw new Error('Invalid credentials');
             }
 
             res.json({
