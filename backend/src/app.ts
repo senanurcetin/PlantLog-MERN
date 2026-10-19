@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { errorHandler } from './middlewares/errorHandler';
+import { resolveAllowedOrigins } from './utils/corsPolicy';
 import authRoutes from './routes/authRoutes';
 import assetRoutes from './routes/assetRoutes';
 import logEntryRoutes from './routes/logEntryRoutes';
@@ -15,14 +16,10 @@ const app: Application = express();
 // Security and CORS
 app.use(helmet());
 app.use(cors({
-    origin: [
-        'http://localhost:5173', // Vite dev port
-        'http://localhost:80',   // Nginx default
-        'http://localhost:8080', // Common alt port
-        'http://localhost:8081', // Current Docker mapping
-        'http://localhost',      // Port 80 without explicit port
-    ],
-    credentials: true,
+    origin: resolveAllowedOrigins(),
+    // Bearer tokens travel in Authorization; this demo does not use cookies.
+    credentials: false,
+    maxAge: 600,
 }));
 
 // Body parsing

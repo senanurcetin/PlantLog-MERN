@@ -23,6 +23,27 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
 
     const base = 'http://127.0.0.1:' + server.address().port + '/api';
+    // Browser read access is limited to explicit origins; CORS is not auth.
+    const allowedCors = await fetch(base + '/health', {
+        headers: { Origin: 'http://localhost:5173' },
+    });
+    assert.equal(allowedCors.headers.get('access-control-allow-origin'), 'http://localhost:5173');
+    assert.equal(allowedCors.headers.get('access-control-allow-credentials'), null);
+    const blockedCors = await fetch(base + '/health', {
+        headers: { Origin: 'https://unauthorized.example' },
+    });
+    assert.equal(blockedCors.headers.get('access-control-allow-origin'), null);
+    const preflight = await fetch(base + '/assets', {
+        method: 'OPTIONS',
+        headers: {
+            Origin: 'http://localhost:5173',
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'Authorization',
+        },
+    });
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get('access-control-allow-origin'), 'http://localhost:5173');
+
     const api = async (method, path, token, body) => {
         const result = await fetch(base + path, {
             method,
