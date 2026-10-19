@@ -93,7 +93,7 @@ const Demo = () => {
                 <summary className="cursor-pointer font-semibold text-teal-800">Example status timeline ({log.statusHistory.length} events)</summary>
                 <ol className="mt-3 space-y-2">
                     {log.statusHistory.map((event, index) => <li key={index} className="border-l-2 border-teal-200 pl-3">
-                        <span className="font-semibold capitalize">{event.from || 'Created'} → {event.to.replace('_', ' ')}</span>
+                        <span className="font-semibold capitalize">{event.from ? event.from.replace('_', ' ') : 'Created'} → {event.to.replace('_', ' ')}</span>
                         <span className="ml-2 text-slate-500">{displayDate(event.changedAt)} · {event.changedBy}</span>
                     </li>)}
                 </ol>
@@ -192,7 +192,7 @@ const Demo = () => {
                                     <label className="relative">
                                         <span className="sr-only">Search sample assets</span>
                                         <Search className="absolute left-3 top-2.5 text-slate-400" size={17} aria-hidden="true" />
-                                        <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Find equipment or location" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
+                                        <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Find equipment or location" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
                                     </label>
                                     <label>
                                         <span className="sr-only">Filter assets by status</span>
@@ -228,7 +228,7 @@ const Demo = () => {
                                     <div className="flex flex-col sm:flex-row gap-2">
                                         <label className="relative">
                                             <span className="sr-only">Search sample log entries</span><Search className="absolute left-3 top-2.5 text-slate-400" size={17} aria-hidden="true" />
-                                            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search records" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
+                                            <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search records" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
                                         </label>
                                         <label><span className="sr-only">Filter log type</span><select value={logType} onChange={event => setLogType(event.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                             <option value="all">All types</option><option value="maintenance">Maintenance</option><option value="incident">Incidents</option><option value="inspection">Inspections</option><option value="operation">Operations</option>

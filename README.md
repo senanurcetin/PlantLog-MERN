@@ -115,7 +115,7 @@ cd backend && npm ci && npm test
 cd ../frontend && npm ci && npm run test:demo && npm run build
 ```
 
-The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
+The public demo additionally has a [real Chromium smoke test](docs/browser-testing.md) in GitHub Actions, distinct from the frontend build and fixture unit tests. The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
 
 Run the MongoDB-backed test locally against a local MongoDB server listening on `127.0.0.1:27017` with `cd backend && npm ci && npm run test:integration`. It creates a randomly named **test-only local database** and deletes it after the test. The test does not accept a remote database URI.
 
