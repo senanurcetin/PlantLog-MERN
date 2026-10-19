@@ -26,7 +26,7 @@ In many facilities, asset lists, shift handovers and maintenance histories live 
 - **Asset registry:** central equipment list, searchable status views and supervisor/admin status updates. New equipment status events include server timestamps and the authenticated actor; concurrent updates use revision checks. Decommissioning is terminal; new logs cannot be created for decommissioned equipment, but existing history remains accessible. Older records retain unknown status history rather than invented events. Asset creation accepts only validated equipment metadata, normalizes text and starts with `operational` status; operators cannot self-assign a privileged equipment state.
 - **Maintenance and incident records:** structured operational logs, forward-only state transitions, server-stamped status history, immutable resolved records (amendments use new entries), and filtered CSV export with formula-safe encoding.
 - **Authentication:** JWT-backed API authentication and role-oriented application flows.
-- **Operator dashboard:** overview interface for operational status and recent activity.
+- **Operator dashboard:** overview interface for operational status and recent activity, with responsive authenticated navigation and accessible mobile links.
 - **Evidence-aware analytics:** authenticated `/analytics` view and `/api/analytics/maintenance` endpoint for report-to-resolution timing, with eligibility and exclusion counts, type-level breakdowns and evidence-qualified unresolved age buckets. This is **not** MTTR or equipment uptime. See [metric definitions](docs/maintenance-metrics.md).
 - **Separated services:** React/Vite frontend, Express API and MongoDB database.
 
