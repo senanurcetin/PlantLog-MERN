@@ -3,7 +3,7 @@ import LogEntry from '../models/LogEntry';
 import Asset from '../models/Asset';
 import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { pickLogUpdate } from '../utils/inputPolicy';
+import { pickLogUpdate, sanitizeLogCreation } from '../utils/inputPolicy';
 import { canEditLog } from '../utils/authorization';
 import { statusTransition, LogStatus } from '../utils/logLifecycle';
 import { InvalidPayloadError } from '../utils/inputPolicy';
@@ -37,17 +37,7 @@ export const getLogs = async (req: AuthRequest, res: Response, next: NextFunctio
 // @access  Private
 export const createLogEntry = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { assetId, type, title, description, status, metrics } = req.body;
-
-        // Creation begins an observed lifecycle. Clients cannot fabricate terminal history.
-        if (status !== undefined && status !== 'open') {
-            throw new InvalidPayloadError('A new log entry must start in open status');
-        }
-
-        if (!assetId || !type || !title || !description) {
-            res.status(400);
-            throw new Error('Please add all required fields');
-        }
+        const { assetId, type, title, description, metrics } = sanitizeLogCreation(req.body);
 
         if (!req.user) {
             res.status(401);

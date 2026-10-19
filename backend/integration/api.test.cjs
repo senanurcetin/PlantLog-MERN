@@ -108,6 +108,20 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(createdLog.status, 201, JSON.stringify(createdLog.data));
     const logId = createdLog.data._id;
+    for (const injected of [
+        { author: registrationB.data._id },
+        { reportedAt: '2000-01-01T00:00:00Z' },
+        { statusHistory: [] },
+        { metrics: { temperature: 'bad' } },
+        { type: { $ne: null } },
+    ]) {
+        const forged = await api('POST', '/logs', operator, {
+            assetId, type: 'incident', title: 'Injection blocked',
+            description: 'Creation payload must be rejected', ...injected,
+        });
+        assert.equal(forged.status, 400, JSON.stringify(forged.data));
+    }
+
     assert.equal(createdLog.data.status, 'open');
     assert.equal(createdLog.data.statusHistory.length, 1);
     assert.equal(createdLog.data.statusHistory[0].to, 'open');
