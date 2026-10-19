@@ -12,6 +12,8 @@ interface AuthState {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
+    /** Increments for each login, account switch or logout. */
+    sessionEpoch: number;
     setCredentials: (user: User, token: string) => void;
     logout: () => void;
 }
@@ -22,10 +24,20 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             isAuthenticated: false,
-            setCredentials: (user, token) => set({ user, token, isAuthenticated: true }),
+            sessionEpoch: 0,
+            setCredentials: (user, token) => set((state) => ({
+                user, token, isAuthenticated: true,
+                sessionEpoch: state.sessionEpoch + 1,
+            })),
             logout: () => {
-                localStorage.removeItem('auth-storage');
-                set({ user: null, token: null, isAuthenticated: false });
+                set((state) => ({
+                    user: null, token: null, isAuthenticated: false,
+                    sessionEpoch: state.sessionEpoch + 1,
+                }));
+                // Persisted credentials must not remain after explicit sign-out.
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.removeItem('auth-storage');
+                }
             },
         }),
         {
