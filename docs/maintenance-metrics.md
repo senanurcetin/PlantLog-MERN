@@ -77,3 +77,16 @@ of whether the case has subsequently been resolved. A record on the reporting
 endpoint falls into the final bucket; counts reconcile to `records`. The
 periods are defined by elapsed UTC time, not local calendar midnights.
 These counts are workload intake, **not failure rate, downtime, or MTBF**.
+
+### Open unresolved cases outside the reporting window
+
+The equipment-workload response additionally exposes three **separate**
+counts of open incident/maintenance cases **not included** in its ranked
+creation-date cohort: `olderOpenCases` (created before the window),
+`undatedOpenCases` (missing/null creation date), and
+`futureDatedOpenCases` (creation date after the observation endpoint).
+
+A period with zero newly created open cases is not necessarily a plant with
+zero maintenance backlog. These counts are obtained from separate database
+queries and are not a transactionally consistent snapshot during concurrent
+writes. They are descriptive only, not downtime or failure-rate measurements.
