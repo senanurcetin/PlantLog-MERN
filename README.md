@@ -123,6 +123,7 @@ Run the MongoDB-backed test locally against a local MongoDB server listening on 
 
 ## Security and limitations
 
+- **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
 - **Browser-origin policy:** local demo origins are explicitly allowlisted. `CORS_ORIGINS` may replace the list with comma-separated exact URL origins; remote origins require HTTPS under `NODE_ENV=production`. Wildcards, URL paths and credentialed origins are rejected at startup. CORS is **not authentication or a substitute for TLS**.
 - **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is now mapped to loopback only in Compose. Use TLS, trusted proxy configuration, distributed rate limits and explicit network access controls before any external deployment.
 - **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.

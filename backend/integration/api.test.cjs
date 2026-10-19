@@ -44,6 +44,33 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(preflight.status, 204);
     assert.equal(preflight.headers.get('access-control-allow-origin'), 'http://localhost:5173');
 
+
+    const encodedForm = await fetch(base + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'email=operator%40example.com&password=invalid',
+    });
+    assert.equal(encodedForm.status, 415);
+    const wrongType = await fetch(base + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: '{"email":"bad@example.com"}',
+    });
+    assert.equal(wrongType.status, 415);
+    const invalidJson = await fetch(base + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{"email":',
+    });
+    assert.equal(invalidJson.status, 400);
+    const oversizedBody = await fetch(base + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'x'.repeat(33000), password: 'test' }),
+    });
+    assert.equal(oversizedBody.status, 413);
+    assert.equal((await fetch(base + '/health')).status, 200);
+
     const api = async (method, path, token, body) => {
         const result = await fetch(base + path, {
             method,
