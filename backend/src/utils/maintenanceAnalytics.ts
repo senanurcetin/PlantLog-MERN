@@ -29,6 +29,13 @@ export interface UnresolvedAgeSummary {
     unknownStart: number;
 }
 
+export interface IntakeBucket {
+    from: string;
+    to: string;
+    incident: number;
+    maintenance: number;
+}
+
 export interface MaintenanceSummary {
     periodDays: number;
     from: string;
@@ -40,6 +47,7 @@ export interface MaintenanceSummary {
     averageHoursToResolve: number | null;
     medianHoursToResolve: number | null;
     byType: Record<'incident' | 'maintenance', TypeCohortSummary>;
+    intakeBuckets: IntakeBucket[];
     unresolvedAge: UnresolvedAgeSummary;
     indicator: string;
     interpretation: string;
@@ -62,6 +70,22 @@ export const summarizeMaintenance = (
         milliseconds(row.createdAt) >= start &&
         milliseconds(row.createdAt) <= end,
     );
+    // Equal-duration UTC buckets; 1–7 buckets depending on the window size.
+    // The final bucket is inclusive of the reporting endpoint.
+    const bucketCount = Math.min(7, periodDays);
+    const windowDuration = end - start;
+    const intakeBuckets: IntakeBucket[] = Array.from({ length: bucketCount }, (_, index) => ({
+        from: new Date(start + index * windowDuration / bucketCount).toISOString(),
+        to: new Date(start + (index + 1) * windowDuration / bucketCount).toISOString(),
+        incident: 0, maintenance: 0,
+    }));
+    for (const row of inCohort) {
+        const index = Math.min(bucketCount - 1, Math.floor(
+            (milliseconds(row.createdAt) - start) / windowDuration * bucketCount,
+        ));
+        if (row.type === 'incident') intakeBuckets[index].incident++;
+        else intakeBuckets[index].maintenance++;
+    }
     let unresolved = 0;
     let legacyOrIncomplete = 0;
     const durations: number[] = [];
@@ -120,7 +144,7 @@ export const summarizeMaintenance = (
         records: inCohort.length, unresolved, legacyOrIncomplete,
         eligibleResolved: durations.length,
         averageHoursToResolve: average, medianHoursToResolve: median,
-        byType, unresolvedAge,
+        byType, intakeBuckets, unresolvedAge,
         indicator: 'Time from log report to resolution (hours)',
         interpretation: 'Calculated from complete server-recorded transitions for incident/maintenance entries created within the selected window. Open-case aging uses only verified report timestamps and is not an SLA breach rate. Not machine downtime, MTTR or MTBF.',
     };
