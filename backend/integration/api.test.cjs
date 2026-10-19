@@ -284,6 +284,16 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(retired.data.statusHistory[3].from, 'operational');
     assert.equal((await api('PUT', '/assets/' + assetId, reviewer,
         { status: 'operational' })).status, 400);
+    const afterRetirement = await api('POST', '/logs', operator, {
+        assetId, type: 'operation', title: 'Invalid post-retirement operation',
+        description: 'Prevent new operational events on retired equipment',
+    });
+    assert.equal(afterRetirement.status, 409, JSON.stringify(afterRetirement.data));
+    // Prior history remains readable, including events recorded before decommissioning.
+    const historicalLogs = await api('GET', '/logs?assetId=' + assetId, operator);
+    assert.equal(historicalLogs.status, 200);
+    assert.equal(historicalLogs.data.length, 2);
+
 
 
     const disposable = await api('POST', '/assets', reviewer, {
