@@ -125,7 +125,7 @@ const Logs = () => {
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <button type="button" onClick={downloadFilteredLogs} disabled={filteredLogs.length === 0}
-                        className="inline-flex items-center justify-center rounded-lg border border-teal-700 bg-white px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50 disabled:opacity-50">
+                        className="inline-flex items-center justify-center rounded-lg border border-blue-700 bg-white px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50 disabled:opacity-50">
                         Export filtered CSV
                     </button>
                     <button type="button" onClick={() => { setSubmitError(''); setFormData((old) => ({ ...old, assetId: availableAssets.some(a => a._id === activeAssetId) ? activeAssetId! : '' })); setShowModal(true); }}
@@ -134,7 +134,7 @@ const Logs = () => {
                     </button>
                 </div>
             </div>
-            {activeAssetId && <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+            {activeAssetId && <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
                 Showing the maintenance history for {assets.find((asset) => asset._id === activeAssetId)?.name || 'selected equipment'}.
                 <Link to="/logs" className="ml-2 font-semibold underline">Show all logs</Link>
             </div>}
@@ -166,7 +166,7 @@ const Logs = () => {
                                             <div className="flex flex-wrap gap-2">
                                                 {log.status === 'open' && <button type="button" disabled={updatingId === log._id}
                                                     onClick={() => void transition(log._id, 'acknowledged')}
-                                                    className="text-xs font-semibold text-teal-700 hover:underline disabled:opacity-50">Acknowledge</button>}
+                                                    className="text-xs font-semibold text-blue-700 hover:underline disabled:opacity-50">Acknowledge</button>}
                                                 {log.status === 'acknowledged' && <button type="button" disabled={updatingId === log._id}
                                                     onClick={() => void transition(log._id, 'in_progress')}
                                                     className="text-xs font-semibold text-blue-700 hover:underline disabled:opacity-50">Start work</button>}
@@ -193,10 +193,10 @@ const Logs = () => {
                                     <span>Logged by: <span className="font-medium text-gray-700">{log.author?.name || 'Unknown'}</span> ({log.author?.role})</span>
                                 </div>
                                 <details className="mt-3 rounded-lg border border-gray-100 bg-slate-50 p-3 text-xs text-gray-700">
-                                    <summary className="cursor-pointer font-semibold text-teal-800">Status history ({log.statusHistory?.length || 0} recorded events)</summary>
+                                    <summary className="cursor-pointer font-semibold text-blue-800">Status history ({log.statusHistory?.length || 0} recorded events)</summary>
                                     {log.statusHistory?.length ? <ol className="mt-3 space-y-2">
                                         {log.statusHistory.map((event, index) => (
-                                            <li key={index} className="border-l-2 border-teal-200 pl-3">
+                                            <li key={index} className="border-l-2 border-blue-200 pl-3">
                                                 <span className="capitalize font-semibold">{event.from || 'Created'} → {event.to.replace('_', ' ')}</span>
                                                 <span className="ml-2 text-gray-500">{new Date(event.changedAt).toLocaleString()}</span>
                                                 {typeof event.changedBy === 'object' && event.changedBy?.name && <span className="ml-2 text-gray-500">by {event.changedBy.name}</span>}

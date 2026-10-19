@@ -36,7 +36,7 @@ const Dashboard = () => {
         <div className="space-y-6 plantlog-dashboard">
             <header className="plantlog-hero bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-2">Operations overview</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-[#8F9BFF] mb-2">Operations overview</p>
                     <h1 className="text-2xl font-bold text-gray-900">Welcome back{user?.name ? `, ${user.name}` : ''}</h1>
                     <p className="text-gray-600 mt-1">Asset status and maintenance activity from your registry. Routine operation logs are not counted as open maintenance cases.</p>
                 </div>
@@ -118,13 +118,13 @@ const Dashboard = () => {
 
                 <section className="plantlog-workflow bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between">
                     <div>
-                        <p className="text-xs uppercase font-semibold tracking-widest text-emerald-300">Asset workflow</p>
+                        <p className="text-xs uppercase font-semibold tracking-widest text-[#4EA8FF]">Asset workflow</p>
                         <h2 className="text-xl font-bold mt-3">Keep the equipment register current</h2>
                         <p className="text-sm text-slate-300 mt-3">Review asset status, document maintenance and keep shift handovers traceable.</p>
-                        <div className="mt-6 flex items-start gap-3 text-sm text-slate-300"><Activity className="h-5 w-5 text-emerald-300 shrink-0" aria-hidden="true" />See the equipment inventory</div>
+                        <div className="mt-6 flex items-start gap-3 text-sm text-slate-300"><Activity className="h-5 w-5 text-[#4EA8FF] shrink-0" aria-hidden="true" />See the equipment inventory</div>
                         <div className="mt-4 flex items-start gap-3 text-sm text-slate-300"><AlertTriangle className="h-5 w-5 text-amber-300 shrink-0" aria-hidden="true" />Track unresolved work</div>
                     </div>
-                    <Link to="/assets" className="mt-8 bg-emerald-400 hover:bg-emerald-300 text-slate-900 text-sm font-bold text-center py-3 rounded-lg">Explore assets</Link>
+                    <Link to="/assets" className="mt-8 nexus-action text-sm font-bold text-center py-3 rounded-lg">Explore assets</Link>
                 </section>
             </div>
         </div>

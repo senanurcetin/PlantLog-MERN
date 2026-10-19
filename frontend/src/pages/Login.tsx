@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
-import { Settings, Lock, Mail } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
+import NexusBrand from '../components/NexusBrand';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -30,17 +31,17 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+        <div className="nexus-auth flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div className="nexus-auth-card max-w-md w-full space-y-8 p-7 sm:p-10 rounded-2xl">
                 <div>
-                    <div className="mx-auto h-16 w-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center">
-                        <Settings className="h-8 w-8" />
+                    <div className="nexus-auth-heading mb-7 rounded-xl p-4">
+                        <NexusBrand />
                     </div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Industrial E-Logbook
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
-                        Sign in to access the registry
+                        NEXUS / PlantLog · Sign in to access the registry
                     </p>
                 </div>
 

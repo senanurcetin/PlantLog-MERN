@@ -64,7 +64,7 @@ const EquipmentCasePanel = ({ days, reload }: { days: number; reload: number }) 
                                 ['Equipment with cases', data.totalEquipment],
                                 ['Cases with missing asset links', data.missingAssetCases],
                             ] as const).map(([name, count]) => (
-                                <div key={name} className="rounded-xl bg-teal-50 p-4">
+                                <div key={name} className="rounded-xl bg-blue-50 p-4">
                                     <p className="text-xs font-semibold text-slate-700">{name}</p>
                                     <p className="mt-1 text-2xl font-bold tabular-nums">{count}</p>
                                 </div>
@@ -107,7 +107,7 @@ const EquipmentCasePanel = ({ days, reload }: { days: number; reload: number }) 
                                         <tr key={item.assetId}>
                                             <td className="p-3">
                                                 <Link to={'/logs?assetId=' + encodeURIComponent(item.assetId)}
-                                                    className="font-semibold text-teal-800 hover:underline">{item.name}</Link>
+                                                    className="font-semibold text-blue-800 hover:underline">{item.name}</Link>
                                                 <span className="block text-xs text-slate-500">{item.serialNumber}</span>
                                             </td>
                                             <td className="p-3 capitalize">{item.status}</td>

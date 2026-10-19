@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Factory, LockKeyhole, UserPlus } from 'lucide-react';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
+import NexusBrand from '../components/NexusBrand';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -54,17 +55,18 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8">
-            <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl border border-slate-200">
-                <header className="bg-gradient-to-br from-[#0b3342] to-[#18756b] text-white p-7 sm:p-9">
+        <div className="nexus-auth flex items-center justify-center p-4 sm:p-8">
+            <div className="nexus-auth-card w-full max-w-lg overflow-hidden rounded-2xl">
+                <header className="nexus-auth-heading text-white p-7 sm:p-9">
+                    <div className="mb-6"><NexusBrand /></div>
                     <div className="flex gap-3 items-center">
                         <div className="rounded-xl border border-white/20 bg-white/10 p-3"><Factory size={26} aria-hidden="true" /></div>
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-widest text-teal-100">PlantLog / Operator onboarding</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-blue-100">NEXUS / PlantLog operator onboarding</p>
                             <h1 className="text-2xl font-bold mt-1">Create an operator account</h1>
                         </div>
                     </div>
-                    <p className="mt-4 text-sm text-teal-50/90 leading-relaxed">
+                    <p className="mt-4 text-sm text-blue-50/90 leading-relaxed">
                         For the locally hosted application. New users receive the operator role;
                         administrative and supervisor permissions cannot be requested here.
                     </p>
@@ -76,42 +78,42 @@ const Register = () => {
                         <label htmlFor="register-name" className="block text-sm font-semibold text-slate-700 mb-2">Full name</label>
                         <input id="register-name" required autoComplete="name" minLength={2} maxLength={100}
                             value={name} onChange={(event) => setName(event.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600"
                             placeholder="Demo Operator" />
                     </div>
                     <div>
                         <label htmlFor="register-email" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
                         <input id="register-email" type="email" required autoComplete="email"
                             value={email} onChange={(event) => setEmail(event.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600"
                             placeholder="operator@example.com" />
                     </div>
                     <div>
                         <label htmlFor="register-password" className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
                         <input id="register-password" type="password" required minLength={12} maxLength={72} autoComplete="new-password"
                             value={password} onChange={(event) => setPassword(event.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600"
                             placeholder="At least 12 characters" />
                     </div>
                     <div>
                         <label htmlFor="register-confirm" className="block text-sm font-semibold text-slate-700 mb-2">Confirm password</label>
                         <input id="register-confirm" type="password" required minLength={12} maxLength={72} autoComplete="new-password"
                             value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-600"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600"
                             placeholder="Repeat password" />
                     </div>
                     <div className="flex gap-2 items-start rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
-                        <LockKeyhole size={17} className="shrink-0 text-teal-700" aria-hidden="true" />
+                        <LockKeyhole size={17} className="shrink-0 text-blue-700" aria-hidden="true" />
                         <p>This account can register equipment and log events. Only supervisors and administrators can edit equipment metadata or decommission assets.</p>
                     </div>
                     <button type="submit" disabled={submitting}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#0e6663] px-4 py-3 text-sm font-bold text-white hover:bg-[#0c514f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 disabled:opacity-60">
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#0e6663] px-4 py-3 text-sm font-bold text-white hover:bg-[#0c514f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60">
                         <UserPlus size={18} aria-hidden="true" />{submitting ? 'Creating account…' : 'Create operator account'}
                     </button>
                     <p className="text-center text-sm text-slate-600">
-                        Already registered? <Link to="/login" className="font-bold text-teal-700 hover:underline">Sign in</Link>
+                        Already registered? <Link to="/login" className="font-bold text-blue-700 hover:underline">Sign in</Link>
                         <span aria-hidden="true" className="mx-2">·</span>
-                        <Link to="/demo" className="font-bold text-teal-700 hover:underline">Explore demo</Link>
+                        <Link to="/demo" className="font-bold text-blue-700 hover:underline">Explore demo</Link>
                     </p>
                 </form>
             </div>

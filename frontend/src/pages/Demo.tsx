@@ -5,6 +5,7 @@ import {
     Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X,
 } from 'lucide-react';
 import fixture from '../demo/fixture.json';
+import NexusBrand from '../components/NexusBrand';
 
 type View = 'overview' | 'assets' | 'logs';
 type Asset = (typeof fixture.assets)[number];
@@ -67,7 +68,7 @@ const Demo = () => {
     };
 
     const metricCards = [
-        { label: 'Registered assets', count: assets.length, subtitle: 'Synthetic equipment inventory', icon: Factory, iconStyle: 'bg-cyan-100 text-cyan-800' },
+        { label: 'Registered assets', count: assets.length, subtitle: 'Synthetic equipment inventory', icon: Factory, iconStyle: 'bg-cyan-100 text-blue-800' },
         { label: 'Operational', count: operational, subtitle: 'From sample status records', icon: CheckCircle2, iconStyle: 'bg-emerald-100 text-emerald-800' },
         { label: 'Maintenance', count: maintenance, subtitle: 'Assets requiring service', icon: Wrench, iconStyle: 'bg-amber-100 text-amber-800' },
         { label: 'Unresolved entries', count: unresolved, subtitle: 'Open or acknowledged logs', icon: Activity, iconStyle: 'bg-rose-100 text-rose-800' },
@@ -84,15 +85,15 @@ const Demo = () => {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mt-3">
                 <div>
                     <h3 className="font-semibold text-slate-900">{log.title}</h3>
-                    <p className="mt-1 text-xs font-semibold text-teal-700">{assetById.get(log.assetId)?.name || 'Unknown asset'}</p>
+                    <p className="mt-1 text-xs font-semibold text-blue-700">{assetById.get(log.assetId)?.name || 'Unknown asset'}</p>
                     <p className="mt-2 text-sm text-slate-600 leading-relaxed">{log.description}</p>
                 </div>
             </div>
             <p className="mt-3 text-xs text-slate-500">Logged by {log.reportedBy} · {log.id}</p>
             {log.statusHistory.length > 0 && <details className="mt-3 rounded-lg bg-slate-50 px-3 py-3 text-xs text-slate-700">
-                <summary className="cursor-pointer font-semibold text-teal-800">Example status timeline ({log.statusHistory.length} events)</summary>
+                <summary className="cursor-pointer font-semibold text-blue-800">Example status timeline ({log.statusHistory.length} events)</summary>
                 <ol className="mt-3 space-y-2">
-                    {log.statusHistory.map((event, index) => <li key={index} className="border-l-2 border-teal-200 pl-3">
+                    {log.statusHistory.map((event, index) => <li key={index} className="border-l-2 border-blue-200 pl-3">
                         <span className="font-semibold capitalize">{event.from ? event.from.replace('_', ' ') : 'Created'} → {event.to.replace('_', ' ')}</span>
                         <span className="ml-2 text-slate-500">{displayDate(event.changedAt)} · {event.changedBy}</span>
                     </li>)}
@@ -103,21 +104,21 @@ const Demo = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#f3f7f8] text-slate-900">
-            <div className="bg-[#092c38] text-slate-100">
+        <div className="nexus-demo min-h-screen text-slate-900">
+            <div className="bg-[#0B0F19] text-slate-100 border-b border-[#6E55C6]/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="inline-flex items-center gap-2 font-semibold"><ShieldCheck size={14} aria-hidden="true" /> READ-ONLY PUBLIC DEMONSTRATION</span>
-                    <span className="text-teal-100">Synthetic records · No login · No API writes · No plant connectivity</span>
+                    <span className="text-blue-100">Synthetic records · No login · No API writes · No plant connectivity</span>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <header className="flex flex-wrap items-center justify-between gap-4 py-6">
-                    <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-[#0d4852] p-2.5 text-teal-200"><Factory size={25} aria-hidden="true" /></div>
-                        <div><p className="text-xl font-extrabold tracking-tight">PlantLog <span className="text-teal-700">/ DEMO</span></p><p className="text-xs text-slate-500">Industrial asset & maintenance logbook</p></div>
+                    <div className="nexus-auth-heading inline-flex items-center rounded-2xl px-4 py-2.5">
+                        <NexusBrand />
+                        <span className="ml-3 hidden rounded-md border border-[#8F9BFF]/40 px-2 py-1 text-xs font-bold tracking-wide text-[#8F9BFF] sm:inline">DEMO</span>
                     </div>
-                    <Link to="/login" className="inline-flex gap-2 items-center text-sm font-semibold text-slate-700 hover:text-teal-800 rounded-lg px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"><ArrowLeft size={16} aria-hidden="true" /> Sign in to full application</Link>
+                    <Link to="/login" className="inline-flex gap-2 items-center text-sm font-semibold text-slate-700 hover:text-blue-800 rounded-lg px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><ArrowLeft size={16} aria-hidden="true" /> Sign in to full application</Link>
                 </header>
 
                 <nav className="flex flex-wrap gap-2 pb-5" aria-label="Demonstration sections">
@@ -128,18 +129,18 @@ const Demo = () => {
                     ] as const).map(([id, label, Icon]) => (
                         <button type="button" key={id} onClick={() => navigate(id)}
                             aria-current={view === id ? 'page' : undefined}
-                            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${view === id ? 'bg-[#0d4852] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'}`}>
+                            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 ${view === id ? 'bg-[#0B0F19] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'}`}>
                             <Icon size={17} aria-hidden="true" />{label}
                         </button>
                     ))}
                 </nav>
 
                 <main className="space-y-6 pb-16">
-                    <section className="rounded-2xl bg-gradient-to-r from-[#0c3543] via-[#115562] to-[#16796b] text-white p-6 sm:p-9 shadow-xl relative overflow-hidden">
+                    <section className="rounded-2xl nexus-hero text-white p-6 sm:p-9 shadow-xl relative overflow-hidden">
                         <div className="relative z-10 max-w-3xl">
-                            <p className="text-xs font-bold uppercase tracking-[.2em] text-teal-200">Operations intelligence / sample facility</p>
+                            <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-200">Operations intelligence / sample facility</p>
                             <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : 'Shift and maintenance records.'}</h1>
-                            <p className="text-sm sm:text-base text-teal-50/90 mt-3 leading-relaxed">{context.facility} · Snapshot {displayDate(context.snapshot)}. Explore a realistic workflow with completely fictional data.</p>
+                            <p className="text-sm sm:text-base text-blue-50/90 mt-3 leading-relaxed">{context.facility} · Snapshot {displayDate(context.snapshot)}. Explore a realistic workflow with completely fictional data.</p>
                             <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold"><HardHat size={16} aria-hidden="true" /> Portfolio demonstration — not live operational monitoring</div>
                         </div>
                     </section>
@@ -172,12 +173,12 @@ const Demo = () => {
                                         </div>;
                                     })}
                                 </div>
-                                <button type="button" onClick={() => navigate('assets')} className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-teal-800 hover:underline">Inspect all assets <ArrowRight size={16} aria-hidden="true" /></button>
+                                <button type="button" onClick={() => navigate('assets')} className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-blue-800 hover:underline">Inspect all assets <ArrowRight size={16} aria-hidden="true" /></button>
                             </section>
                             <section className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                                 <div className="px-6 py-5 border-b border-slate-100 flex flex-wrap gap-3 items-center justify-between">
                                     <div><h2 className="text-lg font-bold">Recent maintenance activity</h2><p className="text-sm text-slate-500">Latest entries from the sample logbook.</p></div>
-                                    <button type="button" onClick={() => navigate('logs')} className="inline-flex items-center gap-1 text-sm font-bold text-teal-800 hover:underline">View all <ArrowRight size={16} aria-hidden="true" /></button>
+                                    <button type="button" onClick={() => navigate('logs')} className="inline-flex items-center gap-1 text-sm font-bold text-blue-800 hover:underline">View all <ArrowRight size={16} aria-hidden="true" /></button>
                                 </div>
                                 <ul className="divide-y divide-slate-100">{logs.slice(0, 4).map(renderLog)}</ul>
                             </section>
@@ -192,11 +193,11 @@ const Demo = () => {
                                     <label className="relative">
                                         <span className="sr-only">Search sample assets</span>
                                         <Search className="absolute left-3 top-2.5 text-slate-400" size={17} aria-hidden="true" />
-                                        <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Find equipment or location" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
+                                        <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Find equipment or location" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
                                     </label>
                                     <label>
                                         <span className="sr-only">Filter assets by status</span>
-                                        <select value={assetStatus} onChange={event => setAssetStatus(event.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                        <select value={assetStatus} onChange={event => setAssetStatus(event.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
                                             <option value="all">All statuses</option><option value="operational">Operational</option><option value="maintenance">Maintenance</option><option value="decommissioned">Decommissioned</option>
                                         </select>
                                     </label>
@@ -210,7 +211,7 @@ const Demo = () => {
                                             <td className="px-5 sm:px-6 py-4"><p className="font-semibold text-slate-900">{asset.name}</p><p className="text-xs text-slate-500 font-mono mt-1">{asset.serialNumber}</p></td>
                                             <td className="px-5 py-4"><StatusPill status={asset.status} /></td><td className="px-5 py-4 text-slate-600">{asset.location}</td>
                                             <td className="px-5 py-4 capitalize text-slate-600">{asset.criticality}</td>
-                                            <td className="px-5 py-4"><button type="button" onClick={() => { setSelectedAssetId(asset.id); setSearch(''); setLogType('all'); setView('logs'); }} className="text-teal-800 font-bold hover:underline whitespace-nowrap">View logs →</button></td>
+                                            <td className="px-5 py-4"><button type="button" onClick={() => { setSelectedAssetId(asset.id); setSearch(''); setLogType('all'); setView('logs'); }} className="text-blue-800 font-bold hover:underline whitespace-nowrap">View logs →</button></td>
                                         </tr>)}
                                     </tbody>
                                 </table>
@@ -228,23 +229,23 @@ const Demo = () => {
                                     <div className="flex flex-col sm:flex-row gap-2">
                                         <label className="relative">
                                             <span className="sr-only">Search sample log entries</span><Search className="absolute left-3 top-2.5 text-slate-400" size={17} aria-hidden="true" />
-                                            <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search records" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600" />
+                                            <input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search records" className="w-full sm:w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
                                         </label>
-                                        <label><span className="sr-only">Filter log type</span><select value={logType} onChange={event => setLogType(event.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                        <label><span className="sr-only">Filter log type</span><select value={logType} onChange={event => setLogType(event.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
                                             <option value="all">All types</option><option value="maintenance">Maintenance</option><option value="incident">Incidents</option><option value="inspection">Inspections</option><option value="operation">Operations</option>
                                         </select></label>
                                     </div>
                                 </div>
-                                {selectedAsset && <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800">Asset: {selectedAsset.name}<button type="button" onClick={() => setSelectedAssetId(null)} aria-label="Clear asset filter" className="hover:text-teal-950 rounded"><X size={16} /></button></div>}
+                                {selectedAsset && <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-800">Asset: {selectedAsset.name}<button type="button" onClick={() => setSelectedAssetId(null)} aria-label="Clear asset filter" className="hover:text-blue-950 rounded"><X size={16} /></button></div>}
                             </div>
                             <ul className="divide-y divide-slate-100">{searchedLogs.map(renderLog)}</ul>
                             {searchedLogs.length === 0 && <p className="p-10 text-center text-slate-500">No log entries match the current filters.</p>}
                             <p className="px-6 py-4 text-xs text-slate-500 border-t border-slate-100">Showing {searchedLogs.length} of {logs.length} fictional log entries.</p>
                         </section>
                     )}
-                    <footer className="rounded-2xl border border-teal-100 bg-teal-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <footer className="rounded-2xl border border-blue-100 bg-blue-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} All indicators are calculated from this fixed example dataset.</p></div>
-                        <Link to="/login" className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-teal-800 hover:underline">Go to sign in <ArrowRight size={16} aria-hidden="true" /></Link>
+                        <Link to="/login" className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-blue-800 hover:underline">Go to sign in <ArrowRight size={16} aria-hidden="true" /></Link>
                     </footer>
                 </main>
             </div>
