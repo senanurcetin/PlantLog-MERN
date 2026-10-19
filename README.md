@@ -27,7 +27,7 @@ In many facilities, asset lists, shift handovers and maintenance histories live 
 - **Maintenance and incident records:** structured operational logs, forward-only state transitions, server-stamped status history and filtered CSV export with formula-safe encoding.
 - **Authentication:** JWT-backed API authentication and role-oriented application flows.
 - **Operator dashboard:** overview interface for operational status and recent activity.
-- **Evidence-aware analytics:** authenticated \`/analytics\` view and \`/api/analytics/maintenance\` endpoint for report-to-resolution timing, with eligibility and exclusion counts. This is **not** MTTR or equipment uptime. See [metric definitions](docs/maintenance-metrics.md).
+- **Evidence-aware analytics:** authenticated `/analytics` view and `/api/analytics/maintenance` endpoint for report-to-resolution timing, with eligibility and exclusion counts. This is **not** MTTR or equipment uptime. See [metric definitions](docs/maintenance-metrics.md).
 - **Separated services:** React/Vite frontend, Express API and MongoDB database.
 
 ## Architecture
