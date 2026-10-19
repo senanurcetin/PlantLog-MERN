@@ -12,6 +12,18 @@ interface MaintenanceSummary {
     eligibleResolved: number;
     averageHoursToResolve: number | null;
     medianHoursToResolve: number | null;
+    byType: Record<'incident' | 'maintenance', {
+        records: number;
+        unresolved: number;
+        eligibleResolved: number;
+        legacyOrIncomplete: number;
+    }>;
+    unresolvedAge: {
+        under24Hours: number;
+        from24To72Hours: number;
+        over72Hours: number;
+        unknownStart: number;
+    };
     indicator: string;
     interpretation: string;
 }
@@ -109,6 +121,54 @@ const MaintenanceAnalytics = () => {
                             </div>
                         </div>
                         {summary.eligibleResolved === 0 && <p role="status" className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">Insufficient complete resolved cases for a duration estimate. No value is fabricated.</p>}
+                    </section>
+
+                    <section className="grid grid-cols-1 lg:grid-cols-2 gap-4" aria-label="Maintenance breakdown">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                            <h2 className="font-bold text-slate-900">Record type breakdown</h2>
+                            <p className="mt-1 text-xs text-slate-500">Counts represent incident and maintenance records created in the chosen window.</p>
+                            <div className="mt-5 space-y-5">
+                                {(['incident', 'maintenance'] as const).map((type) => {
+                                    const counts = summary.byType[type];
+                                    const share = summary.records ? 100 * counts.records / summary.records : 0;
+                                    return <div key={type}>
+                                        <div className="flex justify-between gap-3 text-sm">
+                                            <span className="font-semibold capitalize">{type}</span>
+                                            <span className="font-bold tabular-nums">{counts.records} records</span>
+                                        </div>
+                                        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100"
+                                            role="meter" aria-label={`${type} share of records`}
+                                            aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(share)}>
+                                            <div className="h-full rounded-full bg-teal-600" style={{ width: `${share}%` }} />
+                                        </div>
+                                        <p className="mt-2 text-xs text-slate-600">
+                                            {counts.unresolved} unresolved · {counts.eligibleResolved} timed resolutions · {counts.legacyOrIncomplete} incomplete resolutions
+                                        </p>
+                                    </div>;
+                                })}
+                            </div>
+                            {summary.records === 0 && <p className="mt-4 text-sm text-slate-500">No qualifying records in this period.</p>}
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                            <h2 className="font-bold text-slate-900">Unresolved case age</h2>
+                            <p className="mt-1 text-xs text-slate-500">Age since a verified server-recorded report, not repair downtime or a missed SLA.</p>
+                            <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                                {([
+                                    ['Under 24 hours', summary.unresolvedAge.under24Hours],
+                                    ['24–72 hours', summary.unresolvedAge.from24To72Hours],
+                                    ['72+ hours', summary.unresolvedAge.over72Hours],
+                                    ['Unknown start', summary.unresolvedAge.unknownStart],
+                                ] as const).map(([label, count]) => (
+                                    <div key={label} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                                        <dt className="text-xs text-slate-600">{label}</dt>
+                                        <dd className="mt-1 text-2xl font-bold tabular-nums text-slate-900">{count}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+                            <p className="mt-4 text-xs text-slate-500">
+                                Every unresolved case belongs to exactly one age bucket. Records with unverifiable report timestamps are marked unknown rather than estimated.
+                            </p>
+                        </div>
                     </section>
 
                     <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
