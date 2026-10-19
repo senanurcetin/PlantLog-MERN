@@ -236,6 +236,14 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal((await api('PUT', '/logs/' + logId, operator, {
         statusHistory: [],
     })).status, 400);
+    for (const invalid of [
+        { title: { $ne: null } }, { description: ' ' },
+        { type: { $ne: null } }, { type: 'fault' },
+        { title: 'X'.repeat(201) }, { status: 3 },
+    ]) {
+        const patch = await api('PUT', '/logs/' + logId, operator, invalid);
+        assert.equal(patch.status, 400, JSON.stringify(patch.data));
+    }
     const working = await api('PUT', '/logs/' + logId, operator, { status: 'in_progress' });
     assert.equal(working.status, 200, JSON.stringify(working.data));
     assert.equal(working.data.statusHistory.length, 3);
@@ -258,6 +266,14 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
         { statusHistory: [] })).status, 400);
     assert.equal((await api('PUT', '/assets/' + assetId, reviewer,
         { status: 'nonsense' })).status, 400);
+    for (const invalid of [
+        { name: { $gt: '' } }, { location: 123 }, { category: 'impossible' },
+        { serialNumber: '' }, { purchaseDate: '2025-02-29' },
+        { purchaseDate: { $ne: null } },
+    ]) {
+        const patch = await api('PUT', '/assets/' + assetId, reviewer, invalid);
+        assert.equal(patch.status, 400, JSON.stringify(patch.data));
+    }
     const restored = await api('PUT', '/assets/' + assetId, reviewer, { status: 'operational' });
     assert.equal(restored.status, 200, JSON.stringify(restored.data));
     assert.equal(restored.data.statusHistory.length, 3);
