@@ -12,7 +12,9 @@ npm run build
 npm run dev
 ```
 
-Open `http://localhost:5173/demo`. The browser route is also accessible from the login screen via **Explore demo**.
+**Live public demo:** https://plantlog-nexus-demo.vercel.app/demo (NEXUS 2.0 branding). Opening the project root also leads to `/demo` on this static, guest-only deployment.
+
+Open `http://localhost:5173/demo` in local development mode. The browser route is also accessible from the login screen via **Explore demo**.
 
 ## Demonstration walk-through
 
@@ -31,8 +33,32 @@ Open `http://localhost:5173/demo`. The browser route is also accessible from the
 
 ## Static hosting
 
+The Vercel project `plantlog-nexus-demo` uses `frontend/` as root and sets `VITE_PUBLIC_DEMO_ONLY=true` for production. In that build all other application paths redirect to `/demo` and links to login/register are replaced with source-code links, because **no backend is deployed**. The source repository is connected to Vercel on `main`.
+
 Deploy **only** the `frontend/` directory to a static host if demonstrating `/demo` without the API. Use the root directory `frontend`, build command `npm ci && npm run build`, and output directory `dist`. For Vercel, the included `frontend/vercel.json` provides SPA rewrites for the known application routes. Other hosts need an equivalent `/demo` -> `index.html` fallback. Other authenticated application views will not be functional without their own backend.
 
 **This route is a portfolio example, not a validated CMMS, safety system, digital twin or live telemetry source.**
 
 The illustrative public logbook now includes a few **entirely fictional** status timelines (e.g., synthetic hydraulic service), viewable by expanding an activity item. Dates and actors are invented. The authenticated `/analytics` page is a separate backend-backed feature; the public demo does not simulate MTTR/MTBF or claim a real asset uptime measurement.
+
+## Verified NEXUS screenshot set — 19 October 2026
+
+Captured with actual Chrome at 1440 px desktop and 390 px mobile widths
+from a local build using the same `VITE_PUBLIC_DEMO_ONLY=true` as Vercel production.
+The public URL was independently verified to respond HTTP 200, and the
+pre-flag public deployment passed an online real-browser navigation and logo
+check. The guest-only build additionally passed a local browser verification:
+`/`, `/login`, `/register`, `/dashboard`, and `/analytics` route to
+`/demo`; no API calls or browser JavaScript errors occurred.
+
+- [Overview](nexus-demo-overview.png)
+- [Assets](nexus-demo-assets.png)
+- [Maintenance log](nexus-demo-logs.png)
+- [Mobile overview](nexus-demo-mobile.png)
+- [Mobile login design](nexus-login-mobile.png) — captured **before** the
+  guest-only production flag was enabled; this view is available in local
+  authenticated-app mode, **not** in the guest-only Vercel deployment.
+
+The 20 Node frontend tests and static frontend build passed in a local QA copy.
+These checks do not validate backend/MongoDB, real multi-user production
+security, or conformance to a complete accessibility audit.

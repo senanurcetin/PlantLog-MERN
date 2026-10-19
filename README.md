@@ -8,18 +8,18 @@
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
-> Designed workflow overview; not a live plant dashboard screenshot. The historical interface captures below predate the dashboard update that replaced hard-coded counts and the placeholder activity panel with API-backed metrics and recent logs.
+> The architecture diagram illustrates the workflow. The NEXUS screenshots below come from the **verified production-equivalent, guest-only frontend build** (19 October 2026), not an authenticated production plant dashboard. Earlier `docs/dashboard.png`, `docs/assets.png` and `docs/logs.png` remain as historical interface captures.
 
 
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
 A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
 
-![PlantLog operations dashboard](docs/dashboard.png)
+![NEXUS PlantLog read-only demo overview, 19 October 2026](docs/nexus-demo-overview.png)
 
-**Explore the zero-login demo:** open the `/demo` route on a running frontend, or follow the [demo guide](docs/demo-guide.md).
+**Launch the public read-only demo:** [plantlog-nexus-demo.vercel.app/demo](https://plantlog-nexus-demo.vercel.app/demo). It contains synthetic data only and requires no API, database or login. For reproduction, see the [demo guide](docs/demo-guide.md).
 
-**Explore:** [Portfolio project](https://senanur-cetin.vercel.app/#projects) · [Asset registry](docs/assets.png) · [Maintenance log](docs/logs.png)
+**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
 
 ## Problem and approach
 
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Public, read-only demo
 
-The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs and drill into per-asset history. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
+The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs and drill into per-asset history. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
 
 ## Getting started
 

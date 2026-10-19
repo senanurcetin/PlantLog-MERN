@@ -46,3 +46,14 @@ test('approved palette is exposed as central design tokens', () => {
         assert.ok(css.includes(color), color + ' missing from base CSS');
     }
 });
+
+test('guest-only production deployment cannot expose nonfunctional authentication routes', () => {
+    const app = contents('src/App.tsx');
+    const demo = contents('src/pages/Demo.tsx');
+    assert.match(app, /VITE_PUBLIC_DEMO_ONLY/);
+    assert.match(app, /<Route path="\/demo" element={<Demo \/>} \/>/);
+    assert.match(app, /<Route path="\*" element={<Navigate to="\/demo" replace \/>} \/>/);
+    assert.match(demo, /publicDemoOnly/);
+    assert.match(demo, /View source on GitHub/);
+    assert.match(demo, /Inspect project code/);
+});

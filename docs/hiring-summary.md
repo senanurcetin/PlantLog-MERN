@@ -8,7 +8,7 @@ Replace fragmented paper/spreadsheet records with an asset registry and a search
 
 | What a reviewer can inspect | Evidence |
 |---|---|
-| Is the workflow implemented in UI views? | [Dashboard capture](dashboard.png), [Assets](assets.png), [Maintenance logs](logs.png) |
+| Is the workflow implemented in UI views? | [Live NEXUS read-only demo](https://plantlog-nexus-demo.vercel.app/demo), [current overview](nexus-demo-overview.png), [current assets](nexus-demo-assets.png), [current maintenance logs](nexus-demo-logs.png), [mobile](nexus-demo-mobile.png) |
 | How are services separated? | [Architecture diagram](plantlog-workflow.svg) and [REST application](../backend/src/app.ts) |
 | How do API records map to data? | [Asset model](../backend/src/models/Asset.ts), [LogEntry model](../backend/src/models/LogEntry.ts), [API routes](../backend/src/routes/) |
 | Can it be launched independently? | [Docker Compose guide](../README.md#getting-started) |
@@ -22,6 +22,6 @@ Replace fragmented paper/spreadsheet records with an asset registry and a search
 
 ## Operational boundaries
 
-Existing screenshots are historical interface captures. The development Compose setup exposes MongoDB on the host and needs a strong unique JWT secret; it is **not** suitable for a public production deployment unchanged. A successful build is not evidence of authorization security or end-to-end functional testing.
+The current screenshots linked above are verified public fixture-demo captures. Older `dashboard.png`, `assets.png`, and `logs.png` show historical authenticated interface revisions, not the current NEXUS demo. The development Compose setup exposes MongoDB on the host and needs a strong unique JWT secret; it is **not** suitable for a public production deployment unchanged. A successful build is not evidence of authorization security or end-to-end functional testing.
 
 **Before real-world deployment:** [Security policy](../SECURITY.md) · [README](../README.md).
