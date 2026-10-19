@@ -30,3 +30,14 @@ node --test tests/fullstack-onboarding.test.cjs
 The test spawns local Vite preview and Express processes, generates its own JWT test secret, and removes the isolated database. It does not verify multi-user race conditions, site accessibility conformance, or remote deployment. No external production use is authorized by these tests.
 
 Authenticated CI browser tests use backend defaults with a generated signing key and local MongoDB. Production-mode self-signup is disabled by default; the Docker Compose demo overrides this setting **only while the API stays bound to loopback**. See README for network and credential exposure limits.
+
+## Production visual walkthrough (NEXUS)
+
+On 19 October 2026, the public guest-only NEXUS demo was checked using an
+actual headless Google Chrome browser at 1440 × 900 and 390 × 844 viewport sizes.
+Tests confirmed that the production route returned HTTP 200, the official logo
+had non-zero natural image dimensions, navigation to Assets and Maintenance Log
+worked, and the browser emitted no JavaScript page errors. The resulting
+[current screenshots](nexus-demo-overview.png) are included in this repository.
+These checks were run against the publicly hosted Vercel frontend and do not
+represent live industrial system testing.

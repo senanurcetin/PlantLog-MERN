@@ -10,7 +10,22 @@ import Logs from './pages/Logs';
 import MaintenanceAnalytics from './pages/MaintenanceAnalytics';
 import Layout from './components/Layout';
 
+const publicDemoOnly = import.meta.env.VITE_PUBLIC_DEMO_ONLY === 'true';
+
 function App() {
+    // Portfolio-hosted frontend has no backend: never advertise nonfunctional
+    // authenticated routes or send clients to a registration form.
+    if (publicDemoOnly) {
+        return (
+            <Router>
+                <Routes>
+                    <Route path="/demo" element={<Demo />} />
+                    <Route path="*" element={<Navigate to="/demo" replace />} />
+                </Routes>
+            </Router>
+        );
+    }
+
     return (
         <Router>
             <Routes>

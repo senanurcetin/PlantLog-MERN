@@ -34,6 +34,7 @@ const Demo = () => {
     const [logType, setLogType] = useState('all');
     const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
     const { assets, logs, context } = fixture;
+    const publicDemoOnly = import.meta.env.VITE_PUBLIC_DEMO_ONLY === 'true';
     const operational = assets.filter(asset => asset.status === 'operational').length;
     const maintenance = assets.filter(asset => asset.status === 'maintenance').length;
     const unresolved = logs.filter(log => log.status !== 'resolved').length;
@@ -118,7 +119,12 @@ const Demo = () => {
                         <NexusBrand />
                         <span className="ml-3 hidden rounded-md border border-[#8F9BFF]/40 px-2 py-1 text-xs font-bold tracking-wide text-[#8F9BFF] sm:inline">DEMO</span>
                     </div>
-                    <Link to="/login" className="inline-flex gap-2 items-center text-sm font-semibold text-slate-700 hover:text-blue-800 rounded-lg px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><ArrowLeft size={16} aria-hidden="true" /> Sign in to full application</Link>
+                    {publicDemoOnly
+                        ? <a href="https://github.com/senanurcetin/PlantLog-MERN" target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:text-blue-800">
+                            View source on GitHub <ArrowRight size={16} aria-hidden="true" />
+                        </a>
+                        : <Link to="/login" className="inline-flex gap-2 items-center text-sm font-semibold text-slate-700 hover:text-blue-800 rounded-lg px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><ArrowLeft size={16} aria-hidden="true" /> Sign in to full application</Link>}
                 </header>
 
                 <nav className="flex flex-wrap gap-2 pb-5" aria-label="Demonstration sections">
@@ -245,7 +251,12 @@ const Demo = () => {
                     )}
                     <footer className="rounded-2xl border border-blue-100 bg-blue-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} All indicators are calculated from this fixed example dataset.</p></div>
-                        <Link to="/login" className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-blue-800 hover:underline">Go to sign in <ArrowRight size={16} aria-hidden="true" /></Link>
+                        {publicDemoOnly
+                            ? <a href="https://github.com/senanurcetin/PlantLog-MERN" target="_blank" rel="noopener noreferrer"
+                                className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-blue-800 hover:underline">
+                                Inspect project code <ArrowRight size={16} aria-hidden="true" />
+                            </a>
+                            : <Link to="/login" className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-blue-800 hover:underline">Go to sign in <ArrowRight size={16} aria-hidden="true" /></Link>}
                     </footer>
                 </main>
             </div>
