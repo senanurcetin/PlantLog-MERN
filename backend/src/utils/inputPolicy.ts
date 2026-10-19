@@ -45,7 +45,7 @@ export const sanitizeLogin = (input: unknown) => {
         throw new InvalidPayloadError('Email and password must be strings');
     }
     const email = body.email.trim().toLowerCase();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || email.length > 254) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
         throw new InvalidPayloadError('A valid email is required');
     }
     if (!body.password || body.password.length > 1024) {
