@@ -148,7 +148,7 @@ const Assets = () => {
                         <div><dt className="text-gray-500">Category</dt><dd className="mt-1 font-semibold capitalize">{selectedAsset.category}</dd></div>
                         <div><dt className="text-gray-500">Status</dt><dd className="mt-1">{getStatusBadge(selectedAsset.status)}</dd></div>
                     </dl>
-                    {canManageAssets && (
+                    {canManageAssets && selectedAsset.status !== 'decommissioned' && (
                         <form className="mt-5 rounded-lg bg-slate-50 p-4" onSubmit={async (event) => {
                             event.preventDefault();
                             setStatusSaving(true);
@@ -170,7 +170,7 @@ const Assets = () => {
                                     className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm">
                                     <option value="operational">Operational</option>
                                     <option value="maintenance">Maintenance</option>
-                                    <option value="decommissioned">Decommissioned</option>
+                                    <option value="decommissioned">Decommissioned (final)</option>
                                 </select>
                                 <button type="submit" disabled={statusSaving || editStatus === selectedAsset.status}
                                     className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50">
@@ -179,6 +179,30 @@ const Assets = () => {
                             </div>
                         </form>
                     )}
+                    {selectedAsset.status === 'decommissioned' && (
+                        <p className="mt-5 text-sm text-amber-800" role="status">
+                            This asset is decommissioned. Its status cannot be reopened.
+                        </p>
+                    )}
+                    <div className="mt-5 rounded-lg border border-gray-200 p-4">
+                        <h3 className="text-sm font-semibold text-gray-900">Status change history</h3>
+                        {selectedAsset.statusHistory?.length ? (
+                            <ol className="mt-3 space-y-2 text-sm text-gray-700">
+                                {selectedAsset.statusHistory.map((event, index) => {
+                                    const actor = typeof event.changedBy === 'object' && event.changedBy
+                                        ? event.changedBy.name : 'Recorded user';
+                                    return <li key={index} className="border-l-2 border-teal-300 pl-3">
+                                        <span className="font-medium capitalize">{event.from ?? 'Registered'} → {event.to}</span>
+                                        <span className="block text-xs text-gray-500">
+                                            {actor} · {new Date(event.changedAt).toLocaleString()}
+                                        </span>
+                                    </li>;
+                                })}
+                            </ol>
+                        ) : <p className="mt-2 text-xs text-gray-500">
+                            No recorded status events for this legacy asset. Historical changes cannot be reconstructed.
+                        </p>}
+                    </div>
                     <Link to={`/logs?assetId=${encodeURIComponent(selectedAsset._id)}`}
                         className="mt-5 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">
                         View maintenance history →

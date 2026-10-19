@@ -5,13 +5,16 @@ import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { pickAssetUpdate, sanitizeAssetCreation } from '../utils/inputPolicy';
 import { canManageAssets } from '../utils/authorization';
+import { validateAssetStatusTransition, AssetStatus } from '../utils/assetLifecycle';
+import { InvalidPayloadError } from '../utils/inputPolicy';
 
 // @desc    Get all assets
 // @route   GET /api/assets
 // @access  Private
 export const getAssets = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const assets = await Asset.find().populate('createdBy', 'name email').sort({ createdAt: -1 });
+        const assets = await Asset.find().populate('createdBy', 'name email')
+            .populate('statusHistory.changedBy', 'name role').sort({ createdAt: -1 });
         res.status(200).json(assets);
     } catch (error) {
         next(error);
@@ -27,7 +30,9 @@ export const getAsset = async (req: AuthRequest, res: Response, next: NextFuncti
             res.status(400);
             throw new Error('Invalid asset ID');
         }
-        const asset = await Asset.findById(req.params.id).populate('createdBy', 'name email');
+        const asset = await Asset.findById(req.params.id)
+            .populate('createdBy', 'name email')
+            .populate('statusHistory.changedBy', 'name role');
 
         if (!asset) {
             res.status(404);
@@ -59,6 +64,7 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('Asset with this serial number already exists');
         }
 
+        const createdAt = new Date();
         const asset = await Asset.create({
             name,
             serialNumber,
@@ -67,6 +73,9 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
             location,
             purchaseDate,
             createdBy: req.user.id,
+            statusHistory: [{
+                from: null, to: 'operational', changedAt: createdAt, changedBy: req.user.id,
+            }],
         });
 
         res.status(201).json(asset);
@@ -96,11 +105,36 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
         }
 
         const fields = pickAssetUpdate(req.body);
-        const updatedAsset = await Asset.findByIdAndUpdate(
-            req.params.id,
-            { $set: fields },
+        const patch: Record<string, unknown> = { $set: fields, $inc: { __v: 1 } };
+        if (fields.status !== undefined) {
+            if (typeof fields.status !== 'string' ||
+                !['operational', 'maintenance', 'decommissioned'].includes(fields.status)) {
+                throw new InvalidPayloadError('Unsupported asset status');
+            }
+            if (validateAssetStatusTransition(asset.status, fields.status as AssetStatus)) {
+                patch.$push = {
+                    statusHistory: {
+                        from: asset.status,
+                        to: fields.status,
+                        changedAt: new Date(),
+                        changedBy: req.user!.id,
+                    },
+                };
+            }
+        }
+
+        // Match the loaded version so concurrent changes cannot generate a
+        // transition history inconsistent with the actual previous status.
+        const updatedAsset = await Asset.findOneAndUpdate(
+            { _id: asset._id, __v: asset.__v },
+            patch,
             { new: true, runValidators: true }
-        );
+        ).populate('createdBy', 'name email')
+            .populate('statusHistory.changedBy', 'name role');
+        if (!updatedAsset) {
+            res.status(409);
+            throw new Error('Asset changed since it was loaded; refresh and retry');
+        }
 
         res.status(200).json(updatedAsset);
     } catch (error) {
