@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CalendarRange, Clock3, DatabaseZap, RefreshCw } from 'lucide-react';
 import api from '../services/api';
+import EquipmentCasePanel from '../components/EquipmentCasePanel';
 
 interface MaintenanceSummary {
     periodDays: number;
@@ -170,6 +171,8 @@ const MaintenanceAnalytics = () => {
                             </p>
                         </div>
                     </section>
+
+                    <EquipmentCasePanel days={days} reload={reload} />
 
                     <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="rounded-2xl border border-slate-200 bg-white p-6">
