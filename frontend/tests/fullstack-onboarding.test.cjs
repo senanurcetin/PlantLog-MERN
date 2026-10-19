@@ -110,6 +110,7 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
             await page.getByRole('link', { name: 'Maintenance Analytics' }).click();
             await page.getByText('Resolved with full history').waitFor();
             await page.getByRole('heading', { name: 'Equipment with open maintenance cases' }).waitFor();
+            await page.getByRole('heading', { name: 'New maintenance / incident records over time' }).waitFor();
             const eligibleCard = page.getByText('Resolved with full history').locator('..');
             assert.equal(await eligibleCard.getByText('1', { exact: true }).isVisible(), true);
             assert.equal(await page.getByText(/Not machine downtime, MTTR or MTBF/).isVisible(), true);

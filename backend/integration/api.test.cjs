@@ -274,6 +274,9 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(summary.data.eligibleResolved, 1);
     assert.equal(summary.data.legacyOrIncomplete, 0);
     assert.equal(summary.data.unresolved, 0);
+    assert.equal(summary.data.intakeBuckets.length, 7);
+    assert.equal(summary.data.intakeBuckets.reduce((count, item) =>
+        count + item.incident + item.maintenance, 0), summary.data.records);
     assert.deepEqual(summary.data.byType.incident, {
         records: 1, unresolved: 0, eligibleResolved: 1, legacyOrIncomplete: 0,
     });
