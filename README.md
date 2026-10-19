@@ -106,6 +106,8 @@ npm run dev
 
 PowerShell users can replace `cp` with `Copy-Item`.
 
+The included Compose configuration binds both the API (port 5000) and MongoDB (port 27017) to `127.0.0.1` only. Compose explicitly sets `REGISTRATION_ENABLED=true` for this **local demo**. Server startup rejects missing or weak JWT secrets. A production environment outside Compose defaults to registration disabled unless `REGISTRATION_ENABLED=true` is explicitly set; do not enable it on public infrastructure without stronger ingress controls.
+
 Once the backend and MongoDB are running, visit `http://localhost:5173/register` to create an **operator** account (minimum 12-character password). The local Compose frontend uses `http://localhost:8081/register`. Operators can create assets and maintenance records but cannot change asset metadata or delete assets. There is deliberately **no public privilege escalation flow**: supervisor and administrator roles require trusted out-of-band provisioning. Never expose the development registration endpoint publicly without access controls and rate limiting.
 
 ## Validation
@@ -121,9 +123,9 @@ Run the MongoDB-backed test locally against a local MongoDB server listening on 
 
 ## Security and limitations
 
-- **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is still mapped to the host; use TLS and access controls before any external deployment.
+- **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is now mapped to loopback only in Compose. Use TLS, trusted proxy configuration, distributed rate limits and explicit network access controls before any external deployment.
 - **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
-- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor. Any authenticated user can add assets or create log entries; only supervisors and administrators may change asset metadata/status or remove assets, and an asset with logs cannot be deleted (decommission it instead). Operators may edit only their own logs. Privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Rate limiting, token storage, formal access reviews and audit retention still need further work.
+- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor. Any authenticated user can add assets or create log entries; only supervisors and administrators may change asset metadata/status or remove assets, and an asset with logs cannot be deleted (decommission it instead). Operators may edit only their own logs. Privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Login/signup use bounded single-process, socket-IP attempt limits for the local demo (30 logins/10 minutes and 10 registrations/10 minutes); these **do not** replace distributed edge quotas. Token storage, formal access reviews and audit retention still need further work.
 - **Demo assets:** the public demo's fixture is fictional, and screenshots show project interfaces rather than live equipment integration.
 
 ## Repository map

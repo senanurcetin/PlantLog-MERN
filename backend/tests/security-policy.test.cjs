@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { InvalidPayloadError, sanitizeRegistration, pickAssetUpdate, pickLogUpdate } =
+const { InvalidPayloadError, sanitizeRegistration, sanitizeLogin, pickAssetUpdate, pickLogUpdate } =
     require('../dist/utils/inputPolicy.js');
 const { getJwtSecret } = require('../dist/utils/jwtSecret.js');
 
@@ -63,4 +63,19 @@ test('JWT signing requires an explicit non-placeholder secret', () => {
         if (previous === undefined) delete process.env.JWT_SECRET;
         else process.env.JWT_SECRET = previous;
     }
+});
+
+test('login rejects Mongo selector payloads and non-string passwords', () => {
+    for (const body of [
+        { email: { $ne: null }, password: 'something' },
+        { email: ['a@example.com'], password: 'something' },
+        { email: 'a@example.com', password: { $gt: '' } },
+        { email: '', password: 'something' },
+        { email: 'a@example.com', password: '' },
+        { email: 'a@example.com', password: 'x'.repeat(1025) },
+        null,
+    ]) assert.throws(() => sanitizeLogin(body), InvalidPayloadError);
+    assert.deepEqual(sanitizeLogin({ email: '  USER@Example.Com ', password: 'some-secret' }), {
+        email: 'user@example.com', password: 'some-secret',
+    });
 });

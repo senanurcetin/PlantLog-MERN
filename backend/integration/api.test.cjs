@@ -60,9 +60,37 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(registrationB.status, 201, JSON.stringify(registrationB.data));
     const reviewer = registrationB.data.token;
 
+    // Selector-shaped login bodies must never reach User.findOne as query operators.
+    assert.equal((await api('POST', '/auth/login', null, {
+        email: { $ne: null }, password,
+    })).status, 400);
+    assert.equal((await api('POST', '/auth/login', null, {
+        email: emailA, password: { $ne: null },
+    })).status, 400);
+    const caseInsensitiveLogin = await api('POST', '/auth/login', null, {
+        email: emailA.toUpperCase(), password,
+    });
+    assert.equal(caseInsensitiveLogin.status, 200);
+
     assert.equal((await api('POST', '/auth/login', null, { email: emailA, password: 'wrong' })).status, 401);
     assert.equal((await api('POST', '/auth/login', null, { email: emailA, password })).status, 200);
     assert.equal((await api('GET', '/assets')).status, 401);
+    // Production mode disables public registration unless explicitly enabled.
+    const previousNode = process.env.NODE_ENV;
+    const previousSetting = process.env.REGISTRATION_ENABLED;
+    try {
+        process.env.NODE_ENV = 'production';
+        delete process.env.REGISTRATION_ENABLED;
+        assert.equal((await api('POST', '/auth/register', null, {
+            name: 'Disabled Account', email: 'disabled' + suffix + '@example.com', password,
+        })).status, 403);
+    } finally {
+        if (previousNode === undefined) delete process.env.NODE_ENV;
+        else process.env.NODE_ENV = previousNode;
+        if (previousSetting === undefined) delete process.env.REGISTRATION_ENABLED;
+        else process.env.REGISTRATION_ENABLED = previousSetting;
+    }
+
 
     const createdAsset = await api('POST', '/assets', operator, {
         name: 'Synthetic Conveyor', serialNumber: 'DEMO-' + suffix,
