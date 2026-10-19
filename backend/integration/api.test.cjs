@@ -302,6 +302,45 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(legacySummary.data.legacyOrIncomplete, 1);
     assert.equal(legacySummary.data.byType.maintenance.legacyOrIncomplete, 1);
     assert.equal(legacySummary.data.byType.incident.eligibleResolved, 1);
+    // Workload is open cases *created in the window*, not all historic open items.
+    const backlogAsset = await api('POST', '/assets', operator, {
+        name: 'Synthetic Pump', serialNumber: 'BACKLOG-' + suffix,
+        category: 'machinery', location: 'Fixture Lab',
+    });
+    assert.equal(backlogAsset.status, 201, JSON.stringify(backlogAsset.data));
+    for (const type of ['incident', 'maintenance']) {
+        const queued = await api('POST', '/logs', operator, {
+            assetId: backlogAsset.data._id, type,
+            title: 'Queued fixture ' + type, description: 'Synthetic open issue only',
+        });
+        assert.equal(queued.status, 201, JSON.stringify(queued.data));
+    }
+    const caseSummary = await api('GET', '/analytics/equipment?days=30', operator);
+    assert.equal(caseSummary.status, 200, JSON.stringify(caseSummary.data));
+    assert.equal(caseSummary.data.totalOpenCases, 2);
+    assert.equal(caseSummary.data.missingAssetCases, 0);
+    assert.equal(caseSummary.data.items.length, 1);
+    assert.equal(caseSummary.data.items[0].assetId, backlogAsset.data._id);
+    assert.equal(caseSummary.data.items[0].incidents, 1);
+    assert.equal(caseSummary.data.items[0].maintenance, 1);
+    assert.equal((await api('GET', '/analytics/equipment')).status, 401);
+    assert.equal((await api('GET', '/analytics/equipment?days=0', operator)).status, 400);
+    assert.equal((await api('GET', '/analytics/equipment?days=366', operator)).status, 400);
+    assert.equal((await api('GET', '/analytics/equipment?days=invalid', operator)).status, 400);
+    await LogEntry.create({
+        asset: new mongoose.Types.ObjectId(), author: registrationA.data._id,
+        type: 'incident', status: 'open', title: 'Missing asset fixture',
+        description: 'Reference does not have a matching asset',
+    });
+    const missingAssetSummary = await api('GET', '/analytics/equipment?days=30', operator);
+    assert.equal(missingAssetSummary.status, 200);
+    assert.equal(missingAssetSummary.data.totalOpenCases, 3);
+    assert.equal(missingAssetSummary.data.missingAssetCases, 1);
+    assert.equal(missingAssetSummary.data.displayedOpenCases +
+        missingAssetSummary.data.remainingOpenCases +
+        missingAssetSummary.data.missingAssetCases,
+        missingAssetSummary.data.totalOpenCases);
+
     const preventedDelete = await api('DELETE', '/assets/' + assetId, reviewer);
     assert.equal(preventedDelete.status, 409, JSON.stringify(preventedDelete.data));
     const retired = await api('PUT', '/assets/' + assetId, reviewer, { status: 'decommissioned' });
