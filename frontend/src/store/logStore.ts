@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import api from '../services/api';
 
+export interface StatusEvent {
+    from: string | null;
+    to: string;
+    changedAt: string;
+    changedBy?: { _id: string; name: string; role: string } | string;
+}
+
 export interface LogEntry {
     _id: string;
     asset: {
@@ -18,6 +25,11 @@ export interface LogEntry {
     description: string;
     status: string;
     createdAt: string;
+    reportedAt?: string;
+    acknowledgedAt?: string;
+    workStartedAt?: string;
+    resolvedAt?: string;
+    statusHistory?: StatusEvent[];
 }
 
 interface LogState {
@@ -62,7 +74,7 @@ export const useLogStore = create<LogState>((set) => ({
             const response = await api.put(`/logs/${id}`, { status });
             set((state) => ({
                 logs: state.logs.map((log) =>
-                    log._id === id ? { ...log, status: response.data.status } : log
+                    log._id === id ? response.data : log
                 ),
             }));
         } catch (error: any) {
