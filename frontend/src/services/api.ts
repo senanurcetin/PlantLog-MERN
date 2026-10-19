@@ -12,7 +12,12 @@ const api = axios.create({
 // Request Interceptor: Attach JWT Token to headers
 api.interceptors.request.use(
     (config) => {
-        const token = useAuthStore.getState().token;
+        const auth = useAuthStore.getState();
+        const token = auth.token;
+        // Keep the originating session identity local to the request config;
+        // no browser-visible header or server-side session marker is needed.
+        (config as typeof config & { _plantlogSessionEpoch?: number })._plantlogSessionEpoch =
+            auth.sessionEpoch;
         const path = String(config.url || '');
         // Public login/registration must not accidentally carry a former session.
         const publicAuth = /^\/auth\/(?:login|register)(?:\?|$)/.test(path);
@@ -37,9 +42,10 @@ api.interceptors.response.use(
         const isPublicAuth = /^\/auth\/(?:login|register)(?:\?|$)/.test(requestUrl);
         const authorization = error.config?.headers?.get?.('Authorization') ??
             error.config?.headers?.Authorization;
-        const activeToken = useAuthStore.getState().token;
-        if (error.response?.status === 401 && !isPublicAuth && activeToken &&
-            authorization === `Bearer ${activeToken}`) {
+        const active = useAuthStore.getState();
+        if (error.response?.status === 401 && !isPublicAuth && active.token &&
+            authorization === `Bearer ${active.token}` &&
+            error.config?._plantlogSessionEpoch === active.sessionEpoch) {
             useAuthStore.getState().logout();
             // ProtectedRoute redirects; avoid a hard reload and stale-page flash.
         }
