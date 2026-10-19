@@ -4,6 +4,7 @@ const { randomUUID } = require('node:crypto');
 const mongoose = require('mongoose');
 const app = require('../dist/app.js').default;
 const User = require('../dist/models/User.js').default;
+const LogEntry = require('../dist/models/LogEntry.js').default;
 
 // Always create a fresh local test-only database. Never accept a production URI.
 test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async (t) => {
@@ -79,18 +80,68 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(createdLog.status, 201, JSON.stringify(createdLog.data));
     const logId = createdLog.data._id;
+    assert.equal(createdLog.data.status, 'open');
+    assert.equal(createdLog.data.statusHistory.length, 1);
+    assert.equal(createdLog.data.statusHistory[0].to, 'open');
+    assert.equal(createdLog.data.reportedAt, createdLog.data.statusHistory[0].changedAt);
+    assert.equal((await api('POST', '/logs', operator, {
+        assetId, type: 'incident', title: 'Invalid closed creation',
+        description: 'Disallow fake initial resolution', status: 'resolved',
+    })).status, 400);
     const filtered = await api('GET', '/logs?assetId=' + assetId, operator);
     assert.equal(filtered.status, 200);
     assert.equal(filtered.data.length, 1);
     assert.equal((await api('PUT', '/logs/' + logId, reviewer, { status: 'resolved' })).status, 403);
-    assert.equal((await api('PUT', '/logs/' + logId, operator, { status: 'acknowledged' })).status, 200);
+    const acknowledged = await api('PUT', '/logs/' + logId, operator, { status: 'acknowledged' });
+    assert.equal(acknowledged.status, 200, JSON.stringify(acknowledged.data));
+    assert.equal(acknowledged.data.statusHistory.length, 2);
+    assert.ok(acknowledged.data.acknowledgedAt);
+    assert.equal((await api('PUT', '/logs/' + logId, operator, {
+        status: 'open',
+    })).status, 400);
+    assert.equal((await api('PUT', '/logs/' + logId, operator, {
+        statusHistory: [],
+    })).status, 400);
+    const working = await api('PUT', '/logs/' + logId, operator, { status: 'in_progress' });
+    assert.equal(working.status, 200, JSON.stringify(working.data));
+    assert.equal(working.data.statusHistory.length, 3);
+    assert.ok(working.data.workStartedAt);
 
     // Trusted fixture elevation, never exposed as a public HTTP endpoint.
     await User.updateOne({ email: emailB }, { $set: { role: 'supervisor' } });
     const elevated = await api('PUT', '/assets/' + assetId, reviewer, { status: 'maintenance' });
     assert.equal(elevated.status, 200, JSON.stringify(elevated.data));
     assert.equal(elevated.data.status, 'maintenance');
-    assert.equal((await api('PUT', '/logs/' + logId, reviewer, { status: 'resolved' })).status, 200);
+    const resolved = await api('PUT', '/logs/' + logId, reviewer, { status: 'resolved' });
+    assert.equal(resolved.status, 200, JSON.stringify(resolved.data));
+    assert.equal(resolved.data.statusHistory.length, 4);
+    assert.ok(resolved.data.resolvedAt);
+    assert.equal(resolved.data.statusHistory[3].to, 'resolved');
+    assert.equal((await api('PUT', '/logs/' + logId, reviewer, { status: 'open' })).status, 400);
+
+    const summary = await api('GET', '/analytics/maintenance?days=30', operator);
+    assert.equal(summary.status, 200, JSON.stringify(summary.data));
+    assert.equal(summary.data.records, 1);
+    assert.equal(summary.data.eligibleResolved, 1);
+    assert.equal(summary.data.legacyOrIncomplete, 0);
+    assert.equal(summary.data.unresolved, 0);
+    assert.ok(Number.isFinite(summary.data.averageHoursToResolve));
+    assert.match(summary.data.interpretation, /Not machine downtime/);
+    assert.equal((await api('GET', '/analytics/maintenance?days=0', operator)).status, 400);
+    assert.equal((await api('GET', '/analytics/maintenance?days=366', operator)).status, 400);
+    assert.equal((await api('GET', '/analytics/maintenance')).status, 401);
+
+    // Pre-existing records lack server-recorded events; do not backfill fictional times.
+    await LogEntry.create({
+        asset: assetId, author: registrationA.data._id,
+        type: 'maintenance', status: 'resolved', title: 'Legacy fixture',
+        description: 'Imported record without trustworthy event timestamps',
+    });
+    const legacySummary = await api('GET', '/analytics/maintenance?days=30', operator);
+    assert.equal(legacySummary.status, 200);
+    assert.equal(legacySummary.data.records, 2);
+    assert.equal(legacySummary.data.eligibleResolved, 1);
+    assert.equal(legacySummary.data.legacyOrIncomplete, 1);
     const preventedDelete = await api('DELETE', '/assets/' + assetId, reviewer);
     assert.equal(preventedDelete.status, 409, JSON.stringify(preventedDelete.data));
 
