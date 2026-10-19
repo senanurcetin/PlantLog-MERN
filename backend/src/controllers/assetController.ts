@@ -13,7 +13,7 @@ import { InvalidPayloadError } from '../utils/inputPolicy';
 // @access  Private
 export const getAssets = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const assets = await Asset.find().populate('createdBy', 'name email')
+        const assets = await Asset.find().populate('createdBy', 'name')
             .populate('statusHistory.changedBy', 'name role').sort({ createdAt: -1 });
         res.status(200).json(assets);
     } catch (error) {
@@ -31,7 +31,7 @@ export const getAsset = async (req: AuthRequest, res: Response, next: NextFuncti
             throw new Error('Invalid asset ID');
         }
         const asset = await Asset.findById(req.params.id)
-            .populate('createdBy', 'name email')
+            .populate('createdBy', 'name')
             .populate('statusHistory.changedBy', 'name role');
 
         if (!asset) {
@@ -129,7 +129,7 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
             { _id: asset._id, __v: asset.__v },
             patch,
             { new: true, runValidators: true }
-        ).populate('createdBy', 'name email')
+        ).populate('createdBy', 'name')
             .populate('statusHistory.changedBy', 'name role');
         if (!updatedAsset) {
             res.status(409);

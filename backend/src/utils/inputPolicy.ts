@@ -55,21 +55,25 @@ export const sanitizeLogin = (input: unknown) => {
 };
 
 export const sanitizeRegistration = (input: unknown) => {
-    const body = asRecord(input);
+    const body = pickAllowed(input, ['name', 'email', 'password', 'role']);
     if (body.role !== undefined && body.role !== 'operator') {
         throw new InvalidPayloadError('Privileged roles cannot be self-assigned');
     }
-    if (typeof body.name !== 'string' || body.name.trim().length < 2) {
-        throw new InvalidPayloadError('Name must contain at least 2 characters');
+    if (typeof body.name !== 'string' ||
+        body.name.trim().length < 2 || body.name.trim().length > 100) {
+        throw new InvalidPayloadError('Name must contain between 2 and 100 characters');
     }
-    if (typeof body.email !== 'string' || !body.email.trim()) {
-        throw new InvalidPayloadError('A valid email is required');
+    // Reuse the login email policy so a successfully registered account
+    // cannot later be rejected by the login validator.
+    const { email, password } = sanitizeLogin({
+        email: body.email, password: body.password,
+    });
+    // bcrypt hashes only the first 72 UTF-8 bytes. Reject oversized values
+    // rather than silently creating equivalent/truncated credentials.
+    if (password.length < 12 || Buffer.byteLength(password, 'utf8') > 72) {
+        throw new InvalidPayloadError('Password must be at least 12 characters and at most 72 UTF-8 bytes');
     }
-    if (typeof body.password !== 'string' || body.password.length < 12) {
-        throw new InvalidPayloadError('Password must be at least 12 characters');
-    }
-    return { name: body.name.trim(), email: body.email.trim().toLowerCase(),
-        password: body.password, role: 'operator' as const };
+    return { name: body.name.trim(), email, password, role: 'operator' as const };
 };
 
 /**

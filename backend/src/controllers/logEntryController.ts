@@ -21,7 +21,7 @@ export const getLogs = async (req: AuthRequest, res: Response, next: NextFunctio
         const filter = assetId ? { asset: assetId } : {};
 
         const logs = await LogEntry.find(filter)
-            .populate('author', 'name email role')
+            .populate('author', 'name role')
             .populate('asset', 'name serialNumber')
             .populate('statusHistory.changedBy', 'name role')
             .sort({ createdAt: -1 });
