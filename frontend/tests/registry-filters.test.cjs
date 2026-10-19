@@ -13,7 +13,7 @@ const compiled = ts.transpileModule(source, {
 const compiledExports = {};
 const code = new Function('exports', compiled);
 code(compiledExports);
-const { filterAssets, filterLogs, logsToCsv } = compiledExports;
+const { filterAssets, filterLogs, logsToCsv, countOpenMaintenanceCases } = compiledExports;
 
 const assets = [
     { _id: 'a', name: 'Hydraulic Press', serialNumber: 'HP-001', category: 'machinery',
@@ -58,4 +58,21 @@ test('CSV export escapes formula-prefixed and quote-containing content', () => {
     assert.ok(csv.includes('"' + "'=HYPERLINK(\"\"bad\"\",\"\"click\"\")" + '"'));
     assert.ok(csv.includes('"' + "'  +danger" + '"'));
     assert.ok(csv.includes('"' + "'@risk" + '"'));
+});
+
+test('dashboard attention excludes routine operation and inspection records', () => {
+    const sample = [
+        { type: 'operation', status: 'open' },
+        { type: 'inspection', status: 'in_progress' },
+        { type: 'incident', status: 'open' },
+        { type: 'incident', status: 'resolved' },
+        { type: 'maintenance', status: 'acknowledged' },
+        { type: 'maintenance', status: 'resolved' },
+    ];
+    assert.equal(countOpenMaintenanceCases(sample), 2);
+    assert.equal(countOpenMaintenanceCases([]), 0);
+    assert.equal(countOpenMaintenanceCases([
+        { type: 'operation', status: 'open' },
+        { type: 'inspection', status: 'open' },
+    ]), 0);
 });
