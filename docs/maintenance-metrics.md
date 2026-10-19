@@ -13,7 +13,7 @@ PlantLog is a **portfolio demonstrator** for documenting equipment and handover 
 
 A new log begins in `open` with a server-generated `reportedAt` and an initial event in `statusHistory` containing **who**, **when**, **from** and **to**. Subsequent updates may stamp `acknowledgedAt`, `workStartedAt` or `resolvedAt`. Clients cannot submit these timestamps or edit status history through the REST API. Changes to status, timestamp and event are executed as **one atomic document update**, guarded by a document-version precondition; racing edits return HTTP 409.
 
-The supported statuses include `in_progress`; older `open`, `acknowledged` and `resolved` values remain supported. Direct resolution of `open` is retained for existing client workflows. Terminal records still allow correction of descriptive fields by authorized users, but status cannot move backwards. This is an *application-level status audit trail*, not cryptographically tamper-evident or WORM logging. Administrative database access may modify records.
+The supported statuses include `in_progress`; older `open`, `acknowledged` and `resolved` values remain supported. Direct resolution of `open` is retained for existing client workflows. Resolved records are now immutable through the REST API. Corrections must be captured as new entries, rather than silently rewriting historical titles, descriptions, metrics or status. This is an *application-level status audit trail*, not cryptographically tamper-evident or WORM logging. Administrative database access may modify records.
 
 ### Legacy records
 
@@ -38,3 +38,11 @@ Authenticated endpoint: `GET /api/analytics/maintenance?days=30` (integer range 
 - Database-backed lifecycle/analytics checks: `backend/integration/api.test.cjs`, executed with a disposable local MongoDB database in GitHub Actions.
 - Public `/demo` uses fictional `frontend/src/demo/fixture.json` only. A few synthetic events carry illustrative state sequences. They are not actual backend transitions and do not justify reporting industrial reliability KPIs.
 - Browser E2E testing, event retention policy, audit immutability under database administrator access, rate limiting, and production security review remain separate items.
+
+## Cohort breakdown and unresolved aging
+
+The authenticated analytics response also reports type-level cohorts for `incident` and `maintenance`: each includes `records`, `unresolved`, `eligibleResolved`, and `legacyOrIncomplete`. Type subtotals reconcile to the top-level counts.
+
+The `unresolvedAge` counts classify **unresolved** cases with a verified server-recorded opening event into `under24Hours`, `from24To72Hours`, or `over72Hours` based on `to - reportedAt`. Missing, inconsistent or out-of-cohort opening timestamps are assigned to `unknownStart` rather than being estimated from a modification timestamp. Age is **time since reporting**, not equipment downtime, an SLA breach or time spent actively repairing.
+
+Cohort membership is determined from `createdAt`, consistent with the MongoDB query and the advertised creation-date population. For trusted event metrics, `reportedAt` and its corresponding `statusHistory` opening event are validated separately. These breakdowns describe recorded cases only and do not estimate failure frequency or reliability.

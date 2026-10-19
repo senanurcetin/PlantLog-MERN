@@ -15,6 +15,20 @@ export interface LifecycleRecord {
 const milliseconds = (value: Date | string | null | undefined): number =>
     value == null ? NaN : new Date(value).getTime();
 
+export interface TypeCohortSummary {
+    records: number;
+    unresolved: number;
+    eligibleResolved: number;
+    legacyOrIncomplete: number;
+}
+
+export interface UnresolvedAgeSummary {
+    under24Hours: number;
+    from24To72Hours: number;
+    over72Hours: number;
+    unknownStart: number;
+}
+
 export interface MaintenanceSummary {
     periodDays: number;
     from: string;
@@ -25,13 +39,17 @@ export interface MaintenanceSummary {
     eligibleResolved: number;
     averageHoursToResolve: number | null;
     medianHoursToResolve: number | null;
+    byType: Record<'incident' | 'maintenance', TypeCohortSummary>;
+    unresolvedAge: UnresolvedAgeSummary;
     indicator: string;
     interpretation: string;
 }
 
 /**
  * Cohort: incident/maintenance records created inside [from, to].
+ * The cohort boundary uses createdAt, matching the database query.
  * Only complete server-recorded open->...->resolved histories qualify.
+ * Unresolved ages require a matching server-recorded opening event.
  * Does not calculate machine repair time (MTTR) or MTBF.
  */
 export const summarizeMaintenance = (
@@ -41,33 +59,53 @@ export const summarizeMaintenance = (
     const start = end - periodDays * 86400000;
     const inCohort = rows.filter(row =>
         (row.type === 'incident' || row.type === 'maintenance') &&
-        milliseconds(row.reportedAt ?? row.createdAt) >= start &&
-        milliseconds(row.reportedAt ?? row.createdAt) <= end,
+        milliseconds(row.createdAt) >= start &&
+        milliseconds(row.createdAt) <= end,
     );
     let unresolved = 0;
     let legacyOrIncomplete = 0;
     const durations: number[] = [];
+    const blankType = (): TypeCohortSummary => ({
+        records: 0, unresolved: 0, eligibleResolved: 0, legacyOrIncomplete: 0,
+    });
+    const byType = { incident: blankType(), maintenance: blankType() };
+    const unresolvedAge: UnresolvedAgeSummary = {
+        under24Hours: 0, from24To72Hours: 0, over72Hours: 0, unknownStart: 0,
+    };
 
     for (const row of inCohort) {
-        if (row.status !== 'resolved') {
-            unresolved++;
-            continue;
-        }
+        const group = byType[row.type as 'incident' | 'maintenance'];
+        group.records++;
         const reported = milliseconds(row.reportedAt);
-        const resolved = milliseconds(row.resolvedAt);
         const history = row.statusHistory || [];
-        const opened = history.some(event =>
+        const opened = Number.isFinite(reported) && history.some(event =>
             event.from == null && event.to === 'open' && milliseconds(event.changedAt) === reported,
         );
+        if (row.status !== 'resolved') {
+            unresolved++;
+            group.unresolved++;
+            if (!opened || reported > end || reported < start) {
+                unresolvedAge.unknownStart++;
+            } else {
+                const ageHours = (end - reported) / 3600000;
+                if (ageHours < 24) unresolvedAge.under24Hours++;
+                else if (ageHours < 72) unresolvedAge.from24To72Hours++;
+                else unresolvedAge.over72Hours++;
+            }
+            continue;
+        }
+        const resolved = milliseconds(row.resolvedAt);
         const closed = history.some(event =>
             event.from != null && event.to === 'resolved' && milliseconds(event.changedAt) === resolved,
         );
         if (!opened || !closed || !Number.isFinite(reported) || !Number.isFinite(resolved) ||
             resolved < reported || resolved > end) {
             legacyOrIncomplete++;
+            group.legacyOrIncomplete++;
             continue;
         }
         durations.push((resolved - reported) / 3600000);
+        group.eligibleResolved++;
     }
     durations.sort((a, b) => a - b);
     const round = (n: number) => Math.round(n * 100) / 100;
@@ -82,7 +120,8 @@ export const summarizeMaintenance = (
         records: inCohort.length, unresolved, legacyOrIncomplete,
         eligibleResolved: durations.length,
         averageHoursToResolve: average, medianHoursToResolve: median,
+        byType, unresolvedAge,
         indicator: 'Time from log report to resolution (hours)',
-        interpretation: 'Calculated from complete server-recorded transitions for incident/maintenance entries created within the selected window. Not machine downtime, MTTR or MTBF.',
+        interpretation: 'Calculated from complete server-recorded transitions for incident/maintenance entries created within the selected window. Open-case aging uses only verified report timestamps and is not an SLA breach rate. Not machine downtime, MTTR or MTBF.',
     };
 };

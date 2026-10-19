@@ -274,6 +274,15 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(summary.data.eligibleResolved, 1);
     assert.equal(summary.data.legacyOrIncomplete, 0);
     assert.equal(summary.data.unresolved, 0);
+    assert.deepEqual(summary.data.byType.incident, {
+        records: 1, unresolved: 0, eligibleResolved: 1, legacyOrIncomplete: 0,
+    });
+    assert.deepEqual(summary.data.byType.maintenance, {
+        records: 0, unresolved: 0, eligibleResolved: 0, legacyOrIncomplete: 0,
+    });
+    assert.deepEqual(summary.data.unresolvedAge, {
+        under24Hours: 0, from24To72Hours: 0, over72Hours: 0, unknownStart: 0,
+    });
     assert.ok(Number.isFinite(summary.data.averageHoursToResolve));
     assert.match(summary.data.interpretation, /Not machine downtime/);
     assert.equal((await api('GET', '/analytics/maintenance?days=0', operator)).status, 400);
@@ -291,6 +300,8 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(legacySummary.data.records, 2);
     assert.equal(legacySummary.data.eligibleResolved, 1);
     assert.equal(legacySummary.data.legacyOrIncomplete, 1);
+    assert.equal(legacySummary.data.byType.maintenance.legacyOrIncomplete, 1);
+    assert.equal(legacySummary.data.byType.incident.eligibleResolved, 1);
     const preventedDelete = await api('DELETE', '/assets/' + assetId, reviewer);
     assert.equal(preventedDelete.status, 409, JSON.stringify(preventedDelete.data));
     const retired = await api('PUT', '/assets/' + assetId, reviewer, { status: 'decommissioned' });
