@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { InvalidPayloadError, sanitizeRegistration, sanitizeLogin, pickAssetUpdate, pickLogUpdate } =
+const { InvalidPayloadError, sanitizeRegistration, sanitizeLogin, sanitizeLogCreation, pickAssetUpdate, pickLogUpdate } =
     require('../dist/utils/inputPolicy.js');
 const { getJwtSecret } = require('../dist/utils/jwtSecret.js');
 
@@ -78,4 +78,29 @@ test('login rejects Mongo selector payloads and non-string passwords', () => {
     assert.deepEqual(sanitizeLogin({ email: '  USER@Example.Com ', password: 'some-secret' }), {
         email: 'user@example.com', password: 'some-secret',
     });
+});
+
+test('log creation accepts only editable fields and validates metric types', () => {
+    assert.deepEqual(sanitizeLogCreation({
+        assetId: ' 507f1f77bcf86cd799439011 ', type: 'maintenance',
+        title: ' Inspect belt ', description: ' Check alignment ', status: 'open',
+        metrics: { temperature: 42 },
+    }), {
+        assetId: '507f1f77bcf86cd799439011', type: 'maintenance',
+        title: 'Inspect belt', description: 'Check alignment',
+        metrics: { temperature: 42 },
+    });
+    for (const body of [
+        null, [], {}, { assetId: 'x', type: 'incident', title: 'a', description: 'b', author: 'attacker' },
+        { assetId: 'x', type: 'incident', title: 'a', description: 'b', reportedAt: '2001-01-01' },
+        { assetId: 'x', type: 'incident', title: 'a', description: 'b', statusHistory: [] },
+        { assetId: 'x', type: 'incident', title: 'a', description: 'b', $set: { status: 'resolved' } },
+        { assetId: {}, type: 'incident', title: 'a', description: 'b' },
+        { assetId: 'x', type: { $ne: null }, title: 'a', description: 'b' },
+        { assetId: 'x', type: 'incident', title: ' ', description: 'b' },
+        { assetId: 'x', type: 'incident', title: 'a', description: 'b', status: 'resolved' },
+        { assetId: 'x', type: 'incident', title: 'a', description: 'b', metrics: { temperature: 'warm' } },
+    ]) {
+        assert.throws(() => sanitizeLogCreation(body), InvalidPayloadError);
+    }
 });

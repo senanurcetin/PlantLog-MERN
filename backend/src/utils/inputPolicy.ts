@@ -71,3 +71,35 @@ export const sanitizeRegistration = (input: unknown) => {
     return { name: body.name.trim(), email: body.email.trim().toLowerCase(),
         password: body.password, role: 'operator' as const };
 };
+
+/**
+ * A new operational record accepts only declared user-editable fields.
+ * Server-owned author, asset reference, status history, and lifecycle times
+ * must never be accepted from the request body.
+ */
+export const sanitizeLogCreation = (input: unknown) => {
+    const fields = pickAllowed(input, ['assetId', 'type', 'title', 'description', 'status', 'metrics']);
+    const requiredText = (key: 'assetId' | 'type' | 'title' | 'description'): string => {
+        const value = fields[key];
+        if (typeof value !== 'string' || !value.trim()) {
+            throw new InvalidPayloadError(key + ' must be a non-empty string');
+        }
+        return value.trim();
+    };
+    const assetId = requiredText('assetId');
+    const type = requiredText('type');
+    if (!['operation', 'maintenance', 'incident', 'inspection'].includes(type)) {
+        throw new InvalidPayloadError('Unsupported log type');
+    }
+    const title = requiredText('title');
+    const description = requiredText('description');
+    if (title.length > 200 || description.length > 10000) {
+        throw new InvalidPayloadError('Log title or description exceeds supported length');
+    }
+    if (fields.status !== undefined && fields.status !== 'open') {
+        throw new InvalidPayloadError('A new log entry must start in open status');
+    }
+    const metrics = fields.metrics === undefined
+        ? undefined : pickLogUpdate({ metrics: fields.metrics }).metrics;
+    return { assetId, type, title, description, metrics };
+};
