@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { InvalidPayloadError, sanitizeRegistration, sanitizeLogin, sanitizeLogCreation, pickAssetUpdate, pickLogUpdate } =
+const { InvalidPayloadError, sanitizeRegistration, sanitizeLogin, sanitizeLogCreation, sanitizeAssetCreation, pickAssetUpdate, pickLogUpdate } =
     require('../dist/utils/inputPolicy.js');
 const { getJwtSecret } = require('../dist/utils/jwtSecret.js');
 
@@ -103,4 +103,36 @@ test('log creation accepts only editable fields and validates metric types', () 
     ]) {
         assert.throws(() => sanitizeLogCreation(body), InvalidPayloadError);
     }
+});
+
+test('asset creation normalizes strings and enforces operational initial status', () => {
+    assert.deepEqual(sanitizeAssetCreation({
+        name: '  CNC Mill  ', serialNumber: ' CNC-001 ', category: 'machinery',
+        location: ' Bay A ', status: 'operational', purchaseDate: '2024-02-29',
+    }), {
+        name: 'CNC Mill', serialNumber: 'CNC-001', category: 'machinery',
+        location: 'Bay A', status: 'operational',
+        purchaseDate: new Date('2024-02-29T00:00:00.000Z'),
+    });
+    const withoutOptional = sanitizeAssetCreation({
+        name: 'Conveyor', serialNumber: 'CONV-002',
+        category: 'equipment', location: 'Packing',
+    });
+    assert.equal(withoutOptional.status, 'operational');
+    assert.equal(withoutOptional.purchaseDate, undefined);
+});
+test('asset creation rejects forged owner, operator payloads and non-operational initial states', () => {
+    const valid = { name: 'Pump', serialNumber: 'P-001',
+        category: 'equipment', location: 'Station 1' };
+    for (const body of [
+        null, [], {}, { ...valid, createdBy: 'attacker' },
+        { ...valid, _id: 'fake' }, { ...valid, 'createdBy.role': 'admin' },
+        { ...valid, $set: { status: 'maintenance' } },
+        { ...valid, status: 'maintenance' }, { ...valid, status: 'decommissioned' },
+        { ...valid, name: { $gt: '' } }, { ...valid, location: ['Bay'] },
+        { ...valid, serialNumber: '' }, { ...valid, category: { $ne: null } },
+        { ...valid, category: 'other-kind' }, { ...valid, purchaseDate: '2025-02-29' },
+        { ...valid, purchaseDate: 123456 }, { ...valid, purchaseDate: '2024-12-01T00:00:00Z' },
+        { ...valid, name: 'n'.repeat(121) }, { ...valid, serialNumber: 'n'.repeat(101) },
+    ]) assert.throws(() => sanitizeAssetCreation(body), InvalidPayloadError);
 });

@@ -3,7 +3,7 @@ import Asset from '../models/Asset';
 import LogEntry from '../models/LogEntry';
 import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { pickAssetUpdate } from '../utils/inputPolicy';
+import { pickAssetUpdate, sanitizeAssetCreation } from '../utils/inputPolicy';
 import { canManageAssets } from '../utils/authorization';
 
 // @desc    Get all assets
@@ -45,12 +45,8 @@ export const getAsset = async (req: AuthRequest, res: Response, next: NextFuncti
 // @access  Private
 export const createAsset = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { name, serialNumber, category, status, location, purchaseDate } = req.body;
-
-        if (!name || !serialNumber || !category || !location) {
-            res.status(400);
-            throw new Error('Please add all required fields');
-        }
+        const { name, serialNumber, category, status, location, purchaseDate } =
+            sanitizeAssetCreation(req.body);
 
         if (!req.user) {
             res.status(401);

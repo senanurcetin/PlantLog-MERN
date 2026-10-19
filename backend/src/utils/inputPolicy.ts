@@ -103,3 +103,42 @@ export const sanitizeLogCreation = (input: unknown) => {
         ? undefined : pickLogUpdate({ metrics: fields.metrics }).metrics;
     return { assetId, type, title, description, metrics };
 };
+
+/** Validate the untrusted asset creation body before any database access. */
+export const sanitizeAssetCreation = (input: unknown) => {
+    const fields = pickAllowed(input, [
+        'name', 'serialNumber', 'category', 'location', 'purchaseDate', 'status',
+    ]);
+    const required = (field: 'name' | 'serialNumber' | 'location', limit: number) => {
+        const value = fields[field];
+        if (typeof value !== 'string' || value.trim().length < 1 || value.trim().length > limit) {
+            throw new InvalidPayloadError(field + ' must be a non-empty string of at most ' + limit + ' characters');
+        }
+        return value.trim();
+    };
+    const name = required('name', 120);
+    const serialNumber = required('serialNumber', 100);
+    const location = required('location', 160);
+    const category = fields.category;
+    if (typeof category !== 'string' ||
+        !['machinery', 'vehicle', 'equipment', 'other'].includes(category)) {
+        throw new InvalidPayloadError('Unsupported asset category');
+    }
+    // Only a supervisor/admin can subsequently change a new asset's status.
+    if (fields.status !== undefined && fields.status !== 'operational') {
+        throw new InvalidPayloadError('New assets must start in operational status');
+    }
+    let purchaseDate: Date | undefined;
+    if (fields.purchaseDate !== undefined) {
+        const supplied = fields.purchaseDate;
+        if (typeof supplied !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(supplied)) {
+            throw new InvalidPayloadError('purchaseDate must be an ISO calendar date (YYYY-MM-DD)');
+        }
+        purchaseDate = new Date(supplied + 'T00:00:00.000Z');
+        if (!Number.isFinite(purchaseDate.getTime()) ||
+            purchaseDate.toISOString().slice(0, 10) !== supplied) {
+            throw new InvalidPayloadError('Invalid calendar date');
+        }
+    }
+    return { name, serialNumber, location, category, status: 'operational' as const, purchaseDate };
+};
