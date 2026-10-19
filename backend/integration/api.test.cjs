@@ -98,6 +98,25 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(createdAsset.status, 201, JSON.stringify(createdAsset.data));
     const assetId = createdAsset.data._id;
+    for (const injected of [
+        { createdBy: registrationB.data._id },
+        { status: 'maintenance' },
+        { status: 'decommissioned' },
+        { 'createdBy.role': 'admin' },
+        { name: { $ne: null } },
+        { category: { $ne: null } },
+        { purchaseDate: '2025-02-29' },
+    ]) {
+        const malformed = await api('POST', '/assets', operator, {
+            name: 'Forged Asset', serialNumber: 'FORGED-' + suffix,
+            category: 'equipment', location: 'Fixture Bay', ...injected,
+        });
+        assert.equal(malformed.status, 400, JSON.stringify(malformed.data));
+    }
+    const allAssets = await api('GET', '/assets', operator);
+    assert.equal(allAssets.status, 200);
+    assert.equal(allAssets.data.filter(asset => asset.serialNumber === 'FORGED-' + suffix).length, 0);
+
     assert.equal((await api('GET', '/assets/' + assetId, operator)).status, 200);
     assert.equal((await api('PUT', '/assets/' + assetId, operator, { status: 'maintenance' })).status, 403);
     assert.equal((await api('DELETE', '/assets/' + assetId, operator)).status, 403);
