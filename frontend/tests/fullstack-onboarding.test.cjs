@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { randomBytes, randomUUID } = require('node:crypto');
 const path = require('node:path');
-const { mkdirSync } = require('node:fs');
+const { mkdirSync, readFileSync } = require('node:fs');
 const { chromium } = require('playwright');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
@@ -117,6 +117,14 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
 
             await page.getByRole('link', { name: 'Asset Registry' }).click();
             await page.getByRole('searchbox', { name: 'Search assets' }).fill(serial);
+            const [assetDownload] = await Promise.all([
+                page.waitForEvent('download'),
+                page.getByRole('button', { name: 'Export filtered assets CSV' }).click(),
+            ]);
+            assert.match(assetDownload.suggestedFilename(), /^plantlog-assets-\d{4}-\d{2}-\d{2}\.csv$/);
+            const exportedAssets = readFileSync(await assetDownload.path(), 'utf8');
+            assert.ok(exportedAssets.includes(serial));
+            assert.ok(exportedAssets.includes(equipmentName));
             await page.getByRole('button', { name: 'View' }).click();
             await page.getByRole('link', { name: /View maintenance history/ }).click();
             await page.getByRole('heading', { name: incidentName }).waitFor();

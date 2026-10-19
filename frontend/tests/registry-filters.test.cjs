@@ -13,7 +13,7 @@ const compiled = ts.transpileModule(source, {
 const compiledExports = {};
 const code = new Function('exports', compiled);
 code(compiledExports);
-const { filterAssets, filterLogs, logsToCsv, countOpenMaintenanceCases } = compiledExports;
+const { filterAssets, filterLogs, logsToCsv, assetsToCsv, countOpenMaintenanceCases } = compiledExports;
 
 const assets = [
     { _id: 'a', name: 'Hydraulic Press', serialNumber: 'HP-001', category: 'machinery',
@@ -75,4 +75,24 @@ test('dashboard attention excludes routine operation and inspection records', ()
         { type: 'operation', status: 'open' },
         { type: 'inspection', status: 'open' },
     ]), 0);
+});
+
+test('asset export includes only the currently filtered equipment', () => {
+    const selected = filterAssets(assets, 'press', 'maintenance');
+    const csv = assetsToCsv(selected);
+    assert.match(csv, /^"ID","Name","Serial Number","Category","Status","Location","Created At"/);
+    assert.match(csv, /"Hydraulic Press"/);
+    assert.doesNotMatch(csv, /"Conveyor"/);
+    assert.equal(csv.split('\r\n').length, 3);
+});
+
+test('asset export quotes unsafe spreadsheet values and text punctuation', () => {
+    const csv = assetsToCsv([{
+        ...assets[0], name: '=HYPERLINK("demo","click")',
+        serialNumber: ' +7', location: '@risk, calibration', category: 'machinery',
+    }]);
+    assert.ok(csv.includes('"\'=HYPERLINK(""demo"",""click"")"'));
+    assert.ok(csv.includes('"\' +7"'));
+    assert.ok(csv.includes('"\'@risk, calibration"'));
+    assert.equal(assetsToCsv([]).split('\r\n').length, 2);
 });
