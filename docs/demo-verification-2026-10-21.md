@@ -62,3 +62,23 @@ pen-testing, accessibility manual review, controlled network throttling, and
 real-world scientific validity remain separate verification efforts. This
 project is deliberately not commercialized: no subscriptions, billing, sales,
 customer onboarding, persistent public user input, or live plant controls.
+
+## Controlled comparisons — additional verified evidence
+
+Five deterministic one-record comparisons are now visible below the
+synthetic quality checks. Each is calculated independently from the
+same original twelve-log baseline: no change, an open incident, an
+open maintenance case, a resolved incident, or an intentionally unlinked
+incident. Their differences are exactly reproducible arithmetic, **not**
+statistical inference, risk estimates or predictions.
+
+- 21/21 frontend demo/brand/scientific tests passed.
+- 11/11 registry/session tests passed.
+- TypeScript/Vite build and ESLint passed.
+- Chrome browser smoke passed, including comparison table keyboard focus.
+- axe-core automated WCAG 2/2.1 A/AA checks at 320, 390 and 1440 px:
+  zero reported violations. Document viewport had no horizontal overflow.
+- Desktop and mobile analytics screenshots were recaptured with the
+  updated controlled comparisons from the local production-equivalent build.
+
+The original fixture and approved NEXUS brand files were not modified.
