@@ -124,7 +124,7 @@ Once the backend and MongoDB are running, visit `http://localhost:5173/register`
 
 ```bash
 cd backend && npm ci && npm test
-cd ../frontend && npm ci && npm run lint && npm run test:demo && npm run test:registry && npm run build
+cd ../frontend && npm ci && npm run lint && npm run test:demo && npm run test:registry && npm run test:perf
 ```
 
 The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hooks configuration and runs without accessing any backend or CI runner.
