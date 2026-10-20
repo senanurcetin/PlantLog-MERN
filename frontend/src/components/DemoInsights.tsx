@@ -134,7 +134,9 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                 <div className="mt-5 w-full min-w-0 max-w-full overflow-x-auto pb-2">
                     <ol className="grid min-w-[600px] grid-cols-8 gap-3">
                         {summary.dailyIntake.map(day => (
-                            <li key={day.day} className="rounded-lg bg-slate-50 p-3 text-center">
+                            <li key={day.day} className="relative rounded-lg bg-slate-50 p-3 text-center"
+                                aria-label={`${day.day}: ${day.total} records; ${typeDetails.map(item =>
+                                    `${day[item.key]} ${item.label.toLowerCase()}`).join(', ')}`}>
                                 <span className="text-xs font-bold tabular-nums text-slate-800">{day.total} logs</span>
                                 <div className="mt-3 flex h-28 flex-col justify-end" aria-hidden="true">
                                     <div className="flex w-full flex-col-reverse overflow-hidden rounded-sm"
@@ -148,9 +150,6 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                                 <time dateTime={day.day} className="mt-3 block text-xs font-semibold tabular-nums text-slate-700">
                                     {day.day.slice(5)}
                                 </time>
-                                <span className="sr-only">
-                                    {typeDetails.map(item => `${day[item.key]} ${item.label.toLowerCase()}`).join(', ')}
-                                </span>
                             </li>
                         ))}
                     </ol>
