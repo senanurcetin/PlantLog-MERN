@@ -82,6 +82,15 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await page.setViewportSize({width: 390, height: 844});
         await page.getByRole('button', { name: 'Demo insights' }).click();
         assert.equal(await page.getByRole('heading', { name: 'Recorded intake by UTC date' }).isVisible(), true);
+        const scrollable = page.getByRole('region', {
+            name: 'Eight-day recorded intake chart, scroll horizontally for later dates',
+        });
+        await scrollable.focus();
+        assert.equal(await scrollable.evaluate(element => document.activeElement === element), true,
+            'The intake chart must be keyboard focusable');
+        assert.equal(await page.getByRole('heading', { name: 'Synthetic data quality and provenance' })
+            .isVisible(), true);
+        assert.equal(await page.getByText('12 / 12 eligible rows').isVisible(), true);
         assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
