@@ -51,3 +51,17 @@ Local QA confirmed 13 demo/brand/insights tests, 11 registry/session tests,
 the guest-only Vite production build and the actual Chrome browser smoke.
 The 390 px viewport horizontal overflow detected in the new chart was fixed
 without modifying the approved NEXUS brand files.
+
+## Fifth public tab: NEXUS Scenario Lab
+
+A guided, memory-only fictional incident lifecycle expands the portfolio
+demo beyond static screenshots while remaining explicitly non-productized.
+NEXUS palette, responsive controls, status semantics and the approved logos
+are retained.
+
+- [Desktop simulation](nexus-scenario-lab-desktop.png)
+- [390 px mobile simulation](nexus-scenario-lab-mobile.png)
+
+Simulation state resets on reload and never enters local/session storage,
+an API request or a database. Logged timestamps are tied to the fictional
+fixture snapshot for deterministic audit examples.

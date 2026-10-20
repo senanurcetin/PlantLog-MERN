@@ -63,3 +63,16 @@ the Vite/TypeScript build. Full-page screenshots were captured for
 [390 px](nexus-demo-insights-mobile.png) viewports after verifying
 `document.documentElement.scrollWidth === innerWidth` at both sizes.
 Screenshots were taken from the production-equivalent local guest-only build.
+
+## Scenario laboratory browser check — 21 October 2026
+
+The production-equivalent guest-only frontend successfully completed a local
+Chrome walkthrough of Report → Acknowledge → In progress → Resolve → Reset.
+The browser test verified the temporary 13-entry analytics summary and
+the restored 12-entry baseline. No REST API calls are performed.
+
+Additional visual checks captured
+[desktop](nexus-scenario-lab-desktop.png) and
+[mobile](nexus-scenario-lab-mobile.png) at 1440/390 px respectively,
+confirming the document width matched each viewport. These are fictional
+demonstration interactions, not persisted incident operations.

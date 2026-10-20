@@ -19,7 +19,11 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 **Launch the public read-only demo:** [plantlog-nexus-demo.vercel.app/demo](https://plantlog-nexus-demo.vercel.app/demo). It contains synthetic data only and requires no API, database or login. For reproduction, see the [demo guide](docs/demo-guide.md).
 
-**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
+**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Scenario lab](docs/nexus-scenario-lab-desktop.png) · [Scenario lab mobile](docs/nexus-scenario-lab-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
+
+### Advanced demonstration, intentionally not a product
+
+The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not a workflow for real incidents. Visitors can try one deterministic, fictional maintenance incident through `open → acknowledged → in progress → resolved`, inspect its temporary impact on Demo Insights, and reset without changing any original fixture. No persistent user state, backend writes, real plant connectivity, account creation, billing or productized service is provided by the hosted demo.
 
 ## Problem and approach
 

@@ -59,6 +59,8 @@ check. The guest-only build additionally passed a local browser verification:
 - [Mobile overview](nexus-demo-mobile.png)
 - [Demo insights — desktop, 21 October 2026](nexus-demo-insights.png)
 - [Demo insights — mobile, 21 October 2026](nexus-demo-insights-mobile.png)
+- [Scenario lab — desktop, 21 October 2026](nexus-scenario-lab-desktop.png)
+- [Scenario lab — mobile, 21 October 2026](nexus-scenario-lab-mobile.png)
 - [Mobile login design](nexus-login-mobile.png) — captured **before** the
   guest-only production flag was enabled; this view is available in local
   authenticated-app mode, **not** in the guest-only Vercel deployment.
@@ -105,3 +107,16 @@ in the existing logbook, and restore the baseline with Reset or reload.
   ordering, resets, invalid transitions, recalculated analytics and absence
   of fixture mutation. The Chrome browser smoke walks the four stages and
   verifies the reset and zero-API behavior.
+
+## Scenario lab verification — 21 October 2026
+
+- The original eight fixture assets and twelve fixture logs were retained.
+- Four deterministic lifecycle stages are verified in pure unit tests,
+  including invalid transitions, decommissioned equipment rejection,
+  unchanged fixture content and dynamic analytics reconciliation.
+- In the local production-equivalent guest-only build, real Chrome confirmed
+  a full four-stage incident and reset, including zero backend API calls.
+- The desktop (1440 px) and mobile (390 px) captures come from that verified
+  build. The mobile document width remained **390 px**, with no overflow.
+- These checks do not represent production incident dispatch or regulatory
+  safety certification.
