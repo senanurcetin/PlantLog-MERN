@@ -120,3 +120,13 @@ in the existing logbook, and restore the baseline with Reset or reload.
   build. The mobile document width remained **390 px**, with no overflow.
 - These checks do not represent production incident dispatch or regulatory
   safety certification.
+
+## Evidence Lab — scientific transparency without productization
+
+A sixth public tab presents **five reproducible data-quality cases** drawn
+from the immutable synthetic fixture. Each selected case modifies one field
+in a copied record and compares reference/experiment evidence counts.
+The calculation, reference outcomes and exclusion rules are documented in
+[evidence-methodology.md](evidence-methodology.md). The original fixture,
+session and authenticated API remain untouched. This is a validity
+demonstration, not statistical population inference or a real factory audit.

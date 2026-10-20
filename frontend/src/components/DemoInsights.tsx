@@ -139,7 +139,9 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                         </span>)}
                     </div>
                 </div>
-                <div className="mt-5 w-full min-w-0 max-w-full overflow-x-auto pb-2">
+                <div className="mt-5 w-full min-w-0 max-w-full overflow-x-auto pb-2"
+                    role="region" aria-label="Recorded intake timeline, horizontally scrollable"
+                    tabIndex={0}>
                     <ol className="grid min-w-[600px] grid-cols-8 gap-3">
                         {summary.dailyIntake.map(day => (
                             <li key={day.day} className="relative rounded-lg bg-slate-50 p-3 text-center"

@@ -76,3 +76,14 @@ Additional visual checks captured
 [mobile](nexus-scenario-lab-mobile.png) at 1440/390 px respectively,
 confirming the document width matched each viewport. These are fictional
 demonstration interactions, not persisted incident operations.
+
+## Evidence Lab desktop/mobile accessibility audit
+
+On 21 October 2026, the six public demo tabs were inspected in desktop
+(1440 px) and mobile (390 px) Chrome using axe-core 4.10.3 WCAG 2 A/AA,
+2.1 A/AA and 2.2 AA rules. Keyboard focus of horizontally scrollable
+evidence and intake sections was addressed by semantic named regions
+and `tabIndex=0`. The navigation selection no longer color-animates
+between low-contrast intermediate states. Automated axe checks cover
+detectable issues only; a manual screen-reader and accessibility review
+would still be needed to certify WCAG conformance.

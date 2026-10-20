@@ -105,6 +105,25 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await page.getByRole('button', { name: 'Demo insights' }).click();
         const originalTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
         assert.equal(await originalTotal.getByText('12', { exact: true }).isVisible(), true);
+        // The evidence lab exposes every controlled synthetic anomaly,
+        // with reference resets and keyboard-focusable mobile comparisons.
+        await page.getByRole('button', { name: 'Evidence lab' }).click();
+        await page.getByRole('heading', { name: 'Test the quality of the evidence' }).waitFor();
+        const reference = page.getByRole('row', { name: /Unlinked records/ });
+        assert.equal(await reference.getByRole('cell', { name: '0' }).count(), 3);
+        await page.getByRole('button', { name: /Broken asset link/ }).click();
+        assert.equal(await reference.getByRole('cell', { name: '1', exact: true }).count(), 2);
+        await page.getByRole('button', { name: /Missing audit history/ }).click();
+        const eligible = page.getByRole('row', { name: /Evidence-qualified resolved cases/ });
+        assert.equal(await eligible.getByRole('cell', { name: '0', exact: true }).count(), 1);
+        await page.getByRole('button', { name: 'Restore reference' }).click();
+        assert.equal(await reference.getByRole('cell', { name: '0' }).count(), 3);
+        await page.getByRole('region', { name: 'Evidence comparison table, horizontally scrollable' }).focus();
+        assert.equal(await page.getByRole('region', { name: 'Evidence comparison table, horizontally scrollable' }).evaluate(el => el === document.activeElement), true);
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        await page.getByRole('region', { name: 'Recorded intake timeline, horizontally scrollable' }).focus();
+        assert.equal(await page.getByRole('region', { name: 'Recorded intake timeline, horizontally scrollable' }).evaluate(el => el === document.activeElement), true);
+        assert.deepEqual(apiCalls, [], 'Evidence experiments must remain fixture-only');
         assert.deepEqual(apiCalls, [], 'Scenario interactions must never call the API');
 
         // Standalone public builds intentionally redirect registration to

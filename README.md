@@ -25,6 +25,10 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not a workflow for real incidents. Visitors can try one deterministic, fictional maintenance incident through `open → acknowledged → in progress → resolved`, inspect its temporary impact on Demo Insights, and reset without changing any original fixture. No persistent user state, backend writes, real plant connectivity, account creation, billing or productized service is provided by the hosted demo.
 
+### Reproducible data-quality experiments
+
+The sixth public tab, **Evidence lab**, exposes five controlled synthetic experiments: the unchanged reference, a broken equipment link, removed resolution history, a duplicate identifier and an event dated after the observation window. Each experiment changes exactly one field in a temporary copy and shows reference-versus-experiment counts, exclusion denominators and method limits. [Reproducible methodology](docs/evidence-methodology.md). No case produces a machine reliability or predictive KPI.
+
 ## Problem and approach
 
 In many facilities, asset lists, shift handovers and maintenance histories live in separate spreadsheets or paper registers. PlantLog demonstrates a unified web workflow for tracking equipment and operational events, with a REST API backed by MongoDB.
@@ -58,7 +62,7 @@ flowchart LR
 
 ## Public, read-only demo
 
-The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs, drill into per-asset history, use **Demo insights** to inspect synthetic workload counts, and follow a fifth **Scenario lab** tab through a fictional incident lifecycle (report → acknowledge → in progress → resolve → reset). All scenario actions are local and ephemeral; they do not store anything, create accounts, or call the API. Unlike predictive maintenance or reliability reporting, it makes no unsupported MTTR, uptime or failure-probability claims. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
+The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs, drill into per-asset history, use **Demo insights** to inspect synthetic workload counts, follow a fifth **Scenario lab** tab through a fictional incident lifecycle (report → acknowledge → in progress → resolve → reset). All scenario actions are local and ephemeral; they do not store anything, create accounts, or call the API. Unlike predictive maintenance or reliability reporting, it makes no unsupported MTTR, uptime or failure-probability claims. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
 
 ## Getting started
 
