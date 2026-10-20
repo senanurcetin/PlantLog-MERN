@@ -27,7 +27,7 @@ The original assets are retained verbatim in the repository. `frontend/tests/nex
 
 The palette is declared in `frontend/tailwind.config.js` and `frontend/src/index.css`. The official gradient is preserved within the source SVG files; accessible dark-blue text and buttons are used on light surfaces. Semantic warning/error/success colors continue to represent operational meaning, not brand variation.
 
-The shared `NexusBrand` component appears in authenticated desktop/mobile navigation, the public read-only demo and the login/registration screens. The document title, favicon, responsive shell, dashboard hero and other page accents use the same system. Product workflows and existing accessible route labels remain intact.
+The shared `NexusBrand` component appears in authenticated desktop/mobile navigation, the public read-only demo and the login/registration screens. The fourth public tab, Demo insights, uses the approved palette with semantic incident/maintenance colors, and reports only evidence-backed fictional workload counts. The document title, favicon, responsive shell, dashboard hero and other page accents use the same system. Product workflows and existing accessible route labels remain intact.
 
 ## Verification and scope
 

@@ -22,7 +22,8 @@ Open `http://localhost:5173/demo` in local development mode. The browser route i
 2. In **Asset registry**, search for equipment by name, serial, category or location; filter by status.
 3. Select **View logs** on a particular asset to see its associated records.
 4. In **Maintenance log**, search for a title, description, status or asset; filter by event type and remove the per-asset filter.
-5. Reload the page. No data can be edited, and no example records are persisted.
+5. In **Demo insights**, inspect type distribution, recorded intake by UTC day, and open incident/maintenance cases grouped by equipment. Selecting **View history** applies the existing asset log filter; it is a workload count, not a reliability score.
+6. Reload the page. No data can be edited, and no example records are persisted.
 
 ## Sample data and validation
 
@@ -62,3 +63,18 @@ check. The guest-only build additionally passed a local browser verification:
 The 20 Node frontend tests and static frontend build passed in a local QA copy.
 These checks do not validate backend/MongoDB, real multi-user production
 security, or conformance to a complete accessibility audit.
+
+## Static analytics interpretation
+
+The fourth public tab, **Demo insights**, derives all counts from the same
+fictional `frontend/src/demo/fixture.json`. The eight UTC-date intake
+buckets end at the fixture snapshot date and cover all sample records;
+any record outside that window is counted explicitly. Open
+incident/maintenance records exclude inspections and operations, which
+are disclosed separately if unresolved.
+
+**No** true failure probability, equipment uptime, downtime, MTTR, MTBF,
+production throughput or safety conformance is inferred. The component
+reuses the same equipment-to-log drill-down as the registry. Unit tests
+in `frontend/tests/demo-insights.test.cjs` validate the cohort arithmetic,
+date boundaries, empty data and missing-asset accounting.
