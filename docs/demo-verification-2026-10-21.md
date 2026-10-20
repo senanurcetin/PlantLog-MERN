@@ -82,3 +82,13 @@ statistical inference, risk estimates or predictions.
   updated controlled comparisons from the local production-equivalent build.
 
 The original fixture and approved NEXUS brand files were not modified.
+
+## Reproducible static bundle budget
+
+The build now has an explicit, CI-independent test at
+`cd frontend && npm run test:perf`. It asserts that the compressed generated
+JavaScript and CSS stay below **180 KiB JS** and **32 KiB CSS** respectively,
+and that the main HTML has the NEXUS document title, bundled local icon and
+no remote executable script tag. The test runs on the generated guest-only
+Vite build with Node's built-in gzip implementation. These byte-count budgets
+are intentionally not misleading network-speed or Lighthouse scores.
