@@ -85,6 +85,28 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
+        // Guided scenario can advance one fictional case, update the same
+        // analytics, and reset without sending writes or persisting data.
+        await page.getByRole('button', { name: 'Scenario lab' }).click();
+        await page.getByRole('heading', { name: 'Explore a maintenance case lifecycle' }).waitFor();
+        await page.getByRole('button', { name: 'Report fictional incident' }).click();
+        await page.getByText('SIM-001', { exact: false }).first().waitFor();
+        await page.getByRole('button', { name: 'Acknowledge case' }).click();
+        await page.getByRole('button', { name: 'In progress case' }).click();
+        await page.getByRole('button', { name: 'Resolve case' }).click();
+        await page.getByText('Demo case resolved').waitFor();
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        const afterResolve = page.getByRole('heading', { name: 'Open maintenance cases' }).locator('..');
+        assert.equal(await afterResolve.getByText('4', { exact: true }).isVisible(), true);
+        const logTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
+        assert.equal(await logTotal.getByText('13', { exact: true }).isVisible(), true);
+        await page.getByRole('button', { name: 'Scenario lab' }).click();
+        await page.getByRole('button', { name: 'Reset simulation' }).click();
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        const originalTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
+        assert.equal(await originalTotal.getByText('12', { exact: true }).isVisible(), true);
+        assert.deepEqual(apiCalls, [], 'Scenario interactions must never call the API');
+
         // Standalone public builds intentionally redirect registration to
         // the demo. Local full-stack builds still validate the signup form.
         const publicDemoOnly = await page.getByRole('link', { name: 'View source on GitHub' }).count() === 1;

@@ -23,7 +23,8 @@ Open `http://localhost:5173/demo` in local development mode. The browser route i
 3. Select **View logs** on a particular asset to see its associated records.
 4. In **Maintenance log**, search for a title, description, status or asset; filter by event type and remove the per-asset filter.
 5. In **Demo insights**, inspect type distribution, recorded intake by UTC day, and open incident/maintenance cases grouped by equipment. Selecting **View history** applies the existing asset log filter; it is a workload count, not a reliability score.
-6. Reload the page. No data can be edited, and no example records are persisted.
+6. In **Scenario lab**, select an in-service fictional asset and advance one simulated incident through Report, Acknowledge, In progress and Resolve. Open **Demo insights** or the maintenance log to see its temporary effects. Choose **Reset simulation** to remove it.
+7. Reload the page. No data can be saved, and the original fixture is restored.
 
 ## Sample data and validation
 
@@ -85,3 +86,22 @@ production throughput or safety conformance is inferred. The component
 reuses the same equipment-to-log drill-down as the registry. Unit tests
 in `frontend/tests/demo-insights.test.cjs` validate the cohort arithmetic,
 date boundaries, empty data and missing-asset accounting.
+
+## Scenario lab: educational interaction without productization
+
+The fifth public tab adds **one temporary, fictional incident** to the
+existing synthetic records. Visitors can advance an allowed four-stage
+lifecycle, observe calculated summary changes, inspect its status history
+in the existing logbook, and restore the baseline with Reset or reload.
+
+- State exists only inside the React page instance; **no cookies, local or
+  session storage, API requests, database writes, or downloads** are created.
+- Visitors cannot assign an incident to an already decommissioned asset.
+- The source fixture is never modified; stage transitions are deterministic
+  and timestamped against the fictional snapshot, not the real clock.
+- Simulator outputs are **not** a real maintenance dispatch workflow, alert,
+  predicted failure, safety record, SLA, digital twin or production CMMS.
+- Unit checks in `frontend/tests/demo-scenario.test.cjs` cover lifecycle
+  ordering, resets, invalid transitions, recalculated analytics and absence
+  of fixture mutation. The Chrome browser smoke walks the four stages and
+  verifies the reset and zero-API behavior.
