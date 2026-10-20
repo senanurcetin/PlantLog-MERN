@@ -49,7 +49,12 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
         });
 
         await Promise.all([waitForService(apiUrl), waitForService(frontendUrl + '/register')]);
-        browser = await chromium.launch({ headless: true });
+        browser = await chromium.launch({
+            headless: true,
+            ...(process.env.PLANTLOG_BROWSER_CHANNEL
+                ? { channel: process.env.PLANTLOG_BROWSER_CHANNEL }
+                : {}),
+        });
         const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 
         try {
