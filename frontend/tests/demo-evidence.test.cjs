@@ -64,3 +64,17 @@ test('malformed, contradictory or future-dated audit events are not quietly repa
  assert.equal(hasVerifiableHistory({...ref,date:'2026-10-19T12:00:00Z'},snapshotEnd),false);
  assert.equal(JSON.stringify(fixture),unchanged);
 });
+
+test('strict UTC instant validation rejects impossible calendar dates and local timestamps',()=>{
+ const sample=fixture.logs.find(x=>x.id==='L007');
+ const end=Date.parse(fixture.context.snapshot+'T23:59:59.999Z');
+ assert.equal(hasVerifiableHistory({...sample,date:'2026-02-30T11:30:00Z'},end),false);
+ assert.equal(hasVerifiableHistory({...sample,date:'2026-10-15T11:30:00'},end),false);
+ assert.equal(hasVerifiableHistory({...sample,date:'2026-10-15T11:30:00+00:00'},end),false);
+ assert.equal(hasVerifiableHistory({...sample,date:'invalid'},end),false);
+ const withBad={...fixture,logs:[{...fixture.logs[0],date:'2026-02-30T06:40:00Z'}]};
+ const audited=auditEvidence(withBad);
+ assert.equal(audited.invalidDates,1);
+ assert.equal(audited.records,fixture.logs.length);
+ assert.equal(JSON.stringify(fixture),unchanged);
+});

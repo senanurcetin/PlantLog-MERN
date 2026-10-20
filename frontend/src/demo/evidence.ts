@@ -51,8 +51,14 @@ export interface EvidenceAudit {
 }
 
 const eventTime = (value: string): number => {
-    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(value)) return NaN;
-    return new Date(value).getTime();
+    // Only unambiguous UTC timestamps. Reject local-time strings and
+    // impossible calendar dates rather than normalizing away the anomaly.
+    if (typeof value !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(value)) return NaN;
+    const parsed = new Date(value);
+    if (!Number.isFinite(parsed.getTime()) ||
+        parsed.toISOString().slice(0, 19) !== value.slice(0, 19)) return NaN;
+    return parsed.getTime();
 };
 const accepted: Record<string, string[]> = {
     open: ['acknowledged', 'resolved'],

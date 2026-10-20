@@ -67,7 +67,8 @@ const EvidenceLab = () => {
                         Restore reference
                     </button>
                 </div>
-                <div className="mt-5 overflow-x-auto" role="region"
+                <p className="mt-4 text-xs text-slate-500 sm:hidden">Swipe or use keyboard arrows to view all comparison columns.</p>
+                <div className="mt-3 overflow-x-auto" role="region"
                     aria-label="Evidence comparison table, horizontally scrollable" tabIndex={0}>
                     <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
                         <caption className="sr-only">Baseline compared with the selected fictional experiment</caption>

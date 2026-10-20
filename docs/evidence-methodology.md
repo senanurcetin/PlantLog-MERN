@@ -20,7 +20,7 @@
 | Incomplete case histories | Incident and maintenance logs with missing, non-sequential, inconsistent, after-observation or otherwise untrustworthy audit transitions |
 | Qualified resolved cases | Resolved incident or maintenance cases whose opening event matches their original created timestamp, followed by ordered permitted transitions and a matching resolution status |
 | Future-dated records | Events with a creation timestamp after the observation endpoint |
-| Invalid dates | Record creation timestamps missing or not parseable as ISO timestamps |
+| Invalid dates | Record creation timestamps missing, invalid, impossible calendar dates or not in unambiguous UTC-Z form |
 
 Audited histories require a first `null → open` event at the log timestamp, a known actor, nondecreasing UTC event times, transitions in the allowed lifecycle graph, and a final state matching the log status. Missing history is **not imputed** from `createdAt`, `updatedAt` or human-readable notes. Log status alone cannot substantiate elapsed time.
 
