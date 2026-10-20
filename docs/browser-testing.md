@@ -76,3 +76,14 @@ Additional visual checks captured
 [mobile](nexus-scenario-lab-mobile.png) at 1440/390 px respectively,
 confirming the document width matched each viewport. These are fictional
 demonstration interactions, not persisted incident operations.
+
+## Scientific fixture data audit and keyboard navigation — 21 October 2026
+
+Demo Insights now discloses unlinked assets, invalid dates, records after
+the observation snapshot, duplicate asset/log identifiers and invalid
+status values. Individual findings can overlap: never add finding counts
+to estimate unique invalid records. No actual reliability measurements
+or external scientific validity are asserted.
+
+The eight-day chart has a labelled keyboard-focusable scrolling region.
+The browser test verifies it and the fixture eligibility counts.
