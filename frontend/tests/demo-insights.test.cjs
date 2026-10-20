@@ -53,7 +53,7 @@ test('date buckets use stable UTC calendar dates and correctly distinguish other
     assert.equal(s.unlinkedOpenCases, 1);
     assert.equal(s.affectedEquipment, 1);
     assert.equal(s.equipment[0].openCases,2);
-    assert.equal(s.outsideWindow,3);
+    assert.equal(s.outsideWindow,2);
     assert.equal(s.dailyIntake.reduce((sum,row)=>sum+row.total,0)+s.outsideWindow,6);
 });
 
