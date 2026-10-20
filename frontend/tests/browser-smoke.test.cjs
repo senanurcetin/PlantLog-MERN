@@ -82,6 +82,13 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await page.setViewportSize({width: 390, height: 844});
         await page.getByRole('button', { name: 'Demo insights' }).click();
         assert.equal(await page.getByRole('heading', { name: 'Recorded intake by UTC date' }).isVisible(), true);
+        assert.equal(await page.getByRole('heading', { name: 'Controlled fictional case comparisons' })
+            .isVisible(), true);
+        const comparative = page.getByRole('region', {
+            name: 'Controlled example comparison table, scroll horizontally',
+        });
+        await comparative.focus();
+        assert.equal(await comparative.evaluate(node => document.activeElement === node), true);
         const scrollable = page.getByRole('region', {
             name: 'Eight-day recorded intake chart, scroll horizontally for later dates',
         });

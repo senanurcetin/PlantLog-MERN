@@ -131,3 +131,16 @@ eligible-row totals must not be inferred by summing issue counts. These checks
 only demonstrate internal synthetic-data consistency; they do not establish
 external predictive validity, actual industrial uptime, real-world causal
 relationships or safety assurance.
+
+## Controlled synthetic comparison examples
+
+The live Demo Insights section also compares five deterministic
+counterfactual fixtures: no change, one new open incident, one new open
+maintenance record, one resolved incident and one unlinked incident.
+Every row starts from the **same baseline** and adds at most one fictional
+record. The table exposes absolute counts and differences for total logs,
+open incident/maintenance cases, affected equipment and unlinked cases.
+
+These outcomes are bookkeeping identities, **not** evidence for causal
+relationships, reliability engineering coefficients, forecasting or
+mechanical failure severity. The fixture remains unchanged.
