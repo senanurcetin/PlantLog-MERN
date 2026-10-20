@@ -112,7 +112,7 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                 </section>
             </div>
 
-            <section className="nexus-card p-5 sm:p-6" aria-labelledby="insights-timeline">
+            <section className="nexus-card min-w-0 max-w-full overflow-hidden p-5 sm:p-6" aria-labelledby="insights-timeline">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 id="insights-timeline" className="flex items-center gap-2 text-lg font-bold">
@@ -131,7 +131,7 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                         </span>)}
                     </div>
                 </div>
-                <div className="mt-5 overflow-x-auto pb-2">
+                <div className="mt-5 w-full min-w-0 max-w-full overflow-x-auto pb-2">
                     <ol className="grid min-w-[600px] grid-cols-8 gap-3">
                         {summary.dailyIntake.map(day => (
                             <li key={day.day} className="rounded-lg bg-slate-50 p-3 text-center">
