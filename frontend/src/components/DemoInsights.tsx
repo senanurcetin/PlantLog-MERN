@@ -1,6 +1,7 @@
 import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 'lucide-react';
 import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
+import { assessDemoDataQuality } from '../demo/quality';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -15,6 +16,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
     onOpenHistory: (assetId: string) => void;
 }) => {
     const summary = buildDemoInsights(assets, logs, snapshot);
+    const quality = assessDemoDataQuality(assets, logs, snapshot);
     const highest = Math.max(1, ...summary.dailyIntake.map(day => day.total));
     return (
         <div className="space-y-5" aria-label="Synthetic maintenance analytics">
@@ -30,6 +32,37 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                     </p>
                 </div>
             </div>
+
+            <section className="nexus-card p-5 sm:p-6" aria-labelledby="data-quality-heading">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 id="data-quality-heading" className="text-lg font-bold text-slate-900">
+                            Synthetic data quality and provenance
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-600">
+                            Transparent checks on the same fixed example records; not a plant certification.
+                        </p>
+                    </div>
+                    <span className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-900">
+                        {quality.eligibleRecords} / {quality.assessedRecords} eligible rows
+                    </span>
+                </div>
+                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {quality.findings.map(finding => (
+                        <div key={finding.code} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                            <dt className="text-xs font-medium text-slate-600">{finding.meaning}</dt>
+                            <dd className={`mt-2 text-xl font-bold tabular-nums ${finding.count ? 'text-amber-800' : 'text-slate-900'}`}>
+                                {finding.count}
+                            </dd>
+                        </div>
+                    ))}
+                </dl>
+                <p className="mt-3 text-xs text-slate-500">
+                    Checked {quality.assessedAssets} assets and {quality.assessedRecords} records.
+                    Overlapping findings must not be added together to infer a count of unique bad rows.
+                    {quality.caveat}
+                </p>
+            </section>
 
             <section aria-labelledby="insights-summary-title">
                 <h2 id="insights-summary-title" className="mb-4 text-lg font-bold">Recorded activity at a glance</h2>

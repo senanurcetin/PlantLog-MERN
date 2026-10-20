@@ -120,3 +120,14 @@ in the existing logbook, and restore the baseline with Reset or reload.
   build. The mobile document width remained **390 px**, with no overflow.
 - These checks do not represent production incident dispatch or regulatory
   safety certification.
+
+## Scientific data-quality checks
+
+The public Demo Insights page now reports fixture data quality separately from
+workload metrics, including dangling asset references, invalid dates, timestamps
+after the fixed observation date, duplicate asset/log IDs, and invalid lifecycle
+statuses. An eligible record may have multiple exclusion findings: unique
+eligible-row totals must not be inferred by summing issue counts. These checks
+only demonstrate internal synthetic-data consistency; they do not establish
+external predictive validity, actual industrial uptime, real-world causal
+relationships or safety assurance.

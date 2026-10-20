@@ -34,7 +34,7 @@ test('quality findings preserve denominators and distinguish overlapping exclusi
     assert.equal(report.outsideSnapshot,1);
     assert.equal(report.duplicateAssets,1);
     assert.equal(report.duplicateLogIds,1);
-    assert.equal(report.findings.reduce((sum,x)=>sum+x.count,0),5);
+    assert.equal(report.findings.reduce((sum,x)=>sum+x.count,0),6);
     assert.match(report.caveat,/not operational reliability/);
 });
 test('empty fixture and invalid observation dates do not produce fake counts',()=>{
