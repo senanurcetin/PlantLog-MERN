@@ -72,7 +72,8 @@ test('strict UTC instant validation rejects impossible calendar dates and local 
  assert.equal(hasVerifiableHistory({...sample,date:'2026-10-15T11:30:00'},end),false);
  assert.equal(hasVerifiableHistory({...sample,date:'2026-10-15T11:30:00+00:00'},end),false);
  assert.equal(hasVerifiableHistory({...sample,date:'invalid'},end),false);
- const withBad={...fixture,logs:[{...fixture.logs[0],date:'2026-02-30T06:40:00Z'}]};
+ const withBad={...fixture,logs:fixture.logs.map((log,index)=>
+  index===0?{...log,date:'2026-02-30T06:40:00Z'}:log)};
  const audited=auditEvidence(withBad);
  assert.equal(audited.invalidDates,1);
  assert.equal(audited.records,fixture.logs.length);
