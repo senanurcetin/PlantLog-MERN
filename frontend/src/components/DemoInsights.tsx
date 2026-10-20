@@ -87,7 +87,7 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                                 <div className="min-w-0">
                                     <p className="font-bold text-slate-900">{row.name}</p>
                                     <p className="mt-1 text-xs text-slate-500">
-                                        {row.serialNumber} · {row.incidents} incidents · {row.maintenance} maintenance
+                                        {row.serialNumber} · {row.incidents} {row.incidents === 1 ? 'incident' : 'incidents'} · {row.maintenance} maintenance
                                         {row.status === 'decommissioned' ? ' · Decommissioned' : ''}
                                     </p>
                                 </div>
@@ -123,6 +123,9 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                             {summary.windowDays}-day window ending {summary.snapshot}. Counts reflect new log records,
                             not equipment runtime or an incident rate.
                         </p>
+                        <p className="mt-1 text-xs text-slate-500 sm:hidden">
+                            Swipe the chart horizontally to inspect every date.
+                        </p>
                     </div>
                     <div aria-label="Activity type legend" className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
                         {typeDetails.map(item => <span key={item.key} className="flex items-center gap-1.5">
@@ -135,9 +138,9 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                     <ol className="grid min-w-[600px] grid-cols-8 gap-3">
                         {summary.dailyIntake.map(day => (
                             <li key={day.day} className="relative rounded-lg bg-slate-50 p-3 text-center"
-                                aria-label={`${day.day}: ${day.total} records; ${typeDetails.map(item =>
+                                aria-label={`${day.day}: ${day.total} ${day.total === 1 ? 'record' : 'records'}; ${typeDetails.map(item =>
                                     `${day[item.key]} ${item.label.toLowerCase()}`).join(', ')}`}>
-                                <span className="text-xs font-bold tabular-nums text-slate-800">{day.total} logs</span>
+                                <span className="text-xs font-bold tabular-nums text-slate-800">{day.total} {day.total === 1 ? 'log' : 'logs'}</span>
                                 <div className="mt-3 flex h-28 flex-col justify-end" aria-hidden="true">
                                     <div className="flex w-full flex-col-reverse overflow-hidden rounded-sm"
                                         style={{height: `${day.total / highest * 100}%`}}>

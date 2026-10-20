@@ -160,7 +160,7 @@ const Demo = () => {
                         </div>
                     </section>
 
-                    <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {view !== 'insights' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {metricCards.map(item => {
                             const Icon = item.icon;
                             return <article key={item.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -170,7 +170,7 @@ const Demo = () => {
                                 <p className="text-xs text-slate-500 mt-2">{item.subtitle}</p>
                             </article>;
                         })}
-                    </section>
+                    </section>}
 
                     {view === 'overview' && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
