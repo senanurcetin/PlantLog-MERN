@@ -2,15 +2,18 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Activity, ArrowLeft, ArrowRight, CheckCircle2, ClipboardList,
-    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X, BarChart3,
+    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X, BarChart3, FlaskConical,
 } from 'lucide-react';
 import fixture from '../demo/fixture.json';
 import NexusBrand from '../components/NexusBrand';
 import DemoInsights from '../components/DemoInsights';
+import ScenarioLab from '../components/ScenarioLab';
+import { emptyScenario, advanceScenario, scenarioToLog } from '../demo/scenario';
+import type { ScenarioState, ScenarioAction, ScenarioLog } from '../demo/scenario';
 
-type View = 'overview' | 'assets' | 'logs' | 'insights';
+type View = 'overview' | 'assets' | 'logs' | 'insights' | 'scenario';
 type Asset = (typeof fixture.assets)[number];
-type Log = (typeof fixture.logs)[number];
+type Log = (typeof fixture.logs)[number] | ScenarioLog;
 
 const statusStyles: Record<string, string> = {
     operational: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
@@ -18,6 +21,7 @@ const statusStyles: Record<string, string> = {
     decommissioned: 'bg-slate-100 text-slate-700 ring-slate-200',
     open: 'bg-rose-50 text-rose-700 ring-rose-200',
     acknowledged: 'bg-amber-50 text-amber-800 ring-amber-200',
+    in_progress: 'bg-blue-50 text-blue-800 ring-blue-200',
     resolved: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
 };
 const displayDate = (value: string) =>
@@ -34,7 +38,12 @@ const Demo = () => {
     const [assetStatus, setAssetStatus] = useState('all');
     const [logType, setLogType] = useState('all');
     const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-    const { assets, logs, context } = fixture;
+    const { assets, context } = fixture;
+    const [scenario, setScenario] = useState<ScenarioState>({ ...emptyScenario });
+    const logs: Log[] = useMemo(() => {
+        const temporary = scenarioToLog(scenario, context.snapshot);
+        return temporary ? [temporary, ...fixture.logs] : fixture.logs;
+    }, [scenario, context.snapshot]);
     const publicDemoOnly = import.meta.env.VITE_PUBLIC_DEMO_ONLY === 'true';
     const operational = assets.filter(asset => asset.status === 'operational').length;
     const maintenance = assets.filter(asset => asset.status === 'maintenance').length;
@@ -68,6 +77,9 @@ const Demo = () => {
         setLogType('all');
         setSelectedAssetId(null);
     };
+
+    const scenarioAction = (action: ScenarioAction, chosenAssetId: string) =>
+        setScenario(previous => advanceScenario(previous, action, chosenAssetId, assets));
 
     const showAssetHistory = (assetId: string) => {
         setSelectedAssetId(assetId);
@@ -117,7 +129,7 @@ const Demo = () => {
             <div className="bg-[#0B0F19] text-slate-100 border-b border-[#6E55C6]/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="inline-flex items-center gap-2 font-semibold"><ShieldCheck size={14} aria-hidden="true" /> READ-ONLY PUBLIC DEMONSTRATION</span>
-                    <span className="text-blue-100">Synthetic records · No login · No API writes · No plant connectivity</span>
+                    <span className="text-blue-100">Synthetic records · Temporary scenarios only · No API writes · No plant connectivity</span>
                 </div>
             </div>
 
@@ -141,6 +153,7 @@ const Demo = () => {
                         ['assets', 'Asset registry', Factory],
                         ['logs', 'Maintenance log', ClipboardList],
                         ['insights', 'Demo insights', BarChart3],
+                        ['scenario', 'Scenario lab', FlaskConical],
                     ] as const).map(([id, label, Icon]) => (
                         <button type="button" key={id} onClick={() => navigate(id)}
                             aria-current={view === id ? 'page' : undefined}
@@ -154,13 +167,14 @@ const Demo = () => {
                     <section className="rounded-2xl nexus-hero text-white p-6 sm:p-9 shadow-xl relative overflow-hidden">
                         <div className="relative z-10 max-w-3xl">
                             <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-200">Operations intelligence / sample facility</p>
-                            <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : view === 'logs' ? 'Shift and maintenance records.' : 'Evidence-aware workload insights.'}</h1>
+                            <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : view === 'logs' ? 'Shift and maintenance records.' : view === 'insights'
+                                ? 'Evidence-aware workload insights.' : 'Experience a fictional incident lifecycle.'}</h1>
                             <p className="text-sm sm:text-base text-blue-50/90 mt-3 leading-relaxed">{context.facility} · Snapshot {displayDate(context.snapshot)}. Explore a realistic workflow with completely fictional data.</p>
                             <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold"><HardHat size={16} aria-hidden="true" /> Portfolio demonstration — not live operational monitoring</div>
                         </div>
                     </section>
 
-                    {view !== 'insights' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {view !== 'insights' && view !== 'scenario' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {metricCards.map(item => {
                             const Icon = item.icon;
                             return <article key={item.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -259,10 +273,15 @@ const Demo = () => {
                         </section>
                     )}
                     {view === 'insights' && (
-                        <DemoInsights onOpenHistory={showAssetHistory} />
+                        <DemoInsights assets={assets} logs={logs} snapshot={context.snapshot}
+                            onOpenHistory={showAssetHistory} />
+                    )}
+                    {view === 'scenario' && (
+                        <ScenarioLab assets={assets} scenario={scenario} onAction={scenarioAction}
+                            onInspect={showAssetHistory} />
                     )}
                     <footer className="rounded-2xl border border-blue-100 bg-blue-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} All indicators are calculated from this fixed example dataset.</p></div>
+                        <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} Indicators use the original fixture plus an optional, temporary fictional scenario record that resets on reload.</p></div>
                         {publicDemoOnly
                             ? <a href="https://github.com/senanurcetin/PlantLog-MERN" target="_blank" rel="noopener noreferrer"
                                 className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-blue-800 hover:underline">

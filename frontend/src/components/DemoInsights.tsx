@@ -1,6 +1,6 @@
 import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 'lucide-react';
 import { buildDemoInsights } from '../demo/insights';
-import fixture from '../demo/fixture.json';
+import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -8,9 +8,13 @@ const typeDetails = [
     {key: 'inspection', label: 'Inspections', color: 'bg-[#4EA8FF]', text: 'text-blue-700'},
     {key: 'operation', label: 'Operations', color: 'bg-slate-500', text: 'text-slate-700'},
 ] as const;
-const summary = buildDemoInsights(fixture.assets, fixture.logs, fixture.context.snapshot);
-
-const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => void }) => {
+const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
+    assets: DemoInsightAsset[];
+    logs: DemoInsightLog[];
+    snapshot: string;
+    onOpenHistory: (assetId: string) => void;
+}) => {
+    const summary = buildDemoInsights(assets, logs, snapshot);
     const highest = Math.max(1, ...summary.dailyIntake.map(day => day.total));
     return (
         <div className="space-y-5" aria-label="Synthetic maintenance analytics">
@@ -20,6 +24,7 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                     <h2 className="font-bold">An illustrative workload snapshot, not a reliability report</h2>
                     <p className="mt-1 text-blue-900/85">
                         Calculated exclusively from {summary.totalRecords} fictional entries as of {summary.snapshot}.
+                        Any additional scenario entry is temporary and disappears on reset or reload.
                         Recorded case counts cannot establish equipment downtime, failure rate,
                         probability of failure, MTTR or MTBF.
                     </p>
@@ -72,7 +77,7 @@ const DemoInsights = ({ onOpenHistory }: { onOpenHistory: (assetId: string) => v
                         })}
                     </div>
                     <p className="mt-6 text-xs text-slate-500">
-                        Source: the fixed, synthetic PlantLog demonstration logbook.
+                        Source: the synthetic PlantLog logbook, plus any temporary scenario entry.
                     </p>
                 </section>
 
