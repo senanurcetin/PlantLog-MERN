@@ -2,16 +2,17 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Activity, ArrowLeft, ArrowRight, CheckCircle2, ClipboardList,
-    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X, BarChart3, FlaskConical,
+    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X, BarChart3, FlaskConical, Microscope,
 } from 'lucide-react';
 import fixture from '../demo/fixture.json';
 import NexusBrand from '../components/NexusBrand';
 import DemoInsights from '../components/DemoInsights';
 import ScenarioLab from '../components/ScenarioLab';
+import EvidenceLab from '../components/EvidenceLab';
 import { emptyScenario, advanceScenario, scenarioToLog } from '../demo/scenario';
 import type { ScenarioState, ScenarioAction, ScenarioLog } from '../demo/scenario';
 
-type View = 'overview' | 'assets' | 'logs' | 'insights' | 'scenario';
+type View = 'overview' | 'assets' | 'logs' | 'insights' | 'scenario' | 'evidence';
 type Asset = (typeof fixture.assets)[number];
 type Log = (typeof fixture.logs)[number] | ScenarioLog;
 
@@ -154,6 +155,7 @@ const Demo = () => {
                         ['logs', 'Maintenance log', ClipboardList],
                         ['insights', 'Demo insights', BarChart3],
                         ['scenario', 'Scenario lab', FlaskConical],
+                        ['evidence', 'Evidence lab', Microscope],
                     ] as const).map(([id, label, Icon]) => (
                         <button type="button" key={id} onClick={() => navigate(id)}
                             aria-current={view === id ? 'page' : undefined}
@@ -168,13 +170,14 @@ const Demo = () => {
                         <div className="relative z-10 max-w-3xl">
                             <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-200">Operations intelligence / sample facility</p>
                             <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : view === 'logs' ? 'Shift and maintenance records.' : view === 'insights'
-                                ? 'Evidence-aware workload insights.' : 'Experience a fictional incident lifecycle.'}</h1>
+                                ? 'Evidence-aware workload insights.' : view === 'scenario'
+                                ? 'Experience a fictional incident lifecycle.' : 'Inspect the evidence behind every claim.'}</h1>
                             <p className="text-sm sm:text-base text-blue-50/90 mt-3 leading-relaxed">{context.facility} · Snapshot {displayDate(context.snapshot)}. Explore a realistic workflow with completely fictional data.</p>
                             <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold"><HardHat size={16} aria-hidden="true" /> Portfolio demonstration — not live operational monitoring</div>
                         </div>
                     </section>
 
-                    {view !== 'insights' && view !== 'scenario' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {view !== 'insights' && view !== 'scenario' && view !== 'evidence' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {metricCards.map(item => {
                             const Icon = item.icon;
                             return <article key={item.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -280,6 +283,7 @@ const Demo = () => {
                         <ScenarioLab assets={assets} scenario={scenario} onAction={scenarioAction}
                             onInspect={showAssetHistory} />
                     )}
+                    {view === 'evidence' && <EvidenceLab />}
                     <footer className="rounded-2xl border border-blue-100 bg-blue-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} Indicators use the original fixture plus an optional, temporary fictional scenario record that resets on reload.</p></div>
                         {publicDemoOnly
