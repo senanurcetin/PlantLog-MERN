@@ -118,8 +118,10 @@ Once the backend and MongoDB are running, visit `http://localhost:5173/register`
 
 ```bash
 cd backend && npm ci && npm test
-cd ../frontend && npm ci && npm run test:demo && npm run build
+cd ../frontend && npm ci && npm run lint && npm run test:demo && npm run test:registry && npm run build
 ```
+
+The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hooks configuration and runs without accessing any backend or CI runner.
 
 The public demo additionally has a [real Chromium smoke test](docs/browser-testing.md) in GitHub Actions, distinct from the frontend build and fixture unit tests. The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
 
