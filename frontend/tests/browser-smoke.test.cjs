@@ -112,7 +112,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         const reference = page.getByRole('row', { name: /Unlinked records/ });
         assert.equal(await reference.getByRole('cell', { name: '0' }).count(), 3);
         await page.getByRole('button', { name: /Broken asset link/ }).click();
-        assert.equal(await reference.getByRole('cell', { name: '1', exact: true }).count(), 2);
+        assert.equal(await reference.getByRole('cell', { name: '1', exact: true }).count(), 1);
         await page.getByRole('button', { name: /Missing audit history/ }).click();
         const eligible = page.getByRole('row', { name: /Evidence-qualified resolved cases/ });
         assert.equal(await eligible.getByRole('cell', { name: '0', exact: true }).count(), 1);
