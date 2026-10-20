@@ -56,11 +56,18 @@ check. The guest-only build additionally passed a local browser verification:
 - [Assets](nexus-demo-assets.png)
 - [Maintenance log](nexus-demo-logs.png)
 - [Mobile overview](nexus-demo-mobile.png)
+- [Demo insights — desktop, 21 October 2026](nexus-demo-insights.png)
+- [Demo insights — mobile, 21 October 2026](nexus-demo-insights-mobile.png)
 - [Mobile login design](nexus-login-mobile.png) — captured **before** the
   guest-only production flag was enabled; this view is available in local
   authenticated-app mode, **not** in the guest-only Vercel deployment.
 
-The 20 Node frontend tests and static frontend build passed in a local QA copy.
+The original 20 frontend tests passed during the 19 October release.
+On 21 October, 13 demo/brand/insights tests, 11 registry/session tests
+and the TypeScript/Vite static build passed in an isolated Windows QA
+worktree. The updated Chrome smoke test (including analytics drill-down)
+also passed. Desktop and 390 px mobile screenshots were recaptured after
+checking that the document viewport does not overflow horizontally.
 These checks do not validate backend/MongoDB, real multi-user production
 security, or conformance to a complete accessibility audit.
 

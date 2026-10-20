@@ -49,3 +49,17 @@ official logo loaded and no HTTP API calls or page JavaScript exceptions
 were observed. The current documentation screenshots were recaptured
 from this **production-equivalent local build**. They are not evidence
 of a live backend.
+
+## Demo Insights verification — 21 October 2026
+
+The public demo gained a fourth, fixture-backed analytics tab. Local Chrome
+smoke tests confirmed it opens, exposes four unresolved maintenance/incident
+entries across three equipment assets, and drills into the existing asset log
+history. This is a descriptive snapshot, not a real maintenance KPI.
+
+The updated build passed 13 demo/brand tests, 11 registry/session tests and
+the Vite/TypeScript build. Full-page screenshots were captured for
+[1440 px](nexus-demo-insights.png) and
+[390 px](nexus-demo-insights-mobile.png) viewports after verifying
+`document.documentElement.scrollWidth === innerWidth` at both sizes.
+Screenshots were taken from the production-equivalent local guest-only build.

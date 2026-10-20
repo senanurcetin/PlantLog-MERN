@@ -33,8 +33,21 @@ The shared `NexusBrand` component appears in authenticated desktop/mobile naviga
 
 - Run `cd frontend && npm ci && npm run test:demo && npm run build`.
 - Optional browser check after building: `node --test tests/browser-smoke.test.cjs` with Playwright installed, or run the isolated full-stack onboarding scenario with test-only MongoDB.
-- The current [NEXUS demo overview](nexus-demo-overview.png), [assets](nexus-demo-assets.png), [logs](nexus-demo-logs.png), and [mobile](nexus-demo-mobile.png) captures were recaptured by actual Chrome from the production-equivalent guest-only Vite build after successful render checks; older `dashboard.png`, `assets.png`, `logs.png` are historical authenticated UI images.
+- The current [NEXUS demo overview](nexus-demo-overview.png), [assets](nexus-demo-assets.png), [logs](nexus-demo-logs.png), [mobile](nexus-demo-mobile.png), and the 21 October [new insights](nexus-demo-insights.png) / [insights mobile](nexus-demo-insights-mobile.png) captures were recaptured by actual Chrome from the production-equivalent guest-only Vite build after successful render checks; older `dashboard.png`, `assets.png`, `logs.png` are historical authenticated UI images.
 - On 19 October 2026, the frontend completed 9 demo/logo tests, 11 registry/session tests, and `tsc -b && vite build` successfully in a separate Windows QA copy. The Vercel deployment reached READY and the public /demo route responded with HTTP 200. Browser checks confirmed wordmark rendering and the three sample views on the original hosted build; separate local Chrome checks confirmed the guest-only production configuration, safe route redirects and no API calls.
 - Vercel production is explicitly **guest-only** via `VITE_PUBLIC_DEMO_ONLY=true`: visitors have no login/registration/backend access. The authenticated application remains a separately deployable local workflow; no external production backend or completed security certification is asserted.
 
 Reference pack README and Figma design were consulted, but this change implements the UI in this GitHub repository; it does not claim an independently updated Figma file.
+
+### 21 October 2026: public demo insights
+
+The additional Demo insights tab uses a pure fixture-derived calculation to
+show recorded log-type mix, eight UTC-day intake buckets and equipment-level
+open incident/maintenance work. Inspections and operations are excluded from
+the maintenance backlog, and other open record types have a separate count.
+This is explicitly **not a reliability/failure prediction model**.
+
+Local QA confirmed 13 demo/brand/insights tests, 11 registry/session tests,
+the guest-only Vite production build and the actual Chrome browser smoke.
+The 390 px viewport horizontal overflow detected in the new chart was fixed
+without modifying the approved NEXUS brand files.

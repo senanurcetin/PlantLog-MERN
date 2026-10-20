@@ -8,7 +8,7 @@ Replace fragmented paper/spreadsheet records with an asset registry and a search
 
 | What a reviewer can inspect | Evidence |
 |---|---|
-| Is the workflow implemented in UI views? | [Live NEXUS read-only demo](https://plantlog-nexus-demo.vercel.app/demo), [current overview](nexus-demo-overview.png), [current assets](nexus-demo-assets.png), [current maintenance logs](nexus-demo-logs.png), [mobile](nexus-demo-mobile.png) |
+| Is the workflow implemented in UI views? | [Live NEXUS read-only demo](https://plantlog-nexus-demo.vercel.app/demo), [current overview](nexus-demo-overview.png), [current assets](nexus-demo-assets.png), [current maintenance logs](nexus-demo-logs.png), [demo analytics](nexus-demo-insights.png), [analytics mobile](nexus-demo-insights-mobile.png), [mobile](nexus-demo-mobile.png) |
 | How are services separated? | [Architecture diagram](plantlog-workflow.svg) and [REST application](../backend/src/app.ts) |
 | How do API records map to data? | [Asset model](../backend/src/models/Asset.ts), [LogEntry model](../backend/src/models/LogEntry.ts), [API routes](../backend/src/routes/) |
 | Can it be launched independently? | [Docker Compose guide](../README.md#getting-started) |
