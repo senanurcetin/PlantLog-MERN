@@ -2,6 +2,7 @@ import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 
 import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
+import ControlledComparisons from './ControlledComparisons';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -201,6 +202,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                     {' '}{summary.outsideWindow} recorded outside it. No estimated events are added.
                 </p>
             </section>
+            <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />
         </div>
     );
 };
