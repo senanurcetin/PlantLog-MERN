@@ -19,7 +19,7 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 **Launch the public read-only demo:** [plantlog-nexus-demo.vercel.app/demo](https://plantlog-nexus-demo.vercel.app/demo). It contains synthetic data only and requires no API, database or login. For reproduction, see the [demo guide](docs/demo-guide.md).
 
-**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
+**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
 
 ## Problem and approach
 
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Public, read-only demo
 
-The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs and drill into per-asset history. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
+The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs, drill into per-asset history, and use the fourth **Demo insights** tab to inspect synthetic workload counts and daily record-intake trends. Unlike predictive maintenance or reliability reporting, it makes no unsupported MTTR, uptime or failure-probability claims. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
 
 ## Getting started
 

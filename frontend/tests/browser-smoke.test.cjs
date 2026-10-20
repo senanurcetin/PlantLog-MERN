@@ -29,7 +29,10 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
     t.after(() => { vite.kill(); });
     await waitForServer();
 
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+        headless: true,
+        ...(process.env.PLANTLOG_BROWSER_CHANNEL ? {channel: process.env.PLANTLOG_BROWSER_CHANNEL} : {}),
+    });
     t.after(async () => { await browser.close(); });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     const apiCalls = [];
@@ -67,15 +70,37 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.getByText('No log entries match the current filters.').isVisible(), true);
         assert.deepEqual(apiCalls, [], 'Public demo must not call the authenticated API');
 
-        // The register form must reject invalid confirmation in-browser, without issuing API requests.
+        // Demo insights must use the same static data and drill into the
+        // existing read-only log filter, including on compact viewports.
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        assert.equal(await page.getByRole('heading', { name: 'Recorded activity at a glance' }).isVisible(), true);
+        assert.equal(await page.getByRole('heading', { name: 'Equipment with unresolved cases' }).isVisible(), true);
+        const openCountCard = page.getByRole('heading', { name: 'Open maintenance cases' }).locator('..');
+        assert.equal(await openCountCard.getByText('4', { exact: true }).isVisible(), true);
+        await page.getByRole('button', { name: 'View history for Conveyor Line C-12' }).click();
+        assert.equal(await page.getByText('Asset: Conveyor Line C-12').isVisible(), true);
+        await page.setViewportSize({width: 390, height: 844});
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        assert.equal(await page.getByRole('heading', { name: 'Recorded intake by UTC date' }).isVisible(), true);
+        assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
+        assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
+
+        // Standalone public builds intentionally redirect registration to
+        // the demo. Local full-stack builds still validate the signup form.
+        const publicDemoOnly = await page.getByRole('link', { name: 'View source on GitHub' }).count() === 1;
         await page.goto(base + '/register');
-        await page.getByLabel('Full name').fill('Browser Example');
-        await page.getByLabel('Email').fill('browser@example.com');
-        await page.getByLabel('Password', { exact: true }).fill('twelvechars1234');
-        await page.getByLabel('Confirm password').fill('differentsecret1234');
-        await page.getByRole('button', { name: 'Create operator account' }).click();
-        assert.equal(await page.getByRole('alert').getByText('Passwords do not match.').isVisible(), true);
-        assert.deepEqual(apiCalls, [], 'Invalid signup must not send requests');
+        if (publicDemoOnly) {
+            await page.getByRole('heading', { name: 'Know what needs attention.' }).waitFor();
+            assert.equal(new URL(page.url()).pathname, '/demo');
+        } else {
+            await page.getByLabel('Full name').fill('Browser Example');
+            await page.getByLabel('Email').fill('browser@example.com');
+            await page.getByLabel('Password', { exact: true }).fill('twelvechars1234');
+            await page.getByLabel('Confirm password').fill('differentsecret1234');
+            await page.getByRole('button', { name: 'Create operator account' }).click();
+            assert.equal(await page.getByRole('alert').getByText('Passwords do not match.').isVisible(), true);
+        }
+        assert.deepEqual(apiCalls, [], 'Static browser walk-through must not send API requests');
     } catch (error) {
         mkdirSync(path.join(frontendRoot, 'test-artifacts'), { recursive: true });
         await page.screenshot({

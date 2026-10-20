@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Activity, ArrowLeft, ArrowRight, CheckCircle2, ClipboardList,
-    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X,
+    Factory, Gauge, HardHat, Search, ShieldCheck, Wrench, X, BarChart3,
 } from 'lucide-react';
 import fixture from '../demo/fixture.json';
 import NexusBrand from '../components/NexusBrand';
+import DemoInsights from '../components/DemoInsights';
 
-type View = 'overview' | 'assets' | 'logs';
+type View = 'overview' | 'assets' | 'logs' | 'insights';
 type Asset = (typeof fixture.assets)[number];
 type Log = (typeof fixture.logs)[number];
 
@@ -66,6 +67,13 @@ const Demo = () => {
         setAssetStatus('all');
         setLogType('all');
         setSelectedAssetId(null);
+    };
+
+    const showAssetHistory = (assetId: string) => {
+        setSelectedAssetId(assetId);
+        setSearch('');
+        setLogType('all');
+        setView('logs');
     };
 
     const metricCards = [
@@ -132,6 +140,7 @@ const Demo = () => {
                         ['overview', 'Overview', Gauge],
                         ['assets', 'Asset registry', Factory],
                         ['logs', 'Maintenance log', ClipboardList],
+                        ['insights', 'Demo insights', BarChart3],
                     ] as const).map(([id, label, Icon]) => (
                         <button type="button" key={id} onClick={() => navigate(id)}
                             aria-current={view === id ? 'page' : undefined}
@@ -145,13 +154,13 @@ const Demo = () => {
                     <section className="rounded-2xl nexus-hero text-white p-6 sm:p-9 shadow-xl relative overflow-hidden">
                         <div className="relative z-10 max-w-3xl">
                             <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-200">Operations intelligence / sample facility</p>
-                            <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : 'Shift and maintenance records.'}</h1>
+                            <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">{view === 'overview' ? 'Know what needs attention.' : view === 'assets' ? 'Equipment register.' : view === 'logs' ? 'Shift and maintenance records.' : 'Evidence-aware workload insights.'}</h1>
                             <p className="text-sm sm:text-base text-blue-50/90 mt-3 leading-relaxed">{context.facility} · Snapshot {displayDate(context.snapshot)}. Explore a realistic workflow with completely fictional data.</p>
                             <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold"><HardHat size={16} aria-hidden="true" /> Portfolio demonstration — not live operational monitoring</div>
                         </div>
                     </section>
 
-                    <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {view !== 'insights' && <section aria-label="Sample registry metrics" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {metricCards.map(item => {
                             const Icon = item.icon;
                             return <article key={item.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -161,7 +170,7 @@ const Demo = () => {
                                 <p className="text-xs text-slate-500 mt-2">{item.subtitle}</p>
                             </article>;
                         })}
-                    </section>
+                    </section>}
 
                     {view === 'overview' && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -217,7 +226,7 @@ const Demo = () => {
                                             <td className="px-5 sm:px-6 py-4"><p className="font-semibold text-slate-900">{asset.name}</p><p className="text-xs text-slate-500 font-mono mt-1">{asset.serialNumber}</p></td>
                                             <td className="px-5 py-4"><StatusPill status={asset.status} /></td><td className="px-5 py-4 text-slate-600">{asset.location}</td>
                                             <td className="px-5 py-4 capitalize text-slate-600">{asset.criticality}</td>
-                                            <td className="px-5 py-4"><button type="button" onClick={() => { setSelectedAssetId(asset.id); setSearch(''); setLogType('all'); setView('logs'); }} className="text-blue-800 font-bold hover:underline whitespace-nowrap">View logs →</button></td>
+                                            <td className="px-5 py-4"><button type="button" onClick={() => showAssetHistory(asset.id)} className="text-blue-800 font-bold hover:underline whitespace-nowrap">View logs →</button></td>
                                         </tr>)}
                                     </tbody>
                                 </table>
@@ -248,6 +257,9 @@ const Demo = () => {
                             {searchedLogs.length === 0 && <p className="p-10 text-center text-slate-500">No log entries match the current filters.</p>}
                             <p className="px-6 py-4 text-xs text-slate-500 border-t border-slate-100">Showing {searchedLogs.length} of {logs.length} fictional log entries.</p>
                         </section>
+                    )}
+                    {view === 'insights' && (
+                        <DemoInsights onOpenHistory={showAssetHistory} />
                     )}
                     <footer className="rounded-2xl border border-blue-100 bg-blue-50/70 px-5 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div><p className="font-semibold text-slate-800">About this demo</p><p className="text-sm text-slate-600 mt-1">{context.notice} All indicators are calculated from this fixed example dataset.</p></div>

@@ -15,7 +15,11 @@ const officialSources = [
 
 test('official NEXUS 2.0 Drive-exported SVG identity is unmodified', () => {
     for (const [file, hash] of officialSources) {
-        const digest = createHash('sha256').update(readFileSync(path.join(root, file))).digest('hex');
+        // Git on Windows may check out SVG text as CRLF. Compare the
+        // canonical LF representation so legitimate line-ending conversion
+        // does not invalidate the original approved Drive content.
+        const canonical = readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+        const digest = createHash('sha256').update(canonical, 'utf8').digest('hex');
         assert.equal(digest, hash, file + ' must match the approved Drive SVG');
     }
 });
