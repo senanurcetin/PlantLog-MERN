@@ -144,6 +144,20 @@
     border-radius: 12px; background: #4EA8FF; color: #0B0F19;
 }
 .plantlog-dashboard a:focus-visible { outline: 3px solid #4EA8FF; outline-offset: 3px; }
+/* Keyboard-only skip navigation is hidden visually until focused. */
+.nexus-skip-link {
+    position: fixed; z-index: 1000; left: 1rem; top: -6rem;
+    background: #0B0F19; color: #fff; border: 2px solid #00E0FF;
+    border-radius: .5rem; padding: .75rem 1rem;
+}
+.nexus-skip-link:focus { top: .75rem; }
+@media (prefers-reduced-motion: reduce) {
+    .nexus-demo *, .nexus-shell * {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
 @media (max-width: 639px) {
     .plantlog-dashboard .plantlog-hero { padding: 1.4rem; }
     .plantlog-dashboard .plantlog-kpi { min-height: 108px; }
