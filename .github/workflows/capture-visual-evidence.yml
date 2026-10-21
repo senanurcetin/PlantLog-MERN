@@ -1,10 +1,10 @@
 name: Rebuild guest demo visual evidence
 
-# Dedicated documentation branch: write scope never runs on untrusted PR code.
+# Only a documentation-namespaced branch; never executes on untrusted PR events.
 on:
   push:
     branches:
-      - docs/refresh-plantlog-visual-evidence-20261021
+      - 'docs/*visual-evidence*'
 
 permissions:
   contents: write
@@ -72,7 +72,7 @@ jobs:
             echo "No screenshot changes"
           else
             git commit -m "docs(visual): capture current NEXUS eight-gate demo in Chromium"
-            git push origin HEAD:docs/refresh-plantlog-visual-evidence-20261021
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
 
       - name: Preserve capture evidence if the run fails
