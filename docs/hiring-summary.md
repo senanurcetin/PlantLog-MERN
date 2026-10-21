@@ -22,7 +22,7 @@ Replace fragmented paper/spreadsheet records with an asset registry and a search
 
 ## Operational boundaries
 
-The current screenshots linked above are verified public fixture-demo captures. The development Compose setup binds MongoDB and the API to host loopback and needs a strong unique JWT secret; it is **not** suitable for a public production deployment unchanged. A successful build is not evidence of authorization security or end-to-end functional testing.
+The current screenshots are reproducible synthetic guest-mode Chromium captures, with build provenance in the [capture manifest](screenshots-manifest.json). The development Compose setup binds MongoDB and the API to host loopback and needs a strong unique JWT secret; it is **not** suitable for a public production deployment unchanged. A successful build is not evidence of authorization security or end-to-end functional testing.
 
 **Before real-world deployment:** [Security policy](../SECURITY.md) · [README](../README.md).
 
