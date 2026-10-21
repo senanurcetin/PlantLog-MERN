@@ -44,7 +44,7 @@ async function main() {
         'Screenshot capture is permitted only in the guest-only production-equivalent build');
     mkdirSync(outputDir, { recursive: true });
     const vite = spawn(process.execPath, [
-        require.resolve('vite/bin/vite.js'), 'preview',
+        path.join(frontend, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview',
         '--host', '127.0.0.1', '--port', '4173', '--strictPort',
     ], { cwd: frontend, stdio: 'inherit' });
     let browser;
