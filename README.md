@@ -8,7 +8,7 @@
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
-> The architecture diagram illustrates the workflow. The NEXUS screenshots below come from the **verified production-equivalent, guest-only frontend build** (19 October 2026), not an authenticated production plant dashboard. Earlier `docs/dashboard.png`, `docs/assets.png` and `docs/logs.png` remain as historical interface captures.
+> The architecture diagram illustrates the workflow. The NEXUS screenshots below are documented captures of the **guest-only frontend build**, not an authenticated production plant dashboard or current live telemetry. See [verification evidence](docs/demo-verification-2026-10-21.md) for provenance and limitations.
 
 
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
@@ -127,7 +127,7 @@ cd backend && npm ci && npm test
 cd ../frontend && npm ci && npm run lint && npm run test:demo && npm run test:registry && npm run test:perf
 ```
 
-The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hooks configuration and runs without accessing any backend or CI runner.
+The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hooks configuration and runs without accessing any backend or CI runner. GitHub Actions also exercises lint and the reproducible compressed-bundle budget; the browser job separately tests the public demo and authenticated local flow. Confirm the current commit's actual job results instead of relying on older screenshots or local reports.
 
 The public demo additionally has a [real Chromium smoke test](docs/browser-testing.md) in GitHub Actions, distinct from the frontend build and fixture unit tests. The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
 
