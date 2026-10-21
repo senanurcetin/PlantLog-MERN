@@ -1,0 +1,84 @@
+name: Rebuild guest demo visual evidence
+
+# Dedicated documentation branch: write scope never runs on untrusted PR code.
+on:
+  push:
+    branches:
+      - docs/refresh-plantlog-visual-evidence-20261021
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_PUBLIC_DEMO_ONLY: "true"
+
+    steps:
+      - name: Check out documentation branch
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install checked-in dependencies
+        run: npm ci
+
+      - name: Validate synthetic data and brand fingerprints
+        run: npm run test:demo
+
+      - name: Build guest-only production-equivalent frontend
+        run: npm run build
+
+      - name: Install temporary Playwright tooling
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+
+      - name: Install headless Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture and validate all eight NEXUS views
+        run: node scripts/capture-doc-screenshots.cjs
+
+      - name: Commit updated PNG files and machine-readable manifest
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/nexus-demo-overview.png \
+            docs/nexus-demo-assets.png \
+            docs/nexus-demo-logs.png \
+            docs/nexus-demo-insights.png \
+            docs/nexus-demo-insights-mobile.png \
+            docs/nexus-scenario-lab-desktop.png \
+            docs/nexus-scenario-lab-mobile.png \
+            docs/nexus-demo-mobile.png \
+            docs/screenshots-manifest.json
+          if git diff --cached --quiet; then
+            echo "No screenshot changes"
+          else
+            git commit -m "docs(visual): capture current NEXUS eight-gate demo in Chromium"
+            git push origin HEAD:docs/refresh-plantlog-visual-evidence-20261021
+          fi
+
+      - name: Preserve capture evidence if the run fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-visual-capture-failure
+          path: docs/nexus-demo-*.png
+          if-no-files-found: ignore
