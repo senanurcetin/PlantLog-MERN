@@ -50,11 +50,22 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {quality.findings.map(finding => (
-                        <div key={finding.code} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                            <dt className="text-xs font-medium text-slate-600">{finding.meaning}</dt>
-                            <dd className={`mt-2 text-xl font-bold tabular-nums ${finding.count ? 'text-amber-800' : 'text-slate-900'}`}>
+                        <div key={finding.code} className={`rounded-xl border p-3 ${
+                            finding.count === 0 ? 'border-slate-200 bg-slate-50' :
+                                finding.severity === 'error' ? 'border-rose-200 bg-rose-50' :
+                                    'border-amber-200 bg-amber-50'
+                        }`}>
+                            <dt className="text-xs font-medium text-slate-700">{finding.meaning}</dt>
+                            <dd className={`mt-2 text-xl font-bold tabular-nums ${
+                                finding.count === 0 ? 'text-slate-900' :
+                                    finding.severity === 'error' ? 'text-rose-800' : 'text-amber-800'
+                            }`}>
                                 {finding.count}
                             </dd>
+                            <p className="mt-1 text-[11px] font-semibold text-slate-700">
+                                {finding.count === 0 ? 'Check passed' :
+                                    finding.severity === 'error' ? 'Integrity issue' : 'Review required'}
+                            </p>
                         </div>
                     ))}
                 </dl>
