@@ -58,6 +58,14 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                         </div>
                     ))}
                 </dl>
+                {quality.eligibleRecords < quality.assessedRecords && (
+                    <p role="status" className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+                        This fixture has {quality.assessedRecords - quality.eligibleRecords} record(s)
+                        excluded by the scientific eligibility rules. The activity charts
+                        still show raw fictional records and must not be interpreted as
+                        quality-filtered estimates.
+                    </p>
+                )}
                 <p className="mt-3 text-xs text-slate-500">
                     Checked {quality.assessedAssets} assets and {quality.assessedRecords} records.
                     Overlapping findings must not be added together to infer a count of unique bad rows.
