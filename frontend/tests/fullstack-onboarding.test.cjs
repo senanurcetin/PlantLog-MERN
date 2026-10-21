@@ -75,7 +75,16 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
             await page.setViewportSize({ width: 390, height: 844 });
             const mobileNav = page.getByRole('navigation', { name: 'Mobile primary navigation' });
             assert.equal(await mobileNav.isVisible(), true);
-            assert.equal(await page.getByRole('navigation', { name: 'Primary navigation' }).isVisible(), false);
+            // The mobile label contains "Primary navigation"; getByRole(name) can
+            // match that visible element rather than the hidden desktop sidebar.
+            // Target the actual desktop navigation, even when it is absent from
+            // the accessibility tree due to its responsive hidden class.
+            const desktopNav = page.locator('aside nav[aria-label="Primary navigation"]');
+            assert.equal(await desktopNav.isVisible(), false);
+            await page.setViewportSize({ width: 320, height: 760 });
+            assert.equal(await mobileNav.isVisible(), true);
+            assert.equal(await desktopNav.isVisible(), false);
+            await page.setViewportSize({ width: 390, height: 844 });
             await mobileNav.getByRole('link', { name: 'Asset Registry' }).click();
             await page.getByRole('button', { name: 'Add Asset' }).waitFor();
             await mobileNav.getByRole('link', { name: 'Maintenance Analytics' }).click();

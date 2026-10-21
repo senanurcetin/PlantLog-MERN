@@ -124,9 +124,9 @@ in the existing logbook, and restore the baseline with Reset or reload.
 ## Scientific data-quality checks
 
 The public Demo Insights page now reports fixture data quality separately from
-workload metrics, including dangling asset references, invalid dates, timestamps
-after the fixed observation date, duplicate asset/log IDs, and invalid lifecycle
-statuses. An eligible record may have multiple exclusion findings: unique
+workload metrics, including dangling asset references, invalid UTC timestamps, timestamps
+after the fixed observation date, duplicate asset/log IDs, missing log identities,
+unknown record categories and invalid lifecycle statuses. An eligible record may have multiple exclusion findings: unique
 eligible-row totals must not be inferred by summing issue counts. These checks
 only demonstrate internal synthetic-data consistency; they do not establish
 external predictive validity, actual industrial uptime, real-world causal
@@ -149,9 +149,18 @@ mechanical failure severity. The fixture remains unchanged.
 
 The data-quality panel excludes **all rows carrying repeated log identifiers**
 or pointing at ambiguous duplicate equipment identifiers from its eligible-row
-numerator. It does not sum overlapping errors to invent a count of unique
-invalid rows. Human-readable dates are not treated as valid ISO timestamps
-merely because JavaScript can parse them.
+numerator. It also excludes missing/blank log IDs, unsupported event categories
+and malformed dates. It does not sum overlapping errors to invent a count of
+unique invalid rows. The fixture timestamp contract requires real calendar
+instants encoded with an explicit UTC `Z` designator, with optional
+millisecond precision (not local-time strings or numeric timezone offsets).
+This strict UTC contract is a reproducibility policy for the demo, not an
+assertion that all other ISO 8601 timestamps are universally invalid.
+
+**Interpretation:** quality eligibility and workload charts are intentionally
+separate: the quality panel reports excluded records, while the descriptive
+charts count the raw fictional fixture. When checking a modified fixture,
+inspect the quality panel before treating raw chart counts as trustworthy.
 
 The NEXUS demo provides a visible-on-focus **Skip to demonstration content**
 link and honors the operating system's reduced-motion preference. The

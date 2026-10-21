@@ -18,3 +18,8 @@ docker-compose.override.yml
 
 # Data volumes
 mongodb_data/
+
+# Local browser QA and diagnostic artifacts
+frontend/test-artifacts/
+inspect.json
+logs.txt

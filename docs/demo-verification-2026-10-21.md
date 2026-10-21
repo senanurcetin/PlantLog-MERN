@@ -1,5 +1,16 @@
 # Demo verification evidence — 21 October 2026
 
+> **Evidence scope:** These are dated local observations and historical test
+> results, not a current main-branch acceptance certificate. In particular,
+> GitHub Actions run [#94](https://github.com/senanurcetin/PlantLog-MERN/actions/runs/39519405248)
+> failed the authenticated browser job (mobile desktop-navigation selector
+> mismatch), while backend, frontend and backend-integration jobs passed.
+> A fix and expanded quality assertions are under review; report them as
+> verified only after checking the exact subsequent commit's CI results.
+> The eight-gate rules introduced afterward supersede the six-gate inventory
+> described in the historical results below.
+
+
 ## Scope
 
 NEXUS PlantLog is a fictional, read-only portfolio demonstrator with a local

@@ -105,6 +105,8 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.getByRole('heading', { name: 'Synthetic data quality and provenance' })
             .isVisible(), true);
         assert.equal(await page.getByText('12 / 12 eligible rows').isVisible(), true);
+        assert.equal(await page.getByText('Check passed', { exact: true }).count(), 8,
+            'Every synthetic quality gate must be represented and pass on the reference fixture');
         assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
