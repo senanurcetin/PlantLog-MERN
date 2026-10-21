@@ -45,6 +45,13 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(response.status(), 200);
         assert.equal(await page.getByRole('heading', { name: 'Know what needs attention.' }).isVisible(), true);
         assert.equal(await page.getByText('READ-ONLY PUBLIC DEMONSTRATION').isVisible(), true);
+        // Keyboard users can skip the brand/header/nav before entering content.
+        await page.keyboard.press('Tab');
+        const skip = page.getByRole('link', {name:'Skip to demonstration content'});
+        assert.equal(await skip.evaluate(el => el === document.activeElement), true);
+        await page.keyboard.press('Enter');
+        assert.equal(await page.locator('#main-demo-content').evaluate(el =>
+            el === document.activeElement), true);
         const demoLogo = page.getByRole('img', { name: 'NEXUS' }).first();
         await demoLogo.waitFor();
         assert.equal(await demoLogo.evaluate(img => img.complete && img.naturalWidth > 0), true,

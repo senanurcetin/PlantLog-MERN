@@ -29,18 +29,26 @@ export const assessDemoDataQuality = (
         throw new Error('Invalid snapshot UTC date');
     }
     const knownAssets = new Set<string>();
+    const duplicateAssetIds = new Set<string>();
     let duplicateAssets = 0;
     for (const asset of assets) {
-        if (knownAssets.has(asset.id)) duplicateAssets++;
+        if (knownAssets.has(asset.id)) {
+            duplicateAssets++;
+            duplicateAssetIds.add(asset.id);
+        }
         knownAssets.add(asset.id);
     }
     const ids = new Set<string>();
+    const duplicateLogIdValues = new Set<string>();
     let duplicateLogIds = 0, unlinkedRecords = 0, invalidDates = 0;
     let outsideSnapshot = 0, unknownStatuses = 0;
     const statuses = new Set(['open', 'acknowledged', 'in_progress', 'resolved']);
     for (const entry of logs) {
         if (entry.id !== undefined) {
-            if (ids.has(entry.id)) duplicateLogIds++;
+            if (ids.has(entry.id)) {
+                duplicateLogIds++;
+                duplicateLogIdValues.add(entry.id);
+            }
             ids.add(entry.id);
         }
         if (!knownAssets.has(entry.assetId)) unlinkedRecords++;
@@ -66,7 +74,12 @@ export const assessDemoDataQuality = (
     const excluded = new Set<number>();
     logs.forEach((entry, index) => {
         const t = Date.parse(entry.date);
-        if (!knownAssets.has(entry.assetId) || !statuses.has(entry.status) ||
+        const canonicalDate = typeof entry.date === 'string' &&
+            /^\d{4}-\d{2}-\d{2}T/.test(entry.date);
+        if (!knownAssets.has(entry.assetId) ||
+            duplicateAssetIds.has(entry.assetId) ||
+            (entry.id !== undefined && duplicateLogIdValues.has(entry.id)) ||
+            !statuses.has(entry.status) || !canonicalDate ||
             !Number.isFinite(t) || t > end) excluded.add(index);
     });
     return {
@@ -74,6 +87,6 @@ export const assessDemoDataQuality = (
         eligibleRecords: logs.length - excluded.size,
         outsideSnapshot, unlinkedRecords, invalidDates, duplicateAssets,
         duplicateLogIds, unknownStatuses, findings,
-        caveat: 'Data integrity checks describe synthetic fixture completeness, not operational reliability or scientific external validity. Duplicate identifiers are tracked separately from the eligible-row count.',
+        caveat: 'Data integrity checks describe synthetic fixture completeness, not operational reliability or scientific external validity. Every row with a duplicated log ID or ambiguous equipment ID is excluded from eligibility. Findings may overlap.',
     };
 };
