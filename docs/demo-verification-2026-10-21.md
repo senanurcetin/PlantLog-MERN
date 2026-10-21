@@ -58,6 +58,22 @@ latency benchmark and should not be compared to remote users. The built bundle
 contained approximately 281.40 kB of JavaScript, 90.96 kB gzip, and 34.04 kB
 of CSS, 7.05 kB gzip. These are build sizes, not transfer timing guarantees.
 
+## Current public deployment and screenshot provenance
+
+On 21 October 2026, Vercel reported the production alias
+`plantlog-nexus-demo.vercel.app` READY with GitHub source
+`f4120062dc31e776b2704a070aa31093de24940a`.
+GitHub Actions run
+[#98](https://github.com/senanurcetin/PlantLog-MERN/actions/runs/39522547576)
+passed all four jobs on that same commit, including guest and local authenticated
+Chromium flows. This is **deployment metadata**, not proof of live plant connectivity.
+
+The newer screenshot collection is captured from the isolated guest-only Vite
+build, not by scraping the live Vercel URL. Its
+[manifest](screenshots-manifest.json) is authoritative for capture SHA,
+UTC date, viewports, and which scenario state each image depicts.
+The older local QA results below remain dated historical evidence.
+
 ## Visual evidence
 
 - [Updated desktop analytics](nexus-demo-insights.png), 1440 px
