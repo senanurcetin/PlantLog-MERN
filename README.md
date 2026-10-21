@@ -23,7 +23,7 @@ A full-stack industrial operations prototype that organizes asset records, maint
 
 ### Advanced demonstration, intentionally not a product
 
-**Scientific integrity:** Demo Insights includes five controlled, single-record fictional comparisons and exposes six data-quality gates on fictional records; see the [method notes](docs/demo-guide.md#scientific-data-quality-checks).
+**Scientific integrity:** Demo Insights includes five controlled, single-record fictional comparisons and exposes eight data-quality gates on fictional records; see the [method notes](docs/demo-guide.md#scientific-data-quality-checks).
 
 The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not a workflow for real incidents. Visitors can try one deterministic, fictional maintenance incident through `open → acknowledged → in progress → resolved`, inspect its temporary impact on Demo Insights, and reset without changing any original fixture. No persistent user state, backend writes, real plant connectivity, account creation, billing or productized service is provided by the hosted demo.
 
