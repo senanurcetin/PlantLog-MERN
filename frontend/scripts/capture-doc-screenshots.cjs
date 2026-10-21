@@ -85,6 +85,13 @@ async function main() {
                     assert.equal(await page.getByText('12 / 12 eligible rows').isVisible(), true);
                     assert.equal(await page.getByText('Check passed', { exact: true }).count(), 8);
                     await page.getByRole('heading', { name: 'Controlled fictional case comparisons' }).waitFor();
+                    await page.getByRole('heading', {
+                        name: 'Scientific sensitivity lab: raw versus eligible records',
+                    }).waitFor();
+                    const scientificLab = page.locator('section[aria-labelledby="eligibility-lab-heading"]');
+                    await scientificLab.getByRole('button', { name: 'Overlapping defects' }).click();
+                    assert.equal(await scientificLab.getByText('UNKNOWN_STATUS', { exact: true }).isVisible(), true);
+                    await scientificLab.getByRole('button', { name: 'Baseline', exact: true }).click();
                 }
                 if (capture.scenario) {
                     await page.getByRole('button', { name: 'Report fictional incident' }).click();

@@ -10,6 +10,8 @@ export interface QualityReport {
     assessedRecords: number;
     assessedAssets: number;
     eligibleRecords: number;
+    /** Zero-based record indices retained by all quality gates; immutable audit view. */
+    eligibleRecordIndices: number[];
     outsideSnapshot: number;
     unlinkedRecords: number;
     invalidDates: number;
@@ -114,6 +116,7 @@ export const assessDemoDataQuality = (
     return {
         assessedRecords: logs.length, assessedAssets: assets.length,
         eligibleRecords: logs.length - excluded.size,
+        eligibleRecordIndices: logs.flatMap((_, index) => excluded.has(index) ? [] : [index]),
         outsideSnapshot, unlinkedRecords, invalidDates, duplicateAssets,
         duplicateLogIds, missingLogIds, unknownTypes, unknownStatuses, findings,
         caveat: 'These synthetic-data checks are not operational reliability or external scientific validation. Entries with missing/repeated log identifiers, ambiguous equipment IDs, invalid UTC timestamps or unknown event types/states are excluded from quality eligibility; findings may overlap. Descriptive workload charts still show raw fixture counts.',

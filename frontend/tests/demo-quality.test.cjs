@@ -14,6 +14,7 @@ test('reference fixture is internally consistent and reports all eight gates',()
     assert.equal(report.assessedRecords,12);
     assert.equal(report.assessedAssets,8);
     assert.equal(report.eligibleRecords,12);
+    assert.deepEqual(report.eligibleRecordIndices,Array.from({length:12},(_,i)=>i));
     assert.equal(report.findings.length,8);
     assert.equal(report.findings.every(x=>x.count===0),true);
 });
