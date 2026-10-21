@@ -18,6 +18,17 @@ If a browser assertion fails, the test writes `test-artifacts/browser-smoke-fail
 
 ## Authenticated end-to-end workflow
 
+**CI interpretation:** GitHub Actions run #94 on 21 October 2026 passed
+the guest-only browser smoke but failed at a mobile visibility assertion in
+the authenticated test. Its `getByRole` name query incorrectly matched
+"Mobile primary navigation" when checking "Primary navigation", because
+the desktop navigation is absent from the mobile accessibility tree.
+The regression test now uses the desktop sidebar CSS locator and checks both
+320 px and 390 px layouts. Subsequent browser assertions are not considered
+verified until the revised CI job passes; the test is not evidence of a
+production deployment.
+
+
 The same CI job also runs `tests/fullstack-onboarding.test.cjs` against a **temporary local MongoDB service** and an actual Express backend. It uses one randomly generated operator account and a randomly named database. It signs up, creates an equipment record, logs an incident, acknowledges/starts/resolves that incident, verifies analytical eligibility, views its asset history, signs out and confirms incorrect login credentials display an inline error. It never uses an external service or real credentials.
 
 Run locally only with disposable MongoDB on loopback port 27017 after installing and building `backend/` and `frontend/`, plus installing the pinned Playwright browser dependencies shown above:
