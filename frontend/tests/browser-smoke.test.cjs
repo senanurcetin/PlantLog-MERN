@@ -108,6 +108,27 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.getByText('Check passed', { exact: true }).count(), 8,
             'Every synthetic quality gate must be represented and pass on the reference fixture');
         assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
+        // Sensitivity analysis is in-memory and recomputes quality-filtered
+        // workload separately from raw fictional activity, on mobile too.
+        const lab = page.locator('section[aria-labelledby="eligibility-lab-heading"]');
+        assert.equal(await lab.getByRole('heading', {
+            name: 'Scientific sensitivity lab: raw versus eligible records',
+        }).isVisible(), true);
+        const eligibleMetric = lab.getByText('Eligible rows', { exact: true }).locator('..');
+        assert.equal(await eligibleMetric.getByText('12', { exact: true }).isVisible(), true);
+        await lab.getByRole('button', { name: 'Broken equipment link' }).click();
+        assert.equal(await eligibleMetric.getByText('11', { exact: true }).isVisible(), true);
+        assert.equal(await lab.getByText('UNLINKED', { exact: true }).isVisible(), true);
+        await lab.getByRole('button', { name: 'Duplicate event ID' }).click();
+        assert.equal(await eligibleMetric.getByText('10', { exact: true }).isVisible(), true);
+        await lab.getByRole('button', { name: 'Overlapping defects' }).click();
+        assert.equal(await eligibleMetric.getByText('11', { exact: true }).isVisible(), true);
+        assert.equal(await lab.getByText('INVALID_DATE', { exact: true }).isVisible(), true);
+        assert.equal(await lab.getByText('UNKNOWN_STATUS', { exact: true }).isVisible(), true);
+        await lab.getByRole('button', { name: 'Baseline', exact: true }).click();
+        assert.equal(await eligibleMetric.getByText('12', { exact: true }).isVisible(), true);
+        assert.deepEqual(apiCalls, [], 'Sensitivity lab must stay entirely offline');
+
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
         // Guided scenario can advance one fictional case, update the same
