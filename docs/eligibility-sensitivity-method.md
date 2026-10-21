@@ -86,3 +86,12 @@ exposure-time-normalized. There is no independence/representativeness claim
 for the small synthetic case universe. Claims of external validity require
 separate, legally shareable historical observations, domain expert review,
 and a different evaluation design.
+
+## Visual evidence
+
+The [full-page Chromium screenshots](screenshots-manifest.json) include the
+interactive sensitivity section at its **Baseline** selection. The capture
+routine also exercises the **Overlapping defects** selection before resetting
+the page to the baseline for a deterministic, reviewable screenshot. The
+manifest records its source commit, date and viewport rather than asserting
+that this UI was verified against live industrial data.
