@@ -139,6 +139,20 @@ only demonstrate internal synthetic-data consistency; they do not establish
 external predictive validity, actual industrial uptime, real-world causal
 relationships or safety assurance.
 
+## Data-eligibility sensitivity laboratory
+
+A separate interactive panel compares **raw descriptive** and **quality-eligible**
+workload under five independently reconstructed datasets: original fixture,
+missing equipment link, impossible UTC date, duplicated event ID, and several
+errors on the same record. Every perturbation changes just **one existing**
+fictional row; it never changes the source fixture or sends an API request.
+Ambiguous duplicates cause **both** rows to fail, while overlapping quality
+findings exclude their shared row only **once**.
+
+The raw-versus-eligible difference is an arithmetic sensitivity check, not a
+failure model, risk probability, causal estimate or real plant statistic.
+See the [protocol, denominator and limitations](eligibility-sensitivity-method.md).
+
 ## Controlled synthetic comparison examples
 
 The live Demo Insights section also compares five deterministic
