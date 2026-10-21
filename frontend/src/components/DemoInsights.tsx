@@ -3,6 +3,7 @@ import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
 import ControlledComparisons from './ControlledComparisons';
+import EligibilitySensitivityLab from './EligibilitySensitivityLab';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -222,6 +223,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                 </p>
             </section>
             <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />
+            <EligibilitySensitivityLab assets={assets} logs={logs} snapshot={snapshot} />
         </div>
     );
 };
