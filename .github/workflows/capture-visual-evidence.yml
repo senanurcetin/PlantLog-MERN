@@ -6,6 +6,11 @@ on:
     branches:
       - 'docs/*visual-evidence*'
 
+# Serialize updates to a single documentation branch to avoid competing git pushes.
+concurrency:
+  group: guest-visual-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
