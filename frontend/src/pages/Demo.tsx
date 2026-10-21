@@ -126,6 +126,9 @@ const Demo = () => {
 
     return (
         <div className="nexus-demo min-h-screen text-slate-900">
+            <a href="#main-demo-content" className="nexus-skip-link">
+                Skip to demonstration content
+            </a>
             <div className="bg-[#0B0F19] text-slate-100 border-b border-[#6E55C6]/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="inline-flex items-center gap-2 font-semibold"><ShieldCheck size={14} aria-hidden="true" /> READ-ONLY PUBLIC DEMONSTRATION</span>
@@ -163,7 +166,7 @@ const Demo = () => {
                     ))}
                 </nav>
 
-                <main className="space-y-6 pb-16">
+                <main id="main-demo-content" tabIndex={-1} className="space-y-6 pb-16">
                     <section className="rounded-2xl nexus-hero text-white p-6 sm:p-9 shadow-xl relative overflow-hidden">
                         <div className="relative z-10 max-w-3xl">
                             <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-200">Operations intelligence / sample facility</p>

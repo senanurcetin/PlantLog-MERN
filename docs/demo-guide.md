@@ -144,3 +144,16 @@ open incident/maintenance cases, affected equipment and unlinked cases.
 These outcomes are bookkeeping identities, **not** evidence for causal
 relationships, reliability engineering coefficients, forecasting or
 mechanical failure severity. The fixture remains unchanged.
+
+## Additional data-quality and accessibility safeguards
+
+The data-quality panel excludes **all rows carrying repeated log identifiers**
+or pointing at ambiguous duplicate equipment identifiers from its eligible-row
+numerator. It does not sum overlapping errors to invent a count of unique
+invalid rows. Human-readable dates are not treated as valid ISO timestamps
+merely because JavaScript can parse them.
+
+The NEXUS demo provides a visible-on-focus **Skip to demonstration content**
+link and honors the operating system's reduced-motion preference. The
+browser smoke test checks keyboard access to the main content.
+Automated checks do not constitute WCAG certification.
