@@ -8,18 +8,18 @@
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
-> The architecture diagram illustrates the workflow. The NEXUS screenshots below are documented captures of the **guest-only frontend build**, not an authenticated production plant dashboard or current live telemetry. See [verification evidence](docs/demo-verification-2026-10-21.md) for provenance and limitations.
+> The architecture diagram illustrates the workflow. The NEXUS screenshots below are captured in real Chromium from the **production-equivalent, guest-only frontend build**. They are not plant telemetry or authenticated production screens. Exact capture assumptions, viewports and commit are listed in [the screenshot manifest](docs/screenshots-manifest.json); the [verification report](docs/demo-verification-2026-10-21.md) states the remaining limits.
 
 
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
 A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
 
-![NEXUS PlantLog read-only demo overview, 19 October 2026](docs/nexus-demo-overview.png)
+![NEXUS PlantLog guest-only demo overview — reproducible Chromium capture](docs/nexus-demo-overview.png)
 
 **Launch the public read-only demo:** [plantlog-nexus-demo.vercel.app/demo](https://plantlog-nexus-demo.vercel.app/demo). It contains synthetic data only and requires no API, database or login. For reproduction, see the [demo guide](docs/demo-guide.md).
 
-**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Scenario lab](docs/nexus-scenario-lab-desktop.png) · [Scenario lab mobile](docs/nexus-scenario-lab-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png) · [Mobile login design (local full-app mode)](docs/nexus-login-mobile.png).
+**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Scenario lab](docs/nexus-scenario-lab-desktop.png) · [Scenario lab mobile](docs/nexus-scenario-lab-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png).
 
 ### Advanced demonstration, intentionally not a product
 
