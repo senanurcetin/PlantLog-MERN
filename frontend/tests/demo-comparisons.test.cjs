@@ -8,7 +8,8 @@ const load=(p,req={})=>{
 };
 const original=JSON.stringify(fixture);
 const core=load('insights.ts');
-const {compareDemoCases}=load('comparisons.ts',{'./insights':core});
+const quality=load('quality.ts');
+const {compareDemoCases}=load('comparisons.ts',{'./insights':core,'./quality':quality});
 
 test('controlled experiments compare one-record perturbations with identical baselines',()=>{
  const result=compareDemoCases(fixture.assets,fixture.logs,fixture.context.snapshot);
@@ -20,8 +21,16 @@ test('controlled experiments compare one-record perturbations with identical bas
  assert.equal(byId.baseline.records,12);
  assert.equal(byId.baseline.openCases,4);
  assert.equal(byId.baseline.deltaOpenCases,0);
+ assert.equal(byId.baseline.eligibleRecords,12);
+ assert.equal(byId.baseline.excludedRecords,0);
  for(const id of ['open-incident','open-maintenance','resolved-incident','missing-link'])
    assert.equal(byId[id].deltaRecords,1);
+ for(const id of ['open-incident','open-maintenance','resolved-incident']){
+   assert.equal(byId[id].eligibleRecords,13,'valid hypothetical record must have its own unique identity');
+   assert.equal(byId[id].excludedRecords,0);
+ }
+ assert.equal(byId['missing-link'].eligibleRecords,12);
+ assert.equal(byId['missing-link'].excludedRecords,1);
  assert.equal(byId['open-incident'].deltaOpenCases,1);
  assert.equal(byId['open-maintenance'].deltaOpenCases,1);
  assert.equal(byId['resolved-incident'].deltaOpenCases,0);
@@ -34,4 +43,16 @@ test('controlled experiments compare one-record perturbations with identical bas
 test('empty scenario universe rejects an experiment rather than inventing equipment',()=>{
  assert.throws(()=>compareDemoCases([],[],'2026-10-18'),/in-service/);
  assert.throws(()=>compareDemoCases([{id:'a',name:'Old',serialNumber:'a',status:'decommissioned'}],[],'2026-10-18'),/in-service/);
+});
+
+
+test('comparison IDs are collision-safe and quality denominators remain honest',()=>{
+ const collision=structuredClone(fixture);
+ collision.logs[0].id='COMPARE-open-incident';
+ const result=compareDemoCases(collision.assets,collision.logs,collision.context.snapshot);
+ const added=result.find(x=>x.id==='open-incident');
+ assert.equal(added.eligibleRecords,13);
+ assert.equal(added.excludedRecords,0);
+ assert.equal(result.find(x=>x.id==='missing-link').excludedRecords,1);
+ assert.equal(collision.logs.length,12,'hypothetical comparisons may not modify source log count');
 });
