@@ -30,6 +30,14 @@ jobs:
       - name: Validate synthetic demo data
         run: npm run test:demo
 
+      - name: Archive reproducible synthetic scientific evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-synthetic-science-evidence
+          path: frontend/test-artifacts/scientific-evidence.json
+          if-no-files-found: warn
+
       - name: Test registry filters
         run: npm run test:registry
 

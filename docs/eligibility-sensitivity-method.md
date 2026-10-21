@@ -77,6 +77,27 @@ issues, rejection of malformed baselines, and immutability/repeatability. The
 Playwright Chromium browser smoke tests the interactive case selectors, the
 mobile view and the absence of API calls.
 
+## Machine-readable scientific audit artifact
+
+The frontend test suite generates `frontend/test-artifacts/scientific-evidence.json`
+locally from the checked-in synthetic fixture. The script
+[`demo-scientific-evidence.cjs`](../frontend/scripts/demo-scientific-evidence.cjs)
+records the SHA-256 of the exact fixture bytes, eight quality-gate counters,
+count reconciliations, five additive hypothetical cases, five integrity
+perturbations, and explicit validity limits. It has **no real-time timestamp,
+network input or random seed**, so consecutive executions produce
+byte-identical evidence on the same sources.
+
+The ordinary `npm run test:demo` run asserts the baseline arithmetic and
+artifact reproducibility; GitHub Actions publishes the report as the
+`plantlog-synthetic-science-evidence` build artifact. The report is not a
+ground-truth reliability dataset, and the CI artifact is an analysis output,
+not a permanent user record. The controlled comparison events now receive
+unique, collision-safe identifiers so a nominally valid hypothetical event
+does not accidentally fail the same integrity rules applied to the fixture.
+The deliberately unlinked case remains counted in **raw** activity while
+being omitted from **quality-eligible** activity.
+
 ## Limitations and interpretation
 
 This laboratory is intentionally **not** designed to estimate maintenance

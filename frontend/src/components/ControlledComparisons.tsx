@@ -13,17 +13,19 @@ const ControlledComparisons = ({assets,logs,snapshot}:{
             Controlled fictional case comparisons
         </h2>
         <p className="mt-2 text-sm text-slate-600">
-            Exactly one extra record per comparison, with the same fixture and observation date.
-            The comparison rows are not predictions, failure probabilities, or causal effects.
+            Exactly one identified extra record per nonbaseline comparison, using the same fixture and observation date.
+            The quality-eligible column independently excludes invalid references.
+            These rows are not predictions, failure probabilities, or causal effects.
         </p>
         <div className="mt-5 w-full overflow-x-auto" role="region"
             tabIndex={0} aria-label="Controlled example comparison table, scroll horizontally">
-            <table className="min-w-[680px] w-full text-left text-sm">
+            <table className="min-w-[800px] w-full text-left text-sm">
                 <caption className="sr-only">One-record synthetic perturbations versus unmodified baseline</caption>
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-700">
                     <tr>
                         <th className="p-3" scope="col">Hypothetical case</th>
-                        <th className="p-3 text-right" scope="col">Logs</th>
+                        <th className="p-3 text-right" scope="col">Raw logs</th>
+                        <th className="p-3 text-right" scope="col">Eligible logs</th>
                         <th className="p-3 text-right" scope="col">Open cases</th>
                         <th className="p-3 text-right" scope="col">Affected assets</th>
                         <th className="p-3 text-right" scope="col">Unlinked cases</th>
@@ -37,6 +39,9 @@ const ControlledComparisons = ({assets,logs,snapshot}:{
                         </th>
                         <td className="p-3 text-right tabular-nums">{entry.records}
                             <span className="block text-xs text-slate-500">{delta(entry.deltaRecords)} vs baseline</span>
+                        </td>
+                        <td className="p-3 text-right tabular-nums">{entry.eligibleRecords}
+                            <span className="block text-xs text-slate-500">{entry.excludedRecords} excluded</span>
                         </td>
                         <td className="p-3 text-right tabular-nums">{entry.openCases}
                             <span className="block text-xs text-slate-500">{delta(entry.deltaOpenCases)} vs baseline</span>
@@ -53,8 +58,8 @@ const ControlledComparisons = ({assets,logs,snapshot}:{
         </div>
         <p className="mt-4 text-xs text-slate-500">
             Every counterfactual starts from the same baseline. The unlinked example
-            intentionally tests an invalid equipment reference, and its workload
-            remains in the denominator. No assumptions about repair time,
+            intentionally tests an invalid equipment reference: its workload remains
+            in the raw count but its record is excluded from eligible logs. No assumptions about repair time,
             mechanical risk, or observed industrial performance are introduced.
         </p>
     </section>;

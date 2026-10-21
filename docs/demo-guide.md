@@ -139,6 +139,17 @@ only demonstrate internal synthetic-data consistency; they do not establish
 external predictive validity, actual industrial uptime, real-world causal
 relationships or safety assurance.
 
+## Inspectable scientific audit artifact
+
+Every `npm run test:demo` executes a machine-verifiable fixture audit and
+writes `frontend/test-artifacts/scientific-evidence.json`. The GitHub frontend
+CI job uploads it as `plantlog-synthetic-science-evidence`, including the
+input fixture SHA-256, eight quality gates and both five-case controlled
+experiment families. Repeated runs of unchanged source inputs must produce
+byte-identical JSON; see the [complete scientific protocol](eligibility-sensitivity-method.md).
+Controlled added records have valid unique synthetic IDs, except the
+intentionally broken asset-link example is explicitly ineligible.
+
 ## Data-eligibility sensitivity laboratory
 
 A separate interactive panel compares **raw descriptive** and **quality-eligible**
