@@ -1,4 +1,5 @@
 import { buildDemoInsights } from './insights';
+import { assessDemoDataQuality } from './quality';
 import type { DemoInsightAsset, DemoInsightLog } from './insights';
 
 export interface ComparisonRow {
@@ -9,6 +10,8 @@ export interface ComparisonRow {
     openCases: number;
     equipmentAffected: number;
     unlinkedOpenCases: number;
+    eligibleRecords: number;
+    excludedRecords: number;
     deltaRecords: number;
     deltaOpenCases: number;
     deltaEquipment: number;
@@ -32,19 +35,35 @@ export const compareDemoCases = (
     assets: DemoInsightAsset[], records: DemoInsightLog[], snapshot: string,
 ): ComparisonRow[] => {
     const baseline = buildDemoInsights(assets, records, snapshot);
+    // A controlled addition must itself have a unique event identity. Earlier
+    // synthetic comparisons omitted IDs and silently failed the quality gate.
+    const reservedIds = new Set(records.flatMap(record => {
+        const id = (record as DemoInsightLog & { id?: string }).id;
+        return typeof id === 'string' && id.trim() ? [id] : [];
+    }));
+    const identifier = (caseId: string): string => {
+        let id = 'COMPARE-' + caseId;
+        while (reservedIds.has(id)) id += '-NEXT';
+        return id;
+    };
     const anchor = assets.find(a => a.status !== 'decommissioned');
     if (!anchor) throw new Error('Comparison requires one in-service synthetic asset');
     return designs.map(design => {
         const extra = design.type === null ? [] : [{
+            id: identifier(design.id),
             assetId: design.id === 'missing-link' ? 'FIXTURE-UNKNOWN' : anchor.id,
             type: design.type,
             status: design.status as 'open' | 'resolved',
             date: snapshot + 'T12:00:00.000Z',
         }];
-        const outcome = buildDemoInsights(assets, [...records, ...extra], snapshot);
+        const hypothetical = [...records, ...extra];
+        const outcome = buildDemoInsights(assets, hypothetical, snapshot);
+        const audit = assessDemoDataQuality(assets, hypothetical, snapshot);
         return {
             id: design.id, title:design.title, assumption:design.assumption,
             records:outcome.totalRecords, openCases:outcome.openMaintenanceCases,
+            eligibleRecords:audit.eligibleRecords,
+            excludedRecords:audit.assessedRecords - audit.eligibleRecords,
             equipmentAffected:outcome.affectedEquipment, unlinkedOpenCases:outcome.unlinkedOpenCases,
             deltaRecords:outcome.totalRecords-baseline.totalRecords,
             deltaOpenCases:outcome.openMaintenanceCases-baseline.openMaintenanceCases,
