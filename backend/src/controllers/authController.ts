@@ -38,6 +38,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         });
 
         if (user) {
+            res.locals.auditActorId = user.id;
             res.status(201).json({
                 _id: user.id,
                 name: user.name,
@@ -70,6 +71,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
                 throw new Error('Invalid credentials');
             }
 
+            res.locals.auditActorId = user.id;
             res.json({
                 _id: user.id,
                 name: user.name,

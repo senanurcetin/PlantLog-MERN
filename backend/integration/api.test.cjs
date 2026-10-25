@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const app = require('../dist/app.js').default;
 const User = require('../dist/models/User.js').default;
 const LogEntry = require('../dist/models/LogEntry.js').default;
+const AuditEvent = require('../dist/models/AuditEvent.js').default;
 
 // Always create a fresh local test-only database. Never accept a production URI.
 test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async (t) => {
@@ -479,6 +480,72 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(relogin.status, 200);
     assert.equal((await api('GET', '/assets', relogin.data.token)).status, 200);
+
+    // Operator and unauthenticated callers cannot enumerate security events.
+    assert.equal((await api('GET', '/audit', relogin.data.token)).status, 403);
+    assert.equal((await api('GET', '/audit')).status, 401);
+
+    // Asynchronous post-response audit persistence must be treated as
+    // eventually observed, not transactionally committed with the write.
+    let auditRows = [];
+    for (let attempt = 0; attempt < 50; attempt++) {
+        auditRows = await AuditEvent.find().lean();
+        if (auditRows.some(event => event.action === 'auth.logout' &&
+                event.statusCode === 204) &&
+            auditRows.some(event => event.action === 'asset.create' &&
+                event.resourceId?.toString() === assetId) &&
+            auditRows.some(event => event.action === 'log.update' &&
+                event.statusCode === 200) &&
+            auditRows.some(event => event.action === 'auth.login' &&
+                event.statusCode === 401)) break;
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    assert.ok(auditRows.length >= 9, 'Expected minimal audit event coverage');
+    for (const action of ['auth.register', 'auth.login', 'auth.logout',
+        'asset.create', 'asset.update', 'asset.delete', 'log.create', 'log.update']) {
+        assert.ok(auditRows.some(event => event.action === action), action);
+    }
+    assert.ok(auditRows.some(event => event.action === 'auth.login' &&
+        event.outcome === 'denied' && !event.actorId));
+    assert.ok(auditRows.some(event => event.action === 'asset.update' &&
+        event.outcome === 'denied' && event.statusCode === 403));
+    const logoutEvent = auditRows.find(event => event.action === 'auth.logout' &&
+        event.statusCode === 204);
+    assert.equal(logoutEvent.actorId.toString(), registrationA.data._id);
+    for (const event of auditRows) {
+        const content = JSON.stringify(event);
+        assert.equal(content.includes(password), false);
+        assert.equal(content.includes(emailA), false);
+        assert.equal(content.includes(emailB), false);
+        assert.equal(content.includes(operator), false);
+        for (const key of ['body', 'token', 'email', 'password', 'remoteAddress']) {
+            assert.equal(Object.prototype.hasOwnProperty.call(event, key), false);
+        }
+    }
+
+    // Only supervisors/admins can inspect the append-only, bounded history.
+    const first = await api('GET', '/audit?limit=2', reviewer);
+    assert.equal(first.status, 200, JSON.stringify(first.data));
+    assert.equal(first.data.items.length, 2);
+    assert.match(first.data.nextCursor, /^[0-9a-f]{24}$/);
+    const nextPage = await api('GET', '/audit?limit=2&cursor=' +
+        first.data.nextCursor, reviewer);
+    assert.equal(nextPage.status, 200);
+    assert.equal(nextPage.data.items.length, 2);
+    assert.ok(!nextPage.data.items.some(row =>
+        first.data.items.some(previous => previous._id === row._id)));
+    for (const invalidQuery of ['limit=0', 'limit=51', 'limit=x',
+        'cursor=invalid', 'sort=password', 'limit%5B%24gt%5D=1']) {
+        assert.equal((await api('GET', '/audit?' + invalidQuery, reviewer)).status, 400,
+            invalidQuery);
+    }
+    const noWrite = await fetch(base + '/audit', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + reviewer, 'Content-Type': 'application/json' },
+        body: '{}',
+    });
+    assert.equal(noWrite.status, 404, 'Audit list must have no creation endpoint');
+
 
     // Forged/legacy JWTs with no expected role, version or audience fail
     // even if signed with this disposable test secret.

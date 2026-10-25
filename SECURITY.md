@@ -21,4 +21,12 @@ credentials are cleared but the remote bearer may survive until expiry.
 This does not constitute device-specific revocation or independent
 production security assurance.
 
+**Audit diagnostics:** the loopback API captures an allowlisted set of
+registration, login, logout, asset, maintenance and audit-read HTTP outcomes.
+It records identifiers/status and never intentionally persists JWTs, passwords,
+emails, request bodies or IP addresses. A supervisor/admin-only audit API and
+MongoDB 30-day TTL prototype exist, but event writes are post-response and
+nontransactional. This is not immutable evidence or a verified retention
+policy. See [audit methodology and limitations](docs/audit-trail-protocol.md).
+
 No external PLC or safety-rated control integration is provided.
