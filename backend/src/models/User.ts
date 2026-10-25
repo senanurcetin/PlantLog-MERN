@@ -6,6 +6,8 @@ export interface IUser extends Document {
     password?: string;
     role: 'admin' | 'operator' | 'supervisor';
     isActive: boolean;
+    /** Invalidates every older bearer token when incremented atomically. */
+    tokenVersion: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -39,6 +41,12 @@ const UserSchema: Schema = new Schema(
         isActive: {
             type: Boolean,
             default: true,
+        },
+        tokenVersion: {
+            type: Number,
+            default: 0,
+            min: 0,
+            select: true,
         },
     },
     {
