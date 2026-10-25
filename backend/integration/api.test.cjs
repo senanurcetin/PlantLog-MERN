@@ -100,7 +100,7 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
             },
             ...(body ? { body: JSON.stringify(body) } : {}),
         });
-        const data = await result.json();
+        const data = result.status === 204 ? null : await result.json();
         return { status: result.status, data };
     };
 
