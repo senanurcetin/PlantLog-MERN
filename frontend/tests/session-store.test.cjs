@@ -40,7 +40,7 @@ function fixture() {
         delete(url) { const request = deferred(); pending.push({ url, ...request }); return request.promise; },
     };
     const authModule = loadStore('authStore.ts', {
-        zustand, 'zustand/middleware': { persist: (initializer) => initializer },
+        zustand, 'zustand/middleware': { persist: (initializer) => initializer, createJSONStorage: () => undefined },
     });
     const shared = {
         zustand,
@@ -113,4 +113,11 @@ test('a mutation finishing after account switch cannot change the new registry',
     await oldWrite;
     assert.deepEqual(f.assets.getState().assets, []);
     assert.equal(f.assets.getState().isLoading, false);
+});
+
+test('authenticated store never persists bearer credentials in localStorage', () => {
+    const content = readFileSync(path.join(__dirname, '../src/store/authStore.ts'), 'utf8');
+    assert.match(content, /storage: createJSONStorage\(\(\) => sessionStorage\)/);
+    assert.match(content, /window\.localStorage\.removeItem\('auth-storage'\)/);
+    assert.doesNotMatch(content, /storage: createJSONStorage\(\(\) => localStorage\)/);
 });
