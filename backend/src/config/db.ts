@@ -3,15 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+/**
+ * Connection lifecycle belongs to server.ts, so this helper must never
+ * terminate the process itself or print connection strings on failure.
+ */
 const connectDB = async (): Promise<void> => {
-    try {
-        const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/industrial_elogbook';
-        const conn = await mongoose.connect(mongoURI);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error: any) {
-        console.error(`Error connecting to MongoDB: ${error.message}`);
-        process.exit(1);
-    }
+    const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/industrial_elogbook';
+    await mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 10000 });
+    console.log('PlantLog local demo MongoDB connection established');
 };
 
 export default connectDB;
