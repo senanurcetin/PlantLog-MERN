@@ -9,6 +9,8 @@ import assetRoutes from './routes/assetRoutes';
 import logEntryRoutes from './routes/logEntryRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import healthRoutes from './routes/healthRoutes';
+import auditRoutes from './routes/auditRoutes';
+import { captureAuditTrail } from './middlewares/auditTrail';
 
 dotenv.config();
 
@@ -22,6 +24,10 @@ app.use(cors({
     credentials: false,
     maxAge: 600,
 }));
+
+// Capture only whitelisted authentication and write-route outcomes, even if
+// authentication, payload validation or permissions deny the request.
+app.use(captureAuditTrail);
 
 // JSON-only write API: no HTML forms or ambiguous URL-encoded object graphs.
 // Keep the payload ceiling comfortably above a documented log description,
@@ -48,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/logs', logEntryRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/audit', auditRoutes);
 
 // Global Error Handler Integration
 app.use(errorHandler);
