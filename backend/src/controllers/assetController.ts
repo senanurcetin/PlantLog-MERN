@@ -78,6 +78,7 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
             }],
         });
 
+        res.locals.auditResourceId = asset._id.toString();
         res.status(201).json(asset);
     } catch (error) {
         next(error);
