@@ -27,7 +27,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: elogbook_backend
-    restart: always
+    restart: "no"
     ports:
       - "127.0.0.1:5000:5000"
     environment:
@@ -37,7 +37,7 @@ services:
       - API_BIND_HOST=0.0.0.0
       - PLANTLOG_INTERNAL_CONTAINER_NETWORK=true
       - MONGO_URI=mongodb://mongodb:27017/industrial_elogbook
-      # In production, these should be passed via actual environment variables or a secure secret manager
+      # Local demo only: pass a unique secret via the invoking shell, never commit it
       - "JWT_SECRET=${JWT_SECRET:?Set a unique JWT_SECRET of at least 32 characters}"
       - JWT_EXPIRE=7d
       # Local demo signup only; set false for externally exposed environments.
@@ -65,7 +65,7 @@ services:
         # Pass the backend URL to Vite during the build stage
         - VITE_API_URL=http://localhost:5000/api
     container_name: elogbook_frontend
-    restart: always
+    restart: "no"
     ports:
       - "127.0.0.1:8081:80"
     depends_on:
