@@ -14,6 +14,7 @@ does not mean the industrial application was released to production.**
 | Capability | Evidence available | What is *not* proven |
 |---|---|---|
 | Identity & authorization | Short-lived audience/role/version-bound JWT, account-wide logout revocation, inactive-account enforcement and MongoDB HTTP tests | Per-device token revocation, recovery, SSO, federation and independently reviewed identity security |
+| Pre-production audit diagnostics | Allowlisted auth/asset/log outcomes with actor/resource IDs, minimal MongoDB records, 30-day TTL metadata and supervisor/admin cursor listing | Atomic delivery, immutable/tamper-evident evidence, SIEM, validated retention, archival and privacy assurance |
 | Registry & operational records | Validated writes, asset state transitions, server-stamped histories, optimistic version checks, browser operator journey | A certified maintenance/asset management workflow |
 | Analytics | Reconciled cohort counts, eligibility/exclusions, synthetic scientific experiment reports | Downtime, MTTR/MTBF, failure rates, production reliability or causal effects |
 | Supply of test evidence | TypeScript, unit/integration/Chromium tests, bundle limits and archived deterministic fixture JSON | Security certification, load testing, multi-region availability |
@@ -89,6 +90,14 @@ execution is made until an actual engine check is recorded.
   SSO, account recovery or signing-key rotation exists. These remain
   pre-production design questions, not completed release approvals.
 
+## Local audit-event prototype
+
+The [auditable operation-event protocol](audit-trail-protocol.md) defines a fixed
+security/write action taxonomy, credential-free event fields and access to a
+restricted, paginated event feed. Persistence occurs after each HTTP response
+and is **best-effort, not atomic with mutations**; a durable legal/industrial
+audit system would need failover, tamper-evidence, operations and privacy review.
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
@@ -96,7 +105,7 @@ execution is made until an actual engine check is recorded.
 | G01 | Threat model, independent auth/security review, penetration test | **HOLD — not performed** |
 | G02 | TLS, restricted ingress, distributed abuse prevention and WAF policy | **HOLD — local process limits only** |
 | G03 | Session security: isolated storage, session revocation, recovery, key rotation | **HOLD — tab-scoped JS-readable bearer storage; no recovery, device-specific revocation or verified rotation** |
-| G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — no formal review or retention policy** |
+| G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — minimal 30-day TTL prototype implemented, but unreviewed retention, deletion and legal compliance** |
 | G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — no verified restore exercise** |
 | G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — functional CI is not capacity evidence** |
 | G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
