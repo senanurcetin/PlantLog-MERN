@@ -10,4 +10,15 @@ This industrial logbook is a demonstration, **not a hardened production CMMS**. 
 
 For any future deployment outside an isolated development machine, at minimum: keep the database private, set a strong unique JWT secret via a secret manager, use TLS and restricted ingress, implement distributed authentication rate limits (the repository already has **single-process** login/signup limits), review browser token persistence and implement revocation, validate role authorization, verify audit retention and review logs for sensitive information. All external-release gates are currently **HOLD**; see [the pre-production readiness matrix](docs/preproduction-readiness.md). Do not load real industrial incidents, personnel details or regulated records into the public demo.
 
+**Local identity-session controls:** authenticated JWTs carry a version and
+role bound to the MongoDB account, with explicit issuer/audience and a
+default eight-hour expiry. `POST /api/auth/logout` atomically revokes every
+previous token for that account; stale-role tokens must reauthenticate.
+Browser credentials are stored in tab-scoped `sessionStorage`, not
+`localStorage`. They remain accessible to JavaScript and require an
+application-origin XSS assessment. If logout cannot reach the server, local
+credentials are cleared but the remote bearer may survive until expiry.
+This does not constitute device-specific revocation or independent
+production security assurance.
+
 No external PLC or safety-rated control integration is provided.
