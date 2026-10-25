@@ -4,7 +4,7 @@
 
 ![Official NEXUS 2.0 Midnight wordmark](frontend/src/assets/nexus-midnight.svg)
 
-**Technical reviewer brief:** [System evidence, reproducibility and operational limits](docs/hiring-summary.md).
+**Engineering evidence:** [Demo protocol](docs/demo-guide.md) · [Maintenance metrics](docs/maintenance-metrics.md) · [Browser verification](docs/browser-testing.md).
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
