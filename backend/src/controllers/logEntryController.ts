@@ -75,6 +75,7 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
             }],
         });
 
+        res.locals.auditResourceId = logEntry._id.toString();
         res.status(201).json(logEntry);
     } catch (error) {
         next(error);
