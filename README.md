@@ -1,10 +1,14 @@
 # PlantLog — Industrial Asset & Maintenance Logbook
 
-**PRE-PRODUCTION ENGINEERING DEMONSTRATOR — NOT RELEASED FOR PRODUCTION USE.**\n\n**A NEXUS 2.0 portfolio project.** The public demo and authenticated screens use the original approved NEXUS SVG logo and the Midnight/Cyan/Blue/Lavender/Violet identity. [Brand source and implementation notes](docs/nexus-brand.md).
+**PRE-PRODUCTION ENGINEERING DEMONSTRATOR — NOT RELEASED FOR PRODUCTION USE.**
+
+**A NEXUS 2.0 portfolio project.** The public demo and authenticated screens use the original approved NEXUS SVG logo and the Midnight/Cyan/Blue/Lavender/Violet identity. [Brand source and implementation notes](docs/nexus-brand.md).
 
 ![Official NEXUS 2.0 Midnight wordmark](frontend/src/assets/nexus-midnight.svg)
 
-**Release posture:** [Pre-production engineering readiness and explicit HOLD gates](docs/preproduction-readiness.md).\n\n**Engineering evidence:** [Demo protocol](docs/demo-guide.md) · [Maintenance metrics](docs/maintenance-metrics.md) · [Browser verification](docs/browser-testing.md).
+**Release posture:** [Pre-production engineering readiness and explicit HOLD gates](docs/preproduction-readiness.md).
+
+**Engineering evidence:** [Demo protocol](docs/demo-guide.md) · [Maintenance metrics](docs/maintenance-metrics.md) · [Browser verification](docs/browser-testing.md).
 
 ![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
 
@@ -141,7 +145,9 @@ The public demo additionally has a [real Chromium smoke test](docs/browser-testi
 
 Run the MongoDB-backed test locally against a local MongoDB server listening on `127.0.0.1:27017` with `cd backend && npm ci && npm run test:integration`. It creates a randomly named **test-only local database** and deletes it after the test. The test does not accept a remote database URI.
 
-**Runtime health checks:** `/api/health/live` signals HTTP process liveness; `/api/health/ready` returns 503 until MongoDB is connected or when the server begins shutdown. The legacy `/api/health` route is liveness only, not readiness. See [operational scope and remaining release gates](docs/preproduction-readiness.md).\n\n## Security and limitations
+**Runtime health checks:** `/api/health/live` signals HTTP process liveness; `/api/health/ready` returns 503 until MongoDB is connected or when the server begins shutdown. The legacy `/api/health` route is liveness only, not readiness. See [operational scope and remaining release gates](docs/preproduction-readiness.md).
+
+## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
 - **Browser-origin policy:** local demo origins are explicitly allowlisted. `CORS_ORIGINS` may replace the list with comma-separated exact URL origins; remote origins require HTTPS under `NODE_ENV=production`. Wildcards, URL paths and credentialed origins are rejected at startup. CORS is **not authentication or a substitute for TLS**.
