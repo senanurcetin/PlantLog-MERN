@@ -1,4 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { LayoutDashboard, Database, ClipboardList, BarChart3, LogOut, User as UserIcon } from 'lucide-react';
 import NexusBrand from './NexusBrand';
@@ -14,10 +16,33 @@ const Layout = () => {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isSigningOut, setIsSigningOut] = useState(false);
+    const signoutInFlight = useRef(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login', { replace: true });
+    const handleLogout = async () => {
+        if (signoutInFlight.current) return;
+        signoutInFlight.current = true;
+        setIsSigningOut(true);
+        // Capture the originating session. A late response must never clear
+        // credentials belonging to a different, more recently signed-in user.
+        const original = useAuthStore.getState();
+        try {
+            if (original.token) {
+                await api.post('/auth/logout', {}, { timeout: 4000 });
+            }
+        } catch {
+            // A network failure can leave the signed bearer token valid at the
+            // API until expiry. Do not claim remote revocation on failure.
+        } finally {
+            const current = useAuthStore.getState();
+            if (current.token === original.token &&
+                current.sessionEpoch === original.sessionEpoch) {
+                logout();
+                navigate('/login', { replace: true });
+            }
+            signoutInFlight.current = false;
+            setIsSigningOut(false);
+        }
     };
 
     const currentPage = navItems.find((item) => item.path === location.pathname)?.name || 'Dashboard';
@@ -55,9 +80,9 @@ const Layout = () => {
                             <p className="text-xs capitalize text-[#B9C5CE]">{user?.role}</p>
                         </div>
                     </div>
-                    <button type="button" onClick={handleLogout}
+                    <button type="button" onClick={() => { void handleLogout(); }} disabled={isSigningOut}
                         className="flex w-full items-center rounded-lg px-4 py-2 text-sm text-rose-200 hover:bg-white/10 hover:text-white">
-                        <LogOut className="mr-3 h-4 w-4" aria-hidden="true" /> Sign out
+                        <LogOut className="mr-3 h-4 w-4" aria-hidden="true" /> {isSigningOut ? 'Signing out...' : 'Sign out'}
                     </button>
                     <p className="mt-5 text-[10px] uppercase tracking-widest text-slate-400">
                         NEXUS / PlantLog demonstrator
@@ -83,7 +108,7 @@ const Layout = () => {
                         </div>
                         <div className="flex shrink-0 items-center gap-2 lg:hidden">
                             <span className="hidden max-w-24 truncate text-xs text-slate-300 sm:block">{user?.name}</span>
-                            <button type="button" onClick={handleLogout} aria-label="Sign out"
+                            <button type="button" onClick={() => { void handleLogout(); }} disabled={isSigningOut} aria-label="Sign out"
                                 className="rounded-lg border border-white/20 p-2.5 text-slate-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00E0FF]">
                                 <LogOut className="h-5 w-5" aria-hidden="true" />
                             </button>
