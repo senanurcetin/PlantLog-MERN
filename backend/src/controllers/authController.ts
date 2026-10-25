@@ -43,7 +43,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user.id),
+                token: generateToken(user.id, user.tokenVersion, user.role),
             });
         } else {
             res.status(400);
@@ -75,7 +75,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user.id),
+                token: generateToken(user.id, user.tokenVersion, user.role),
             });
         } else {
             res.status(401);
@@ -95,7 +95,41 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
             res.status(401);
             throw new Error('User not found in request');
         }
-        res.status(200).json(req.user);
+        // Project only the UI-facing profile. No hash, token version,
+        // internal Mongoose fields, or other users' credentials.
+        res.status(200).json({
+            _id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+            role: req.user.role,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Revoke all bearer tokens for the account on explicit logout. The version
+ * bump is atomic and guarded against racing or replayed old credentials.
+ */
+export const logoutUser = async (
+    req: AuthRequest, res: Response, next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401);
+            throw new Error('Authentication required for logout');
+        }
+        const result = await User.updateOne(
+            { _id: req.user._id, tokenVersion: req.user.tokenVersion },
+            { $inc: { tokenVersion: 1 } },
+        );
+        if (result.modifiedCount !== 1) {
+            res.status(401);
+            throw new Error('Session has already been revoked');
+        }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(204).send();
     } catch (error) {
         next(error);
     }

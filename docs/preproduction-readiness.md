@@ -13,7 +13,7 @@ does not mean the industrial application was released to production.**
 
 | Capability | Evidence available | What is *not* proven |
 |---|---|---|
-| Identity & authorization | JWT validation, role checks, inactive-account enforcement, local API integration tests | Enterprise IAM, account recovery, session revocation, SSO or identity federation |
+| Identity & authorization | Short-lived audience/role/version-bound JWT, account-wide logout revocation, inactive-account enforcement and MongoDB HTTP tests | Per-device token revocation, recovery, SSO, federation and independently reviewed identity security |
 | Registry & operational records | Validated writes, asset state transitions, server-stamped histories, optimistic version checks, browser operator journey | A certified maintenance/asset management workflow |
 | Analytics | Reconciled cohort counts, eligibility/exclusions, synthetic scientific experiment reports | Downtime, MTTR/MTBF, failure rates, production reliability or causal effects |
 | Supply of test evidence | TypeScript, unit/integration/Chromium tests, bundle limits and archived deterministic fixture JSON | Security certification, load testing, multi-region availability |
@@ -62,13 +62,40 @@ unless erasure of the *local demo* database is intended. Tests assert
 loopback mappings and readiness conditions, but no claim of real Docker
 execution is made until an actual engine check is recorded.
 
+## Authenticated local session contract
+
+- **JWT scope:** signed HS256 tokens declare their intended issuer, API audience,
+  account ID, account role, and monotonically increasing account token version.
+  A valid signature alone is insufficient. Every protected request checks
+  account activation, the currently stored role and the current token version
+  from MongoDB, so role edits do not implicitly elevate existing bearers.
+- **Lifetime:** default eight hours; `JWT_EXPIRE` must explicitly specify a
+  value between 15 minutes and 24 hours in `m`, `h` or `d` units. The
+  server refuses invalid settings at startup. Previously issued JWTs lacking
+  these claims are intentionally rejected; test operators must sign in again.
+- **Logout:** `POST /api/auth/logout` requires a valid bearer and atomically
+  increments the user-level token version. This revokes **all previously
+  issued bearer tokens for the account**, not just the active tab or one
+  device. A concurrent or replayed logout cannot increment it twice.
+- **Frontend:** credentials are kept in JavaScript-accessible
+  `sessionStorage` rather than durable `localStorage`. Existing legacy
+  localStorage credentials are removed when the application loads. Logout
+  requests server revocation and always clears local credentials even if
+  the request fails; **offline logout does not guarantee remote revocation**
+  until the token expires or the server receives a valid logout.
+- **Limitations:** browser token storage still exposes the bearer if a script
+  injection executes in the application origin. No refresh-token family,
+  device-scoped sessions, replay-resistant proof-of-possession, validated
+  SSO, account recovery or signing-key rotation exists. These remain
+  pre-production design questions, not completed release approvals.
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
 |---|---|---|
 | G01 | Threat model, independent auth/security review, penetration test | **HOLD — not performed** |
 | G02 | TLS, restricted ingress, distributed abuse prevention and WAF policy | **HOLD — local process limits only** |
-| G03 | Session security: token storage, expiration/revocation, recovery, key rotation | **HOLD — browser JWT persistence remains** |
+| G03 | Session security: isolated storage, session revocation, recovery, key rotation | **HOLD — tab-scoped JS-readable bearer storage; no recovery, device-specific revocation or verified rotation** |
 | G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — no formal review or retention policy** |
 | G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — no verified restore exercise** |
 | G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — functional CI is not capacity evidence** |

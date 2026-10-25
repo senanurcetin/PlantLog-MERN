@@ -100,7 +100,7 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
             },
             ...(body ? { body: JSON.stringify(body) } : {}),
         });
-        const data = await result.json();
+        const data = result.status === 204 ? null : await result.json();
         return { status: result.status, data };
     };
 
@@ -138,7 +138,7 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
         name: 'Demo Reviewer', email: emailB, password,
     });
     assert.equal(registrationB.status, 201, JSON.stringify(registrationB.data));
-    const reviewer = registrationB.data.token;
+    let reviewer = registrationB.data.token;
 
     // Selector-shaped login bodies must never reach User.findOne as query operators.
     assert.equal((await api('POST', '/auth/login', null, {
@@ -271,6 +271,15 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
 
     // Trusted fixture elevation, never exposed as a public HTTP endpoint.
     await User.updateOne({ email: emailB }, { $set: { role: 'supervisor' } });
+    // Privilege changes must invalidate credentials minted for a different
+    // account role. The user must explicitly re-authenticate.
+    assert.equal((await api('GET', '/assets', reviewer)).status, 401);
+    const supervisorLogin = await api('POST', '/auth/login', null, {
+        email: emailB, password,
+    });
+    assert.equal(supervisorLogin.status, 200);
+    assert.equal(supervisorLogin.data.role, 'supervisor');
+    reviewer = supervisorLogin.data.token;
     const elevated = await api('PUT', '/assets/' + assetId, reviewer, { status: 'maintenance' });
     assert.equal(elevated.status, 200, JSON.stringify(elevated.data));
     assert.equal(elevated.data.status, 'maintenance');
@@ -454,4 +463,34 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal((await api('DELETE', '/assets/' + disposable.data._id, reviewer)).status, 200);
     assert.equal((await api('GET', '/assets/not-an-object-id', operator)).status, 400);
     assert.equal((await api('GET', '/logs?assetId=bad', operator)).status, 400);
+    // Signing out atomically invalidates all bearer tokens for this account
+    // across different login calls, including tokens that remain unexpired.
+    assert.equal((await api('GET', '/assets', operator)).status, 200);
+    assert.equal((await api('POST', '/auth/logout', null, {})).status, 401);
+    const logout = await api('POST', '/auth/logout', operator, {});
+    assert.equal(logout.status, 204);
+    assert.equal((await api('GET', '/assets', operator)).status, 401);
+    assert.equal((await api('GET', '/assets', caseInsensitiveLogin.data.token)).status, 401);
+    assert.equal((await api('POST', '/auth/logout', operator, {})).status, 401);
+    assert.equal((await api('GET', '/assets', reviewer)).status, 200,
+        'Revoking operator tokens must not revoke another account');
+    const relogin = await api('POST', '/auth/login', null, {
+        email: emailA, password,
+    });
+    assert.equal(relogin.status, 200);
+    assert.equal((await api('GET', '/assets', relogin.data.token)).status, 200);
+
+    // Forged/legacy JWTs with no expected role, version or audience fail
+    // even if signed with this disposable test secret.
+    const jwt = require('jsonwebtoken');
+    const legacy = jwt.sign({ id: registrationA.data._id },
+        process.env.JWT_SECRET, { expiresIn: '1h' });
+    assert.equal((await api('GET', '/assets', legacy)).status, 401);
+    const wrongAudience = jwt.sign({
+        id: registrationA.data._id, ver: 1, role: 'operator',
+    }, process.env.JWT_SECRET, {
+        expiresIn: '1h', issuer: 'plantlog-local-demo', audience: 'another-api',
+    });
+    assert.equal((await api('GET', '/assets', wrongAudience)).status, 401);
+
 });
