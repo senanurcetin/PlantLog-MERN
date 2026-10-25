@@ -12,6 +12,21 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     const mongoUri = 'mongodb://127.0.0.1:27017/' + database;
     process.env.JWT_SECRET = 'test-only-unique-local-jwt-secret-for-ci-tests-2026';
 
+    // Before connecting, process liveness is true but DB readiness must be
+    // false; monitoring must never label a disconnected API as ready.
+    const disconnected = app.listen(0, '127.0.0.1');
+    await new Promise(resolve => disconnected.once('listening', resolve));
+    const disconnectedBase = 'http://127.0.0.1:' + disconnected.address().port;
+    const notReady = await fetch(disconnectedBase + '/api/health/ready');
+    assert.equal(notReady.status, 503);
+    assert.deepEqual(await notReady.json(), { status: 'unavailable' });
+    assert.equal(notReady.headers.get('cache-control'), 'no-store');
+    const liveWithoutDb = await fetch(disconnectedBase + '/api/health/live');
+    assert.equal(liveWithoutDb.status, 200);
+    assert.deepEqual(await liveWithoutDb.json(),
+        { status: 'alive', service: 'plantlog-api' });
+    await new Promise((resolve, reject) => disconnected.close(err => err ? reject(err) : resolve()));
+
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 20000 });
     const server = app.listen(0, '127.0.0.1');
     await new Promise((resolve) => server.once('listening', resolve));
@@ -70,6 +85,11 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(oversizedBody.status, 413);
     assert.equal((await fetch(base + '/health')).status, 200);
+    const ready = await fetch(base + '/health/ready');
+    assert.equal(ready.status, 200);
+    assert.deepEqual(await ready.json(), { status: 'ready' });
+    assert.equal(ready.headers.get('cache-control'), 'no-store');
+
 
     const api = async (method, path, token, body) => {
         const result = await fetch(base + path, {
