@@ -22,4 +22,6 @@ Security policy unit tests run alongside the backend build. The separate `npm ru
 - Use synthetic fixtures; do not commit credentials, personal data or real plant records.
 - Review authorization boundaries and update the README for changed setup, ports and environment variables.
 
+All authenticated API, environment and Compose networking changes must also preserve the local-only binding and readiness contract in [the pre-production readiness matrix](docs/preproduction-readiness.md). Passing CI does **not** authorize Internet-facing backend deployment.
+
 See [SECURITY.md](SECURITY.md) for private vulnerability disclosure.

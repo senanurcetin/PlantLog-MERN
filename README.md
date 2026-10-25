@@ -1,8 +1,12 @@
 # PlantLog — Industrial Asset & Maintenance Logbook
 
+**PRE-PRODUCTION ENGINEERING DEMONSTRATOR — NOT RELEASED FOR PRODUCTION USE.**
+
 **A NEXUS 2.0 portfolio project.** The public demo and authenticated screens use the original approved NEXUS SVG logo and the Midnight/Cyan/Blue/Lavender/Violet identity. [Brand source and implementation notes](docs/nexus-brand.md).
 
 ![Official NEXUS 2.0 Midnight wordmark](frontend/src/assets/nexus-midnight.svg)
+
+**Release posture:** [Pre-production engineering readiness and explicit HOLD gates](docs/preproduction-readiness.md).
 
 **Engineering evidence:** [Demo protocol](docs/demo-guide.md) · [Maintenance metrics](docs/maintenance-metrics.md) · [Browser verification](docs/browser-testing.md).
 
@@ -74,7 +78,7 @@ The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /
 
 ### Option A — Docker Compose (local demo)
 
-**Requirements:** Docker Engine or Docker Desktop with Compose, and available ports 8081, 5000 and loopback-only 27017.
+**Requirements:** Docker Engine or Docker Desktop with Compose and loopback ports 8081, 5000 and 27017 available. **All three** services publish to `127.0.0.1` only.
 
 ```bash
 git clone https://github.com/senanurcetin/PlantLog-MERN.git
@@ -124,7 +128,7 @@ npm run dev
 
 PowerShell users can replace `cp` with `Copy-Item`.
 
-The included Compose configuration binds both the API (port 5000) and MongoDB (port 27017) to `127.0.0.1` only. Compose explicitly sets `REGISTRATION_ENABLED=true` for this **local demo**. Server startup rejects missing or weak JWT secrets. A production environment outside Compose defaults to registration disabled unless `REGISTRATION_ENABLED=true` is explicitly set; do not enable it on public infrastructure without stronger ingress controls.
+The included Compose configuration binds the frontend (port 8081), API (port 5000) and MongoDB (port 27017) to host `127.0.0.1` only. Within its private network the API explicitly binds `0.0.0.0`; directly started API processes bind loopback by default. Compose explicitly sets `REGISTRATION_ENABLED=true` for this **local demo**. Server startup rejects missing or weak JWT secrets. A production environment outside Compose defaults to registration disabled unless `REGISTRATION_ENABLED=true` is explicitly set; do not enable it on public infrastructure without stronger ingress controls.
 
 Once the backend and MongoDB are running, visit `http://localhost:5173/register` to create an **operator** account (minimum 12-character password). The local Compose frontend uses `http://localhost:8081/register`. Operators can create assets and maintenance records but cannot change asset metadata or delete assets. There is deliberately **no public privilege escalation flow**: supervisor and administrator roles require trusted out-of-band provisioning. Never expose the development registration endpoint publicly without access controls and rate limiting.
 
@@ -140,6 +144,8 @@ The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hook
 The public demo additionally has a [real Chromium smoke test](docs/browser-testing.md) in GitHub Actions, distinct from the frontend build and fixture unit tests. The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
 
 Run the MongoDB-backed test locally against a local MongoDB server listening on `127.0.0.1:27017` with `cd backend && npm ci && npm run test:integration`. It creates a randomly named **test-only local database** and deletes it after the test. The test does not accept a remote database URI.
+
+**Runtime health checks:** `/api/health/live` signals HTTP process liveness; `/api/health/ready` returns 503 until MongoDB is connected or when the server begins shutdown. The legacy `/api/health` route is liveness only, not readiness. See [operational scope and remaining release gates](docs/preproduction-readiness.md).
 
 ## Security and limitations
 

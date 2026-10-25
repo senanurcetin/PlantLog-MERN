@@ -73,6 +73,12 @@ jobs:
       - name: Test backend security policies
         run: npm test
 
+      - name: Validate local-only pre-production Compose topology
+        working-directory: .
+        env:
+          JWT_SECRET: ci-only-compose-validation-not-a-deployment-key-2026
+        run: docker compose config --quiet
+
   backend-integration:
     runs-on: ubuntu-latest
     services:

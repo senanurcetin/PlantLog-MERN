@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import assetRoutes from './routes/assetRoutes';
 import logEntryRoutes from './routes/logEntryRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
+import healthRoutes from './routes/healthRoutes';
 
 dotenv.config();
 
@@ -38,6 +39,9 @@ app.use(express.json({ limit: '32kb', strict: true }));
 app.get('/api/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'success', message: 'Industrial E-Logbook API is running' });
 });
+
+// Split liveness/readiness checks are intentionally public but disclose no infrastructure details.
+app.use('/api/health', healthRoutes);
 
 // API Routes
 app.use('/api/auth', authRoutes);

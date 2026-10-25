@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ----------------------------------------
   # Database Service (MongoDB)
@@ -7,11 +5,17 @@ services:
   mongodb:
     image: mongo:6.0
     container_name: elogbook_mongo
-    restart: always
+    restart: "no"
     ports:
       - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
     networks:
       - elogbook_network
 
@@ -23,20 +27,30 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: elogbook_backend
-    restart: always
+    restart: "no"
     ports:
       - "127.0.0.1:5000:5000"
     environment:
       - NODE_ENV=production
       - PORT=5000
+      # Bind only inside the isolated Docker network; published host port is loopback.
+      - API_BIND_HOST=0.0.0.0
+      - PLANTLOG_INTERNAL_CONTAINER_NETWORK=true
       - MONGO_URI=mongodb://mongodb:27017/industrial_elogbook
-      # In production, these should be passed via actual environment variables or a secure secret manager
+      # Local demo only: pass a unique secret via the invoking shell, never commit it
       - "JWT_SECRET=${JWT_SECRET:?Set a unique JWT_SECRET of at least 32 characters}"
       - JWT_EXPIRE=7d
       # Local demo signup only; set false for externally exposed environments.
       - REGISTRATION_ENABLED=true
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/api/health/ready', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 30s
     networks:
       - elogbook_network
 
@@ -51,11 +65,12 @@ services:
         # Pass the backend URL to Vite during the build stage
         - VITE_API_URL=http://localhost:5000/api
     container_name: elogbook_frontend
-    restart: always
+    restart: "no"
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - elogbook_network
 
