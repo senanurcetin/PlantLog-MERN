@@ -107,7 +107,8 @@ jobs:
         run: npm run test:integration
 
   frontend-browser:
-    runs-on: ubuntu-latest
+    # Pinned until the project's Playwright 1.56 runtime supports newer runners.
+    runs-on: ubuntu-24.04
     services:
       mongodb:
         image: mongo:6
