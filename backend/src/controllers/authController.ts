@@ -95,7 +95,14 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
             res.status(401);
             throw new Error('User not found in request');
         }
-        res.status(200).json(req.user);
+        // Project only the UI-facing profile. No hash, token version,
+        // internal Mongoose fields, or other users' credentials.
+        res.status(200).json({
+            _id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+            role: req.user.role,
+        });
     } catch (error) {
         next(error);
     }
