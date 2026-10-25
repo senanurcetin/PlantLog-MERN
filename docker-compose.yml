@@ -39,7 +39,7 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/industrial_elogbook
       # Local demo only: pass a unique secret via the invoking shell, never commit it
       - "JWT_SECRET=${JWT_SECRET:?Set a unique JWT_SECRET of at least 32 characters}"
-      - JWT_EXPIRE=7d
+      - JWT_EXPIRE=8h
       # Local demo signup only; set false for externally exposed environments.
       - REGISTRATION_ENABLED=true
     depends_on:
