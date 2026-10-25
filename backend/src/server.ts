@@ -3,6 +3,7 @@ import connectDB from './config/db';
 import mongoose from 'mongoose';
 import { Server } from 'node:http';
 import { getJwtSecret } from './utils/jwtSecret';
+import { getTokenLifetimeSeconds } from './utils/generateToken';
 import { resolveApiBindHost } from './utils/runtimePosture';
 import { beginShutdown } from './utils/readiness';
 
@@ -20,6 +21,7 @@ const startServer = async (): Promise<void> => {
         // Check network posture and secret before making a DB connection.
         const bindHost = resolveApiBindHost();
         getJwtSecret();
+        getTokenLifetimeSeconds(); // Reject long or malformed lifetimes before listening.
         await connectDB();
 
         const server: Server = app.listen(port, bindHost, () => {
