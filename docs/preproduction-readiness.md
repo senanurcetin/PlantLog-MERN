@@ -1,0 +1,92 @@
+# PlantLog — Pre-production engineering readiness
+
+**Status: PRE-PRODUCTION / NOT RELEASED / NO PRODUCTION AUTHORIZATION**
+
+PlantLog is an advanced full-stack software engineering demonstrator. Its
+public Vercel URL serves only a guest-mode, synthetic, API-free portfolio
+view. The Express/MongoDB system exists for loopback-only local development,
+disposable CI integration tests and controlled engineering evaluation. **A
+deployment marked `production` by Node.js, Docker build stages or Vercel
+does not mean the industrial application was released to production.**
+
+## Demonstrated engineering capabilities
+
+| Capability | Evidence available | What is *not* proven |
+|---|---|---|
+| Identity & authorization | JWT validation, role checks, inactive-account enforcement, local API integration tests | Enterprise IAM, account recovery, session revocation, SSO or identity federation |
+| Registry & operational records | Validated writes, asset state transitions, server-stamped histories, optimistic version checks, browser operator journey | A certified maintenance/asset management workflow |
+| Analytics | Reconciled cohort counts, eligibility/exclusions, synthetic scientific experiment reports | Downtime, MTTR/MTBF, failure rates, production reliability or causal effects |
+| Supply of test evidence | TypeScript, unit/integration/Chromium tests, bundle limits and archived deterministic fixture JSON | Security certification, load testing, multi-region availability |
+| API health & lifecycle | Separate liveness/readiness checks, MongoDB ready-state gating and graceful SIGTERM/SIGINT draining | Dependency deep ping, HA failover or an orchestrated production rollout |
+| Network exposure | Docker host port binding restricted to 127.0.0.1 and API loopback-by-default | Safe Internet exposure or hardened reverse proxy ingress |
+| Public NEXUS demo | Vercel static guest-mode UI and browser-tested synthetic datasets | A live production backend, industrial sensors or customer service |
+
+## Networking and runtime contract
+
+All three local Compose services publish only to loopback:
+`127.0.0.1:8081` (Nginx frontend), `127.0.0.1:5000` (Express API),
+and `127.0.0.1:27017` (MongoDB). The backend binds to `0.0.0.0`
+**inside the container** solely through an explicit
+`PLANTLOG_INTERNAL_CONTAINER_NETWORK=true` flag; its *host* mapping
+remains loopback. A standalone API listener otherwise binds to
+`127.0.0.1`, including when `NODE_ENV=production`. Changing Compose
+ports, networking, containers or proxying this API requires a fresh threat
+assessment; the runtime flag alone is not a perimeter control.
+
+`GET /api/health/live` returns **200** while Express responds, independent
+of MongoDB. `GET /api/health/ready` returns **200** only if Mongoose is in
+ready state and shutdown draining has not started, otherwise **503**.
+Health responses are `no-store` and reveal no connection strings or user
+data. The original `/api/health` remains for compatibility but it is
+**liveness only and must never be used as the readiness probe**. Readiness
+uses the connection state; it does not prove a fresh database query, backup
+health or external system reachability. SIGTERM/SIGINT drain new requests,
+stop the listener and close Mongoose, with a bounded ten-second deadline.
+Compose starts dependent services after healthchecks pass; this is local
+startup sequencing, not a high-availability strategy.
+
+### Check locally
+
+```bash
+# Generate an independent strong JWT_SECRET in your own environment first.
+docker compose config
+docker compose up --build -d
+curl -fsS http://127.0.0.1:5000/api/health/live
+curl -fsS http://127.0.0.1:5000/api/health/ready
+docker compose ps
+docker compose down
+```
+
+Inspect `docker compose ps` for expected healthy services. Avoid `down -v`
+unless erasure of the *local demo* database is intended. Tests assert
+loopback mappings and readiness conditions, but no claim of real Docker
+execution is made until an actual engine check is recorded.
+
+## Release gates — ALL HOLD until specifically verified
+
+| Gate | Required before external use | Current assessment |
+|---|---|---|
+| G01 | Threat model, independent auth/security review, penetration test | **HOLD — not performed** |
+| G02 | TLS, restricted ingress, distributed abuse prevention and WAF policy | **HOLD — local process limits only** |
+| G03 | Session security: token storage, expiration/revocation, recovery, key rotation | **HOLD — browser JWT persistence remains** |
+| G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — no formal review or retention policy** |
+| G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — no verified restore exercise** |
+| G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — functional CI is not capacity evidence** |
+| G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
+| G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — full enforcement not independently verified** |
+| G09 | Real operational data permissions, domain expert review and safety sign-off | **HOLD — synthetic fixture only** |
+| G10 | Production monitoring, incident response, on-call ownership and rollback | **HOLD — not provisioned** |
+
+The project is considered **engineering-demo ready** when verified tests
+pass at the exact source commit and all known limitations are clearly
+disclosed. That milestone is NOT a go-live release. Production authorization
+would require explicit independent approval and evidence for **every**
+release gate above, regardless of green CI or Vercel READY status.
+
+## Change discipline
+
+Changes to authentication, MongoDB schema, networking, request validation
+or role policy require matching unit/integration tests. UI edits must preserve
+the guest-only no-API and synthetic fixture constraints. Prefer focused PRs
+with verified checks; do not deploy the authenticated backend publicly,
+create live customer accounts, seed real incident data or claim compliance.
