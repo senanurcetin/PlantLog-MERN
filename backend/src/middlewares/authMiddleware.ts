@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 import { getJwtSecret } from '../utils/jwtSecret';
+import { tokenIssuer, tokenAudience } from '../utils/generateToken';
 import { canManageAssets } from '../utils/authorization';
 
 export interface AuthRequest extends Request {
@@ -16,12 +17,20 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         return;
     }
     try {
-        const decoded = jwt.verify(match[1], getJwtSecret());
-        if (typeof decoded === 'string' || typeof decoded.id !== 'string') {
+        const decoded = jwt.verify(match[1], getJwtSecret(), {
+            algorithms: ['HS256'], issuer: tokenIssuer, audience: tokenAudience,
+        });
+        if (typeof decoded === 'string' || typeof decoded.id !== 'string' ||
+            !Number.isSafeInteger(decoded.ver) || decoded.ver < 0 ||
+            !['operator', 'supervisor', 'admin'].includes(decoded.role)) {
             throw new Error('Invalid token payload');
         }
         const user = await User.findById(decoded.id).select('-password');
-        if (!user || !user.isActive) {
+        // Reject stale, pre-migration and role-mismatched credentials even if
+        // their signature and expiry are valid. Read the role/version fresh
+        // from MongoDB on each protected request; no in-memory token allowlist.
+        if (!user || !user.isActive || user.tokenVersion !== decoded.ver ||
+            user.role !== decoded.role) {
             res.status(401);
             next(new Error('Not authorized, account unavailable'));
             return;
