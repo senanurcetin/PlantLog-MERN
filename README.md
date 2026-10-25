@@ -147,6 +147,13 @@ Run the MongoDB-backed test locally against a local MongoDB server listening on 
 
 **Runtime health checks:** `/api/health/live` signals HTTP process liveness; `/api/health/ready` returns 503 until MongoDB is connected or when the server begins shutdown. The legacy `/api/health` route is liveness only, not readiness. See [operational scope and remaining release gates](docs/preproduction-readiness.md).
 
+**Pre-production audit events:** the authenticated local API tracks a fixed
+set of auth, equipment and maintenance operation outcomes with minimal IDs and
+status codes, never raw requests or bearer tokens. Supervisors and
+administrators can review bounded pages at `GET /api/audit`; records use an
+approximately 30-day MongoDB TTL. This is *not* an immutable or guaranteed
+audit ledger. Details and failure modes: [audit trail protocol](docs/audit-trail-protocol.md).
+
 ## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
