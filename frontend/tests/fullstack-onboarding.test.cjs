@@ -67,6 +67,17 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
             await page.getByLabel('Confirm password').fill(password);
             await page.getByRole('button', { name: 'Create operator account' }).click();
             await page.getByRole('heading', { name: 'Welcome back, Browser CI Operator' }).waitFor();
+            // Bearer credentials must live in the active tab, not durable
+            // localStorage accessible to unrelated future browser sessions.
+            const registeredToken = await page.evaluate(() => {
+                const local = window.localStorage.getItem('auth-storage');
+                const active = window.sessionStorage.getItem('auth-storage');
+                if (local !== null || !active) return null;
+                return JSON.parse(active).state.token;
+            });
+            assert.ok(typeof registeredToken === 'string' && registeredToken.length > 50,
+                'Session must be tab-scoped and contain an authenticated bearer');
+
             const applicationLogo = page.getByRole('img', { name: 'NEXUS' }).first();
             assert.equal(await applicationLogo.evaluate(img => img.complete && img.naturalWidth > 0), true,
                 'Official NEXUS identity must load on authenticated screens');
@@ -143,6 +154,19 @@ test('operator onboarding, asset, incident, lifecycle and analytics in Chromium 
 
             await page.getByRole('button', { name: 'Sign out' }).click();
             await page.getByRole('heading', { name: 'Industrial E-Logbook' }).waitFor();
+            assert.equal(await page.evaluate(() => window.sessionStorage.getItem('auth-storage')),
+                null, 'Logout must discard the active tab bearer');
+            assert.equal(await page.evaluate(() => window.localStorage.getItem('auth-storage')),
+                null, 'Logout must not leave legacy localStorage credentials');
+            const replayStatus = await page.evaluate(async bearer => {
+                const response = await fetch('http://localhost:5000/api/auth/me', {
+                    headers: { Authorization: 'Bearer ' + bearer },
+                });
+                return response.status;
+            }, registeredToken);
+            assert.equal(replayStatus, 401,
+                'Signing out must invalidate the previously issued bearer server-side');
+
             await page.getByPlaceholder('Email address').fill(email);
             await page.getByPlaceholder('Password').fill('deliberately-incorrect');
             await page.getByRole('button', { name: 'Sign in', exact: true }).click();
