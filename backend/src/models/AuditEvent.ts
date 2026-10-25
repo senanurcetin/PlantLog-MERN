@@ -36,6 +36,5 @@ const AuditEventSchema = new Schema<IAuditEvent>({
 // Local demo retention: an eventually processed TTL index is NOT a verified
 // erasure SLA or a production data retention policy.
 AuditEventSchema.index({ occurredAt: 1 }, { expireAfterSeconds: 30 * 86400 });
-AuditEventSchema.index({ _id: -1 });
 
 export default mongoose.model<IAuditEvent>('AuditEvent', AuditEventSchema);
