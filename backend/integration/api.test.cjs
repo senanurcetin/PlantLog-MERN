@@ -539,7 +539,12 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
         assert.equal((await api('GET', '/audit?' + invalidQuery, reviewer)).status, 400,
             invalidQuery);
     }
-    assert.equal((await api('POST', '/audit', reviewer, { action: 'fake' })).status, 404);
+    const noWrite = await fetch(base + '/audit', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + reviewer, 'Content-Type': 'application/json' },
+        body: '{}',
+    });
+    assert.equal(noWrite.status, 404, 'Audit list must have no creation endpoint');
 
 
     // Forged/legacy JWTs with no expected role, version or audience fail
