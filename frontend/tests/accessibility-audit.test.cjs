@@ -34,7 +34,10 @@ test('public synthetic demo has no serious/critical automated accessibility viol
 
     const browser = await chromium.launch({ headless: true });
     t.after(async () => { await browser.close(); });
-    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    // axe-core opens a collector frame in the explicit Playwright context;
+    // browser.newPage() creates an implicit owned context and is unsupported.
+    const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const page = await context.newPage();
     const apiCalls = [];
     page.on('request', req => {
         if (new URL(req.url()).pathname.startsWith('/api/')) apiCalls.push(req.url());
