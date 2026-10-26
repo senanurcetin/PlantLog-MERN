@@ -144,7 +144,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await fault.getByText('1 / 1', { exact: true }).isVisible(), true,
             'Faulted timeline may still pass separate basic data checks');
         await faultSelect.selectOption('unrecorded');
-        assert.equal(await fault.getByText('Unrecorded history', { exact: true }).isVisible(), true);
+        assert.equal(await fault.getByRole('heading', { name: 'Unrecorded history' }).isVisible(), true);
         assert.equal(await fault.getByText('MISSING_HISTORY', { exact: true }).isVisible(), true);
         await faultSelect.selectOption('baseline');
         assert.equal(await fault.getByText('0 / 9', { exact: true }).isVisible(), true);
@@ -195,7 +195,10 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await ledger.filter({hasText:'INVALID_TRANSITION'}).count(), 2);
         await populations.fixture.click();
         assert.equal(await ledger.count(), 12);
-        for (const region of matrix.getByRole('region')) {
+        const matrixRegions = matrix.getByRole('region');
+        assert.equal(await matrixRegions.count(), 2);
+        for (let index = 0; index < 2; index++) {
+            const region = matrixRegions.nth(index);
             await region.focus();
             assert.equal(await region.evaluate(node => node === document.activeElement), true,
                 'Both matrix tables remain keyboard focusable at 390px');
