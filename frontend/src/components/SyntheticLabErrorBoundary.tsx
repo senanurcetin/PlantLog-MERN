@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import type { ErrorInfo, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface Props {
     children: ReactNode;
@@ -21,11 +21,6 @@ export class SyntheticLabErrorBoundary extends Component<Props, State> {
 
     static getDerivedStateFromError(): State {
         return { failed: true };
-    }
-
-    componentDidCatch(_error: Error, _info: ErrorInfo): void {
-        // No analytics, error payload transmission, production telemetry, or
-        // sensitive exception details in the read-only public demo.
     }
 
     render() {
