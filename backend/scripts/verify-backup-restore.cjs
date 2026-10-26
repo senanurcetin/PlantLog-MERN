@@ -24,9 +24,14 @@ const token = randomUUID().replaceAll('-', '');
 const originalName = 'plantlog_restore_source_' + token;
 const restoredName = 'plantlog_restore_target_' + token;
 const archive = '/tmp/plantlog-test-only-' + token + '.archive.gz';
+let phase = 'configuration';
+const mark = next => {
+    phase = next;
+    process.stdout.write('Recovery check phase: ' + phase + '\n');
+};
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const docker = (...argv) => execFileSync('docker', ['exec', serviceId, ...argv],
-    { encoding: 'utf8', timeout: 60000, maxBuffer: 1024 * 1024 });
+    { encoding: 'utf8', timeout: 15000, maxBuffer: 1024 * 1024 });
 const canonical = value => JSON.stringify(value);
 const fingerprint = async db => {
     const data = {};
@@ -52,9 +57,12 @@ async function run() {
     let source = false;
     let target = false;
     try {
+        mark('connect');
         await mongoose.connect(sourceURI, { serverSelectionTimeoutMS: 10000 });
         source = true;
+        mark('schema-indexes');
         await Promise.all([User.init(), Asset.init(), LogEntry.init(), AuditEvent.init()]);
+        mark('seed');
         const when = new Date();
         const user = await User.create({
             name: 'Synthetic Recovery Operator',
@@ -88,6 +96,7 @@ async function run() {
         });
         const sourceDb = mongoose.connection.db;
         assert.ok(sourceDb, 'Test database is not available');
+        mark('fingerprint-source');
         const before = await fingerprint(sourceDb);
         for (const coll of collections) {
             assert.equal(before.documents[coll].count, 1, coll + ' requires a real fixture row');
@@ -96,15 +105,18 @@ async function run() {
         assert.equal(auditTtl?.expireAfterSeconds, 30 * 86400);
 
         // Run database tools in MongoDB 6 service, NOT on a user workstation.
+        mark('mongodump');
         docker('mongodump', '--host=127.0.0.1:27017',
             '--db=' + originalName, '--archive=' + archive, '--gzip');
         // Mark the destination for cleanup even if restore fails halfway.
         target = true;
+        mark('mongorestore');
         docker('mongorestore', '--host=127.0.0.1:27017',
             '--archive=' + archive, '--gzip',
             '--nsFrom=' + originalName + '.*', '--nsTo=' + restoredName + '.*');
         const destDb = mongoose.connection.useDb(restoredName, { useCache: true }).db;
         assert.ok(destDb, 'Restored database is not available');
+        mark('fingerprint-restored');
         const after = await fingerprint(destDb);
         assert.deepEqual(after, before, 'Restore must preserve all data and indexes');
 
@@ -118,6 +130,7 @@ async function run() {
         assert.equal(restoredLog.statusHistory.length, 2);
         assert.equal(restoredAudit.actorId.toString(), user._id.toString());
 
+        mark('write-proof');
         mkdirSync(path.join(__dirname, '../test-artifacts'), { recursive: true });
         const proof = {
             schemaVersion: 1,
@@ -133,6 +146,7 @@ async function run() {
             JSON.stringify(proof, null, 2) + '\n');
         process.stdout.write('Synthetic backup/restore verification PASS: 4 collections, indexes, links, lifecycle\n');
     } finally {
+        mark('cleanup');
         if (source) {
             // Never delete caller-controlled data: both names were generated here
             // under fixed prefixes using a random UUID.
