@@ -63,6 +63,13 @@ test('public synthetic demo has no serious/critical automated accessibility viol
                 id: v.id, impact: v.impact,
                 affectedElements: v.nodes.length,
                 selectors: v.nodes.slice(0, 12).map(node => node.target.join(' ')),
+                // Include only automated contrast numbers/colors for diagnosis;
+                // no DOM text, tokens, user data or request bodies are stored.
+                contrastChecks: v.id === 'color-contrast' ? v.nodes.slice(0, 12).map(node => ({
+                    target: node.target.join(' '),
+                    data: [...node.any, ...node.all].filter(c => c.id === 'color-contrast')
+                        .map(c => c.data).filter(Boolean),
+                })) : undefined,
             })),
         });
     }
