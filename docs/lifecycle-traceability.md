@@ -61,7 +61,7 @@ The three category counts always reconcile to `assessedRecords`.
   [demo-traceability.test.cjs](../frontend/tests/demo-traceability.test.cjs).
 - `npm run test:demo` runs those tests alongside existing scientific checks.
 - The deterministic `scientific-evidence.json` artifact uses
-  `schemaVersion: 4` and adds `lifecycleTraceability`: category totals,
+  `schemaVersion: 5` and retains `lifecycleTraceability`: category totals,
   observed event count and all nine issue counters. It retains the fixture
   SHA-256, workload cohort and existing comparative experiments.
 - CI checks that the generated artifact is byte-identical between runs.
@@ -97,7 +97,7 @@ Demo Insights page. A selection does not create a real incident or persist
 data. Regression checks live in
 [demo-exhaustive-lifecycle.test.cjs](../frontend/tests/demo-exhaustive-lifecycle.test.cjs)
 and run within `npm run test:demo`. The deterministic scientific report
-(schema v3) now includes `scenarioModelCheck` and
+(introduced in schema v3) includes `scenarioModelCheck` and
 `lifecycleFaultExperiments` as additional sections, alongside the unchanged
 cohort and original sensitivity experiments.
 
@@ -123,12 +123,42 @@ is a client-only read-only view with no persistence or API calls. The
 [boundary tests](../frontend/tests/demo-temporal-boundaries.test.cjs) exercise
 each expectation, dual-classification differences, leap-year rules and
 immutable fixture behavior. The deterministic
-`scientific-evidence.json` **schema v4** adds sanitized
+`scientific-evidence.json` first added sanitized
 `temporalBoundaryExperiments` beside the prior evidence sections.
 
 These checks prove only bounded consistency of declared UTC timestamp
 semantics; they do not validate event provenance, technician response
 times, PLC behavior, equipment uptime or a production SLA.
+
+## Six-cell evidence intersection and anonymous review
+
+The [cross-axis analyzer](../frontend/src/demo/evidence-matrix.ts)
+**joins two independent assessments by input row position**, never by
+log ID: missing or duplicate IDs are among the reasons a row can be
+excluded, so an ID join could silently discard a disputed row.
+
+Each fictional row belongs to exactly one cell of a **2 × 3 matrix**:
+basic eligible/excluded × history internally consistent/unrecorded/invalid.
+Six separately cloned synthetic mutations demonstrate all six combinations.
+The [read-only inspector](../frontend/src/components/EvidenceMatrixLab.tsx)
+shows both the six-cell counts and a row-level reason ledger using
+one-based row positions; no source log IDs, names, actor fields or timestamps
+are copied to the ledger. Multiple codes may describe the same row.
+
+**Duplicate-ID accounting matters:** dataset-level duplicate counts measure
+extra copies, whereas *every row sharing an ambiguous identifier* is excluded.
+A row-level `DUPLICATE_LOGS` reason therefore need not sum to the
+aggregate duplicate count. The eligibility denominator is always the number
+of distinct input **positions**, not the sum of overlapping reason counts.
+The same rule applies to duplicated equipment identifiers.
+
+The deterministic report is now **schema v5** and includes
+`evidenceIntersection`: the six cells, anonymous decisions for the fixed
+fictional data and a controlled six-row probe. This adds a separate review
+dimension, not field provenance, cryptographic authenticity, safety
+certification or a probability of failure. Regression tests reside in
+[demo-evidence-matrix.test.cjs](../frontend/tests/demo-evidence-matrix.test.cjs).
+This development remains isolated from production release gates.
 
 ## Explicit non-claims
 
