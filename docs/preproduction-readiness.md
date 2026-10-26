@@ -129,6 +129,17 @@ and backend. CI checks the lockfiles and archives inventory evidence but
 does **not** certify dependency origins, build-tool supply chains or
 artifact signing. All formal release gates remain HOLD.
 
+## Browser accessibility and build-tool security checks
+
+The [static guest accessibility protocol](preproduction-accessibility.md)
+describes an `axe-core`/Chromium WCAG 2/2.1 A/AA heuristic scan across
+five synthetic public-demo views at desktop/mobile sizes (ten scans).
+Serious or critical automated violations fail CI; all lesser and incomplete
+findings remain archived. This does **not** verify the authenticated
+application, screen readers, assisted interaction or manual WCAG compliance.
+The Vite development/build toolchain is moved to the patched 6.4.5
+maintenance release with npm supply-chain checks and browser regressions.
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
@@ -139,7 +150,7 @@ artifact signing. All formal release gates remain HOLD.
 | G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — minimal 30-day TTL prototype implemented, but unreviewed retention, deletion and legal compliance** |
 | G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — synthetic same-container logical restore tested in CI; real recovery, RTO/RPO and key rotation unverified** |
 | G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — bounded 150-request localhost observation and two-writer CAS tested; no capacity/soak/SLO evidence** |
-| G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
+| G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — automated axe guest audit added; manual assistive technology and authenticated flows not certified** |
 | G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — runtime advisory gate, official npm lock sources and SBOMs added; no provenance signing, dev-tool risk sign-off or independent enforcement review** |
 | G09 | Real operational data permissions, domain expert review and safety sign-off | **HOLD — synthetic fixture only** |
 | G10 | Production monitoring, incident response, on-call ownership and rollback | **HOLD — local readiness disconnect/reconnect checked; no monitored production service or incident response** |

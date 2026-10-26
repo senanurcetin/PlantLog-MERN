@@ -65,10 +65,10 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                             }`}>
                                 {finding.count}
                             </dd>
-                            <p className="mt-1 text-[11px] font-semibold text-slate-700">
+                            <dd className="mt-1 text-[11px] font-semibold text-slate-700">
                                 {finding.count === 0 ? 'Check passed' :
                                     finding.severity === 'error' ? 'Integrity issue' : 'Review required'}
-                            </p>
+                            </dd>
                         </div>
                     ))}
                 </dl>

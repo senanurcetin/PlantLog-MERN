@@ -248,8 +248,11 @@ jobs:
           if-no-files-found: warn
 
   frontend-browser:
-    # Pinned until the project's Playwright 1.56 runtime supports newer runners.
+    # GitHub-hosted Ubuntu 24.04 image includes Chrome; no network browser
+    # download or separate apt install is necessary for this browser suite.
     runs-on: ubuntu-24.04
+    env:
+      PLANTLOG_BROWSER_CHANNEL: chrome
     services:
       mongodb:
         image: mongo:6
@@ -284,17 +287,28 @@ jobs:
       - name: Install and build isolated backend
         run: cd ../backend && npm ci && npm run build
 
-      - name: Install browser test tooling in CI only
-        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install browser and accessibility tooling in CI only
+        run: npm install --no-save --no-package-lock playwright@1.56.1 @axe-core/playwright@4.14.0
 
-      - name: Install isolated Chromium runtime
-        run: npx playwright install --with-deps chromium
+      - name: Verify runner-provided Chrome is available
+        run: google-chrome --version
 
       - name: Run real browser demo smoke test
         run: node --test tests/browser-smoke.test.cjs
 
       - name: Test authenticated operator lifecycle in a real browser
         run: node --test tests/fullstack-onboarding.test.cjs
+
+      - name: Audit static demo accessibility on desktop and mobile
+        run: node --test tests/accessibility-audit.test.cjs
+
+      - name: Archive sanitized accessibility findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-automated-accessibility-evidence
+          path: frontend/test-artifacts/accessibility-audit.json
+          if-no-files-found: warn
 
       - name: Preserve failure screenshot
         if: failure()
