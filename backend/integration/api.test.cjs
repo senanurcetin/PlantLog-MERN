@@ -4,6 +4,7 @@ const { randomUUID } = require('node:crypto');
 const mongoose = require('mongoose');
 const app = require('../dist/app.js').default;
 const User = require('../dist/models/User.js').default;
+const Asset = require('../dist/models/Asset.js').default;
 const LogEntry = require('../dist/models/LogEntry.js').default;
 const AuditEvent = require('../dist/models/AuditEvent.js').default;
 
@@ -29,6 +30,13 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     await new Promise((resolve, reject) => disconnected.close(err => err ? reject(err) : resolve()));
 
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 20000 });
+    // MongoDB must enforce this rule, not just a racy API-level existence check.
+    await Asset.init();
+    const indexes = await Asset.collection.indexes();
+    const serialIndex = indexes.find(index => index.name === 'serial_number_unique_casefold');
+    assert.equal(serialIndex?.unique, true);
+    assert.deepEqual(serialIndex?.key, { serialNumber: 1 });
+    assert.equal(serialIndex?.collation?.strength, 2);
     const server = app.listen(0, '127.0.0.1');
     await new Promise((resolve) => server.once('listening', resolve));
 
@@ -134,6 +142,15 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     });
     assert.equal(registrationA.status, 201, JSON.stringify(registrationA.data));
     assert.equal(registrationA.data.role, 'operator');
+    const longTld = 'longtld' + suffix + '@example.technology';
+    const longTldRegistration = await api('POST', '/auth/register', null, {
+        name: 'Long TLD Example', email: longTld.toUpperCase(), password,
+    });
+    assert.equal(longTldRegistration.status, 201,
+        'API-accepted long-TLD email must satisfy the Mongo User schema');
+    assert.equal((await api('POST', '/auth/login', null, {
+        email: longTld, password,
+    })).status, 200);
     const operator = registrationA.data.token;
 
     const registrationB = await api('POST', '/auth/register', null, {
@@ -184,6 +201,26 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(createdAsset.data.statusHistory[0].from, null);
     assert.equal(createdAsset.data.statusHistory[0].to, 'operational');
     assert.equal(createdAsset.data.statusHistory[0].changedBy, registrationA.data._id);
+    // Case-only duplicates are forbidden even if normal string equality differs.
+    const duplicateCase = await api('POST', '/assets', operator, {
+        name: 'Duplicate fictional conveyor', serialNumber: ('DEMO-' + suffix).toLowerCase(),
+        category: 'equipment', location: 'Fixture Bay',
+    });
+    assert.equal(duplicateCase.status, 400);
+    const rawCollision = await Promise.allSettled([
+        Asset.create({ name: 'Concurrent duplicate A', serialNumber: 'RACE-' + suffix,
+            category: 'equipment', location: 'Fixture Bay', createdBy: registrationA.data._id }),
+        Asset.create({ name: 'Concurrent duplicate B', serialNumber: 'race-' + suffix,
+            category: 'equipment', location: 'Fixture Bay', createdBy: registrationA.data._id }),
+    ]);
+    assert.equal(rawCollision.filter(result => result.status === 'fulfilled').length, 1,
+        'MongoDB must prevent concurrent casefold duplicate serials');
+    assert.equal(rawCollision.filter(result =>
+        result.status === 'rejected' && result.reason.code === 11000).length, 1);
+    assert.equal(await Asset.countDocuments({ serialNumber: 'race-' + suffix })
+        .collation({ locale: 'en', strength: 2 }), 1);
+    await Asset.deleteMany({ serialNumber: 'RACE-' + suffix })
+        .collation({ locale: 'en', strength: 2 });
 
     for (const injected of [
         { createdBy: registrationB.data._id },

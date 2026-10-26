@@ -1,11 +1,19 @@
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 'lucide-react';
 import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
 import { assessLifecycleTraceability } from '../demo/traceability';
-import ControlledComparisons from './ControlledComparisons';
-import EligibilitySensitivityLab from './EligibilitySensitivityLab';
-import LifecycleFaultLab from './LifecycleFaultLab';
+import { SyntheticLabErrorBoundary } from './SyntheticLabErrorBoundary';
+
+// Keep all six fictional experiment modules out of the initial guest bundle.
+// Loading one module never authenticates, changes source data or starts an API call.
+const ControlledComparisons = lazy(() => import('./ControlledComparisons'));
+const EligibilitySensitivityLab = lazy(() => import('./EligibilitySensitivityLab'));
+const LifecycleFaultLab = lazy(() => import('./LifecycleFaultLab'));
+const TemporalBoundaryLab = lazy(() => import('./TemporalBoundaryLab'));
+const EvidenceMatrixLab = lazy(() => import('./EvidenceMatrixLab'));
+const EvidenceReviewWorkbench = lazy(() => import('./EvidenceReviewWorkbench'));
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -13,15 +21,41 @@ const typeDetails = [
     {key: 'inspection', label: 'Inspections', color: 'bg-[#4EA8FF]', text: 'text-blue-700'},
     {key: 'operation', label: 'Operations', color: 'bg-slate-500', text: 'text-slate-700'},
 ] as const;
+/**
+ * Only the selected scientific panel is mounted. This keeps the ordinary
+ * maintenance overview usable without executing every in-memory experiment
+ * and lets keyboard users navigate six distinct research tools.
+ *
+ * This is a presentation state, not evidence, validation or a saved review.
+ */
+const laboratoryOptions = [
+    { id: 'comparisons', title: 'Controlled comparisons',
+        description: 'Single-record hypothetical additions and eligible workload' },
+    { id: 'sensitivity', title: 'Eligibility sensitivity',
+        description: 'How invalid records change the descriptive denominator' },
+    { id: 'history-faults', title: 'History contradictions',
+        description: 'Nine timeline checks against deliberately inconsistent records' },
+    { id: 'utc-boundaries', title: 'UTC boundary cases',
+        description: 'Twelve illustrative chronology and leap-year edge cases' },
+    { id: 'evidence-matrix', title: 'Six-cell evidence matrix',
+        description: 'Two independent data-quality and lifecycle dimensions' },
+    { id: 'review-workbench', title: 'Document review workbench',
+        description: 'Anonymous, overlapping diagnostic intersections' },
+] as const;
+type LaboratoryId = (typeof laboratoryOptions)[number]['id'];
+
 const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
     assets: DemoInsightAsset[];
     logs: DemoInsightLog[];
     snapshot: string;
     onOpenHistory: (assetId: string) => void;
 }) => {
-    const summary = buildDemoInsights(assets, logs, snapshot);
-    const quality = assessDemoDataQuality(assets, logs, snapshot);
-    const traceability = assessLifecycleTraceability(logs, snapshot);
+    const [selectedLaboratory, setSelectedLaboratory] = useState<LaboratoryId>('comparisons');
+    const summary = useMemo(() => buildDemoInsights(assets, logs, snapshot), [assets, logs, snapshot]);
+    const quality = useMemo(() => assessDemoDataQuality(assets, logs, snapshot),
+        [assets, logs, snapshot]);
+    const traceability = useMemo(() => assessLifecycleTraceability(logs, snapshot),
+        [logs, snapshot]);
     const highest = Math.max(1, ...summary.dailyIntake.map(day => day.total));
     return (
         <div className="space-y-5" aria-label="Synthetic maintenance analytics">
@@ -265,9 +299,66 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                     {' '}{summary.outsideWindow} recorded outside it. No estimated events are added.
                 </p>
             </section>
-            <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />
-            <EligibilitySensitivityLab assets={assets} logs={logs} snapshot={snapshot} />
-            <LifecycleFaultLab assets={assets} logs={logs} snapshot={snapshot} />
+            <section className="nexus-card min-w-0 max-w-full p-5 sm:p-6"
+                aria-labelledby="research-laboratories-heading">
+                <h2 id="research-laboratories-heading"
+                    className="text-lg font-bold text-slate-900">
+                    Explore synthetic evidence laboratories
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm text-slate-600">
+                    Choose one fictional experiment at a time. Only the selected
+                    panel is calculated and rendered; switching panels does not
+                    save any result, modify source records or contact a backend.
+                    The separate workload and data-quality summaries above
+                    continue to include the entire fictional population.
+                </p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+                    role="group" aria-label="Select synthetic evidence laboratory">
+                    {laboratoryOptions.map(option =>
+                        <button key={option.id} type="button"
+                            aria-pressed={selectedLaboratory === option.id}
+                            aria-controls="selected-synthetic-laboratory"
+                            onClick={() => setSelectedLaboratory(option.id)}
+                            className={`rounded-xl border p-3 text-left focus-visible:outline
+                                focus-visible:outline-2 focus-visible:outline-offset-2
+                                focus-visible:outline-blue-600 ${selectedLaboratory === option.id
+                                    ? 'border-blue-900 bg-[#061524] text-white'
+                                    : 'border-slate-300 bg-white text-slate-800 hover:bg-blue-50'}`}>
+                            <span className="block text-sm font-bold">{option.title}</span>
+                            <span className={`mt-1 block text-xs ${selectedLaboratory === option.id
+                                ? 'text-blue-100' : 'text-slate-600'}`}>
+                                {option.description}
+                            </span>
+                        </button>)}
+                </div>
+            </section>
+            <div id="selected-synthetic-laboratory" role="region"
+                aria-label="Selected synthetic evidence laboratory" aria-live="off">
+                <SyntheticLabErrorBoundary key={selectedLaboratory}
+                    label={laboratoryOptions.find(option =>
+                        option.id === selectedLaboratory)!.title}
+                    onChooseAnother={selectedLaboratory === 'comparisons'
+                        ? undefined : () => setSelectedLaboratory('comparisons')}>
+                <Suspense fallback={
+                    <p role="status" className="nexus-card p-5 text-sm text-slate-700">
+                        Loading selected fictional laboratory…
+                    </p>
+                }>
+                {selectedLaboratory === 'comparisons' &&
+                    <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />}
+                {selectedLaboratory === 'sensitivity' &&
+                    <EligibilitySensitivityLab assets={assets} logs={logs} snapshot={snapshot} />}
+                {selectedLaboratory === 'history-faults' &&
+                    <LifecycleFaultLab assets={assets} logs={logs} snapshot={snapshot} />}
+                {selectedLaboratory === 'utc-boundaries' &&
+                    <TemporalBoundaryLab assets={assets} />}
+                {selectedLaboratory === 'evidence-matrix' &&
+                    <EvidenceMatrixLab assets={assets} logs={logs} snapshot={snapshot} />}
+                {selectedLaboratory === 'review-workbench' &&
+                    <EvidenceReviewWorkbench assets={assets} logs={logs} snapshot={snapshot} />}
+                </Suspense>
+                </SyntheticLabErrorBoundary>
+            </div>
         </div>
     );
 };

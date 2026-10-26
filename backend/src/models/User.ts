@@ -25,7 +25,10 @@ const UserSchema: Schema = new Schema(
             unique: true,
             trim: true,
             lowercase: true,
-            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
+            // Mirror sanitizeLogin(): do not accept registration and then
+            // silently fail Mongo validation for modern long-TLD emails.
+            maxlength: [254, 'Email must not exceed 254 characters'],
+            match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please add a valid email'],
         },
         password: {
             type: String,

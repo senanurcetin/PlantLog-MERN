@@ -89,7 +89,11 @@ jobs:
       - name: Lint frontend
         run: npm run lint
 
-      - name: Build frontend and verify compressed asset budgets
+      - name: Build guest-only frontend and verify compressed asset budgets
+        # This is the shipped API-free /demo variant, not the larger
+        # authenticated full-stack build tested separately below.
+        env:
+          VITE_PUBLIC_DEMO_ONLY: 'true'
         run: npm run test:perf
 
   backend:

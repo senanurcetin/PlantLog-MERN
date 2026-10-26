@@ -150,6 +150,20 @@ byte-identical JSON; see the [complete scientific protocol](eligibility-sensitiv
 Controlled added records have valid unique synthetic IDs, except the
 intentionally broken asset-link example is explicitly ineligible.
 
+## Independently verify an archived synthetic evidence report
+
+The guest-only synthetic JSON report can also be verified **offline and
+without CI**. First generate it using `npm run test:demo`, then run
+`npm run evidence:verify` inside `frontend/`; alternatively pass the
+path of an archived JSON report to
+`node scripts/verify-scientific-evidence.cjs saved-report.json`.
+The independent verifier enforces schema version 5, canonical JSON bytes,
+a 1 MiB input limit and complete reconstruction from the local fixture
+and checked-out source. It returns a nonzero exit code on altered or stale
+evidence and never writes the inspected file. This is not a digital signature
+or external event-provenance verification. Full methodology:
+[offline evidence verification](offline-evidence-verification.md).
+
 ## Independent lifecycle-history traceability
 
 The public Demo Insights view also counts documented, absent and contradictory
@@ -185,6 +199,113 @@ basic eligibility rules. A separate exhaustive model check enumerates
 19,531 fictional action-attempt prefixes and confirms rejection, reset and
 in-memory timeline invariants; it does not exercise the production system.
 See [model and fault-injection methodology](lifecycle-traceability.md).
+
+## Combined review facets
+
+The workbench now also filters **simultaneously** by its exclusive
+documentary review group, original history classification, and observed
+diagnostic code. This distinguishes a basic-data exclusion from a timeline
+contradiction even if both occur in one fictional row. Issue counts overlap,
+so the number of filtered rows is computed from unique positions, not from
+adding diagnostic frequencies. Filters are local, reset upon changing the
+example population, and do not save an investigation outcome.
+
+## Failure isolation for lazy experiments (development branch)
+
+A `SyntheticLabErrorBoundary` contains dynamic import or panel-render
+errors to the **selected research panel**. The surrounding synthetic
+maintenance workload, data-quality checks, navigation and six lab selectors
+remain available. The fallback gives a short accessible error announcement
+without exposing stack traces, source identifiers or simulated hardware
+conclusions. Users may switch to the default controlled-comparisons panel,
+or reload the entire guest demo to retry a failed import.
+
+JavaScript caches a failed dynamic module import during the page session,
+so simply rerendering the same panel is **not** promised as a retry.
+The reload action explicitly states that temporary fictional cases and
+experiment selections are cleared. Neither recovery action writes
+to the database or sends error telemetry.
+
+## Verified on-demand JavaScript loading (development branch)
+
+The six laboratories now use React `lazy()` and Vite dynamic imports,
+so choosing an experiment downloads its dedicated code chunk only when needed.
+Selecting **Demo insights** initially requests only the default controlled
+comparison code; the other five experimental interfaces and their specific
+dependencies are not eagerly included in that screen's initial bundle.
+Already loaded modules are cached by the browser. A bounded loading message
+is shown while a requested chunk resolves.
+
+The production-bundle regression asserts six named deferred chunks and
+a reduced initial JavaScript budget. Local Playwright network interception
+independently asserts that opening the homepage loads **no** scientific
+laboratory chunks, selecting insights loads **only** the comparison chunk,
+and selecting all six subsequently requests each experiment once.
+These tests are local-only, do not contact a backend, and do not constitute
+measurements of the published Vercel deployment.
+
+The synthetic evidence computations, report schema v5, source fixture
+and no-industrial-connectivity claims are unchanged.
+
+## On-demand research laboratory navigation (development branch)
+
+The Demo Insights screen now separates its fixed summary from **six
+individually selectable scientific panels**: controlled comparisons,
+eligibility sensitivity, lifecycle fault injection, UTC boundaries,
+evidence matrix and document review. Only **one experimental panel** is
+mounted and calculated at a time; the overview's quality, lifecycle and
+workload summaries always remain present.
+
+The selector is a keyboard-operated button group with explicit
+`aria-pressed` state, rather than an unimplemented tab-widget keyboard
+pattern. Switching panels discards only that panel's transient selection,
+never edits records, and never caches, stores or uploads review choices.
+Returning from another demonstration section or reloading restores
+controlled comparisons as the initial panel. This is **progressive UI
+disclosure**, not fewer quality checks or a change to scientific evidence
+criteria.
+
+The dated screenshots in this document were captured from earlier code
+and are **not** evidence that this unmerged branch is deployed. The new
+navigation is verified with a local guest-only Chrome build; the publicly
+hosted demo remains unchanged.
+
+## Synthetic evidence review workbench
+
+The new reviewer workbench organizes the same fictional evidence matrix into
+four **exclusive document-check categories**: base data inconsistencies,
+contradictory histories, unrecorded histories and internally consistent
+histories. The initial sample has nine unrecorded and three internally
+consistent histories; six controlled cases exercise every matrix intersection.
+A filter exposes anonymous row positions and overlapping issue codes without
+creating records, storing review decisions or attributing actual maintenance
+work. Filtering is local and has **no API access**. This is not a safety or
+dispatch priority queue. See the [review protocol](lifecycle-traceability.md).
+
+## Cross-axis evidence and eligibility explorer
+
+The Demo Insights screen additionally exposes a **2 × 3 synthetic evidence
+matrix**: eligible/excluded basic rows versus consistent/unrecorded/invalid
+status histories. A switch shows either the same fixed fictitious sample
+or six independently reconstructed, deliberately contradictory rows.
+An anonymous row-position ledger explains the separate reasons for each
+classification without copying log identifiers or actors. Counts reconcile
+to the source population; aggregated duplicate counts may differ from the
+number of excluded rows because all ambiguous copies must be excluded.
+The deterministic `scientific-evidence.json` report uses **schema v5**
+and includes `evidenceIntersection`. See
+[the matrix protocol](lifecycle-traceability.md).
+
+## UTC chronology boundary lab
+
+The synthetic insights panel includes **12 fixed UTC boundary experiments**
+for day-end millisecond equality, leap days, year rollover, timezone
+format enforcement, reversed transitions and missing history. Basic
+log eligibility is distinguished from the validity of a status-event
+timeline; a case can be an eligible descriptive log but have an invalid
+stored history. Every case shows the declared expected and observed
+result without modifying any fixture record or calling an API.
+See the [temporal boundary methodology](lifecycle-traceability.md).
 
 ## Controlled synthetic comparison examples
 

@@ -98,3 +98,123 @@ or external scientific validity are asserted.
 
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
+
+## Intentional failed-module browser recovery (development branch)
+
+The Chrome guest smoke now opens a **fresh browser context** and deliberately
+aborts the `TemporalBoundaryLab` JavaScript request. It confirms that the
+failure is bounded by the selected laboratory: the static quality metrics and
+workload overview remain accessible; no successful experiment or verified
+maintenance record is claimed; the internal import exception is not shown;
+the user can select another laboratory without a reload. Since JavaScript
+module-loader import failures are cached for that page session, the fallback
+also offers a clearly named **full-page reload** which discards all temporary
+scenario entries. The test unblocks the module, reloads, and confirms that
+the previously unavailable laboratory can render successfully.
+
+The simulation is a controlled request abort in local real Chrome, not
+evidence of production network reliability, industrial connectivity,
+or availability of a backend. Tests must not turn off React error handling
+to simulate the problem.
+
+## Laboratory code-splitting and request inspection
+
+The static production build emits six lazily imported experiment bundles,
+not merely six conditionally visible React panels. The build test checks
+all six file identities, verifies that initial HTML does not preload them,
+and enforces an initial-entry gzip ceiling in addition to the overall
+bundle budget.
+
+The Chrome smoke test records JavaScript requests in the guest demo.
+It checks that **no experiment module** is downloaded when the user opens
+the ordinary dashboard, that the first **Demo insights** selection loads
+only **ControlledComparisons**, and that subsequent laboratory choices
+load each of the other five modules exactly once. The test confirms
+the six selected views still work and observes no authenticated API calls.
+A loading message covers the module-fetch interval without pretending
+that a fixture verification or network-backed analysis occurred.
+
+This is a reproducible local build and network request test, not a
+production real-user performance measurement. Browser HTTP cache and Vite
+chunk hashes are implementation details; the tests identify the
+experiment names rather than relying on exact hashes.
+
+## Single-panel scientific laboratory navigation
+
+The local Chromium smoke asserts that the selectable research group
+exposes six keyboard-accessible, pressed-state buttons and that **only
+the chosen laboratory is mounted in the DOM**. It switches among all six,
+checks mobile region focus, and confirms that a reload reselects the
+controlled-comparisons panel rather than replaying previous experimental
+choices. Scenario counts continue to reconcile when reviewers open
+the evidence matrix and document review workbench one at a time.
+
+The accessibility runner explicitly activates each desired experiment
+before conducting its existing 18 axe scans (desktop 1280 px, mobile
+390 px). This is not a claim of full keyboard or screen-reader
+certification, and the panel selection never calls an API or persists
+any fixture data.
+
+## Reviewer cross-filter browser regression
+
+Playwright now checks the combined documentary category, history and
+diagnostic dropdowns on the 390 px guest-only demo. It verifies overlapping
+`INVALID_TRANSITION` on a basic-data-excluded case, a valid empty-result
+intersection, population-switch resets and no document-level horizontal
+overflow or API calls. The existing **18 automated axe scans** include
+one fully intersected review state at both desktop and mobile sizes.
+The tests do not certify screen-reader operation or production plant data.
+
+## Documentary-review workbench browser checks
+
+The local Chromium smoke additionally exercises the new read-only reviewer
+queue: filtering all 12 fictional rows into nine missing histories or three
+internally consistent timelines, exploring six controlled cases, confirming
+three excluded rows and a separately conflicting history, and restoring the
+original population. It checks the mobile table is keyboard-focusable,
+has no document-level overflow, and never calls the authenticated API.
+It also checks that the temporary 13th recorded scenario raises the
+internally consistent category to four, and reset restores 12 rows.
+
+Automated axe coverage adds one filtered review state at both desktop and
+mobile sizes. The full suite now expects **18 scans**: five normal views
+plus four selected lab states at each viewport. This automated rule coverage
+does not constitute manual assistive-technology certification.
+
+## Laboratory interaction and accessibility regression (development branch)
+
+The guest-only Playwright smoke suite now inspects the **three scientific
+panels** as real DOM interactions rather than trusting unit tests alone:
+
+- **Lifecycle fault-injection:** select overlapping faults (four diagnostics),
+  unknown status history and reset to the original valid example.
+- **UTC chronology:** move from a future event to an impossible leap date,
+  and then a valid leap day, checking both basic eligibility and independent
+  history diagnostics.
+- **Six-cell evidence matrix:** verify 12 source rows, switch to six controlled
+  contradictions (one per matrix cell), check the anonymous decision ledger,
+  restore the source, and confirm the matrix follows the temporary 13th
+  scenario row before returning to 12 after reset.
+
+At **390 px** the two tabular regions must remain keyboard focusable and
+scroll within the panel, without document-level horizontal overflow. Browser
+network interception checks there are no requests to the authenticated
+`/api/` path.
+
+The automated axe-core test now scans all five normal views **plus four
+selected diagnostic states**, on both 1280 px desktop and 390 px mobile:
+**18 scans** in all. All WCAG 2/2.1 A/AA checks remain enabled, and
+serious/critical findings fail the test. Results are not full accessibility
+certification; manual assistive technology review is still outstanding.
+
+For local use only, run `npm ci`, `npm run build`, install the pinned
+`playwright@1.56.1` and `@axe-core/playwright@4.14.0` test packages,
+then set `PLANTLOG_BROWSER_CHANNEL=chrome` and execute
+`node --test tests/browser-smoke.test.cjs` followed by
+`node --test tests/accessibility-audit.test.cjs`. This does not create a
+pull request, deploy anything, or require any database.
+
+The new interactions remain strictly illustrative, synthetic, and
+in-memory; their success does not demonstrate industrial safety or
+production reliability.
+

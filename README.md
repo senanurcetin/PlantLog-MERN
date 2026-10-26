@@ -15,6 +15,8 @@
 > The architecture diagram illustrates the workflow. The NEXUS screenshots below are captured in real Chromium from the **production-equivalent, guest-only frontend build**. They are not plant telemetry or authenticated production screens. Exact capture assumptions, viewports and commit are listed in [the screenshot manifest](docs/screenshots-manifest.json); the [verification report](docs/demo-verification-2026-10-21.md) states the remaining limits.
 
 
+**MongoDB data integrity:** case-insensitive unique equipment serials, verified at local API startup; long-domain email validation aligned between HTTP and the database. These checks include concurrent synthetic insert tests in disposable MongoDB. See [MongoDB integrity contract](docs/mongodb-integrity-contract.md). The public Vercel demo continues to use read-only fictional data; no Mongo credentials or private API endpoints are shipped.
+
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
 A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
@@ -42,9 +44,55 @@ The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not 
 **Lifecycle evidence verification:** the synthetic Demo Insights screen now
 includes 11 independently reconstructed status-history fault examples.
 An exhaustive, fixed-depth reference-model test inspects 19,531 fictional
-action prefixes, and the deterministic schema-v3 audit keeps these results
+action prefixes, and the deterministic audit (initially schema v3) kept these results
 separate from maintenance workload and real industrial reliability claims.
 See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
+
+**Offline scientific evidence verification:** the version-5 report can now
+be checked independently against its source and fixture by running
+`cd frontend && npm run evidence:verify` after `npm run test:demo`.
+Read-only validation rejects stale/tampered numbers, changed fixture hashes,
+noncanonical JSON and incompatible schemas without uploading records or
+starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
+The SHA-256 output is a checksum, **not an authenticated signature**.
+
+**Deferred laboratory JavaScript:** the six fictional research tools
+are loaded as separate chunks only after the corresponding selection,
+rather than being shipped in the guest demo's initial JavaScript.
+Browser-request and gzip-budget regressions protect the change;
+[verification details](docs/browser-testing.md).
+
+**Progressive experiment navigation:** the Demo Insights overview now
+keeps its workload and quality summaries always visible while mounting
+only the selected one of six fictional research laboratories. This
+reduces default interactive complexity without dropping data checks,
+and does not change the hosted `main` build. See the
+[guest demo protocol](docs/demo-guide.md).
+
+**Independent reviewer filters:** the workbench supports simultaneous
+documentary category, original history and diagnostic-code filtering,
+including defects that overlap across the separate quality and lifecycle
+audits. It counts unique fictional row positions and changes no data;
+see [review filter methodology](docs/lifecycle-traceability.md).
+
+**Synthetic evidence review workbench:** four read-only documentary categories
+organize the anonymous matrix without treating missing evidence as proof of
+work or assigning industrial risk scores. Review filters are ephemeral;
+the fixture and schema-v5 audit stay unchanged. Details are in the
+[lifecycle and documentary review protocol](docs/lifecycle-traceability.md).
+
+**Dual-axis synthetic evidence:** the guest Demo Insights now has a
+six-cell eligibility-versus-history matrix, a row-position-only audit
+ledger and six controlled contradictions. Scientific evidence **schema v5**
+contains the reconciled counts and anonymized per-row classifications.
+Nothing changes real maintenance systems, public APIs or production gates.
+See [evidence matrix methodology](docs/lifecycle-traceability.md).
+
+**UTC chronology laboratory (development only):** an additional synthetic
+read-only Demo Insights panel presents 12 deterministic date/timestamp
+boundary cases. The report first recorded expected versus
+observed classifications; no industrial data, live API or runtime is
+introduced. See [event chronology limitations](docs/lifecycle-traceability.md).
 
 ## Problem and approach
 

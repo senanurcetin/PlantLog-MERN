@@ -14,7 +14,7 @@ test('scientific evidence is reproducible, auditable and follows actual fixture 
     assert.match(firstResult, /Scientific evidence: PASS/);
     const first = readFileSync(artifact);
     const report = JSON.parse(first.toString('utf8'));
-    assert.equal(report.schemaVersion, 3);
+    assert.equal(report.schemaVersion, 5);
     assert.match(report.source.fixtureSHA256, /^[a-f0-9]{64}$/);
     assert.equal(report.source.fictionalAssetCount, 8);
     assert.equal(report.source.fictionalEventCount, 12);
@@ -29,6 +29,25 @@ test('scientific evidence is reproducible, auditable and follows actual fixture 
         events: report.lifecycleTraceability.recordedTransitionEvents,
     }, { assessed: 12, verified: 3, missing: 9, invalid: 0, events: 7 });
     assert.equal(report.lifecycleTraceability.issueCounts.length, 9);
+    assert.equal(report.evidenceIntersection.assessedRows, 12);
+    assert.equal(report.evidenceIntersection.eligibleRows, 12);
+    assert.equal(report.evidenceIntersection.excludedRows, 0);
+    assert.deepEqual(report.evidenceIntersection.cells.map(cell => cell.rows),
+        [3, 9, 0, 0, 0, 0]);
+    assert.equal(report.evidenceIntersection.anonymizedRowDecisions.length, 12);
+    assert.equal(report.evidenceIntersection.controlledSixCellProbes.assessedRows, 6);
+    assert.deepEqual(report.evidenceIntersection.controlledSixCellProbes
+        .cells.map(cell => cell.rows), [1, 1, 1, 1, 1, 1]);
+    assert.equal(report.evidenceIntersection.controlledSixCellProbes
+        .anonymizedRowDecisions.length, 6);
+    assert.equal(report.temporalBoundaryExperiments.cases.length, 12);
+    assert.ok(report.temporalBoundaryExperiments.cases.every(x => x.matchesExpected));
+    assert.deepEqual(report.temporalBoundaryExperiments.cases.map(x => x.id), [
+        'ordinary', 'final-millisecond', 'post-snapshot-transition',
+        'reversed-time', 'leap-day', 'non-leap-day', 'offset-opening',
+        'local-event', 'year-boundary', 'future-opening', 'unrecorded',
+        'equal-transition-time',
+    ]);
     assert.equal(report.scenarioModelCheck.maximumSequenceLength, 6);
     assert.equal(report.scenarioModelCheck.exploredPrefixes, 19531);
     assert.equal(report.scenarioModelCheck.distinctPhases.length, 5);
