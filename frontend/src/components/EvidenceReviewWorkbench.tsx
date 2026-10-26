@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { buildEvidenceMatrix, buildEvidenceMatrixProbes } from '../demo/evidence-matrix';
 import { buildSyntheticReviewQueue } from '../demo/review-queue';
 import type { ReviewCategory } from '../demo/review-queue';
+import { buildReviewDiagnosticFacets, filterSyntheticReview } from '../demo/review-filters';
+import type { DiagnosticCode, ReviewHistory } from '../demo/review-filters';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 
 const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
@@ -11,13 +13,23 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
 }) => {
     const [population, setPopulation] = useState<'fixture' | 'probes'>('fixture');
     const [selected, setSelected] = useState<ReviewCategory | 'all'>('all');
+    const [history, setHistory] = useState<ReviewHistory | 'all'>('all');
+    const [diagnostic, setDiagnostic] = useState<DiagnosticCode | 'all'>('all');
+    const resetFilters = () => {
+        setSelected('all');
+        setHistory('all');
+        setDiagnostic('all');
+    };
     const reports = useMemo(() => ({
         fixture: buildSyntheticReviewQueue(buildEvidenceMatrix(assets, logs, snapshot)),
         probes: buildSyntheticReviewQueue(buildEvidenceMatrixProbes(assets, logs, snapshot)),
     }), [assets, logs, snapshot]);
     const current = reports[population];
-    const visibleRows = current.rows.filter(row =>
-        selected === 'all' || row.category === selected);
+    const facets = useMemo(() => buildReviewDiagnosticFacets(current), [current]);
+    const filtered = filterSyntheticReview(current, {
+        category: selected, history, diagnostic,
+    });
+    const visibleRows = filtered.matchedRows;
     const selectedCategory = current.categories.find(item => item.id === selected);
 
     return (
@@ -35,7 +47,7 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
             <div className="mt-4 flex flex-wrap gap-2" role="group"
                 aria-label="Synthetic review population">
                 <button type="button" aria-pressed={population === 'fixture'}
-                    onClick={() => { setPopulation('fixture'); setSelected('all'); }}
+                    onClick={() => { setPopulation('fixture'); resetFilters(); }}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold focus-visible:outline
                         focus-visible:outline-2 focus-visible:outline-blue-600 ${population === 'fixture'
                             ? 'border-blue-900 bg-[#061524] text-white'
@@ -43,7 +55,7 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
                     Current fictional sample
                 </button>
                 <button type="button" aria-pressed={population === 'probes'}
-                    onClick={() => { setPopulation('probes'); setSelected('all'); }}
+                    onClick={() => { setPopulation('probes'); resetFilters(); }}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold focus-visible:outline
                         focus-visible:outline-2 focus-visible:outline-blue-600 ${population === 'probes'
                             ? 'border-blue-900 bg-[#061524] text-white'
@@ -63,7 +75,8 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
                     <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{metric.value}</p>
                 </div>)}
             </div>
-            <div className="mt-5 max-w-xl">
+            <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                <div>
                 <label htmlFor="evidence-review-filter"
                     className="block text-sm font-semibold text-slate-800">
                     Filter by documentary review category
@@ -82,8 +95,52 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
                     {selectedCategory ? selectedCategory.guidance :
                         'Each row is listed once. Overlapping diagnostics remain visible.'}
                 </p>
+                </div>
+                <div>
+                    <label htmlFor="evidence-review-history"
+                        className="block text-sm font-semibold text-slate-800">
+                        Filter by original history assessment
+                    </label>
+                    <select id="evidence-review-history" value={history}
+                        onChange={event =>
+                            setHistory(event.target.value as ReviewHistory | 'all')}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3
+                            text-sm text-slate-900 focus-visible:outline focus-visible:outline-2
+                            focus-visible:outline-blue-600">
+                        <option value="all">Any history assessment</option>
+                        <option value="verified">Internally consistent</option>
+                        <option value="unrecorded">Unrecorded</option>
+                        <option value="invalid">Contradictory</option>
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="evidence-review-diagnostic"
+                        className="block text-sm font-semibold text-slate-800">
+                        Filter by independent diagnostic
+                    </label>
+                    <select id="evidence-review-diagnostic" value={diagnostic}
+                        onChange={event =>
+                            setDiagnostic(event.target.value as DiagnosticCode | 'all')}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3
+                            text-sm text-slate-900 focus-visible:outline focus-visible:outline-2
+                            focus-visible:outline-blue-600">
+                        <option value="all">Any diagnostic code</option>
+                        {facets.map(facet => <option key={facet.code} value={facet.code}>
+                            {facet.code} ({facet.rows} fictional row{facet.rows === 1 ? '' : 's'})
+                        </option>)}
+                    </select>
+                    <p className="mt-2 text-xs text-slate-600">
+                        Diagnostic totals overlap across axes. Never add them
+                        to estimate distinct records.
+                    </p>
+                </div>
             </div>
-            <div className="mt-4 w-full overflow-x-auto" role="region" tabIndex={0}
+            <p className="mt-3 text-sm font-semibold text-slate-700" role="status"
+                aria-live="polite">
+                {filtered.matched} of {filtered.assessed} fictional rows match
+                the combined filters. Original classifications are unchanged.
+            </p>
+            <div className="mt-4 w-full overflow-x-auto" role="region" tabIndex={0>
                 aria-label="Filtered fictional documentary evidence review rows">
                 <table className="w-full min-w-[580px] text-left text-sm">
                     <caption className="mb-2 text-left text-sm font-semibold text-slate-800">
@@ -114,6 +171,12 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
                         </tr>)}
                     </tbody>
                 </table>
+                {visibleRows.length === 0 && (
+                    <p className="p-3 text-sm text-slate-600" role="status">
+                        No fictional row matches all selected documentary checks.
+                        Change a filter to compare another intersection.
+                    </p>
+                )}
             </div>
             <p className="mt-4 text-xs leading-relaxed text-slate-600">{current.caveat}</p>
         </section>
