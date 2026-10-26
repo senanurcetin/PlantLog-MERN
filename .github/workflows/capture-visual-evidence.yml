@@ -17,13 +17,14 @@ permissions:
 jobs:
   capture:
     if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
         working-directory: frontend
     env:
       VITE_PUBLIC_DEMO_ONLY: "true"
+      PLANTLOG_BROWSER_CHANNEL: chrome
 
     steps:
       - name: Check out documentation branch
@@ -50,10 +51,10 @@ jobs:
       - name: Install temporary Playwright tooling
         run: npm install --no-save --no-package-lock playwright@1.56.1
 
-      - name: Install headless Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Verify runner-provided Chrome
+        run: google-chrome --version
 
-      - name: Capture and validate all eight NEXUS views
+      - name: Capture and validate eleven current NEXUS views
         run: node scripts/capture-doc-screenshots.cjs
 
       - name: Commit updated PNG files and machine-readable manifest
@@ -63,7 +64,9 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
+          # Replace the stale repository-root image gallery instead of
+          # retaining two competing historical screenshot collections.
+          git rm -f --ignore-unmatch -- \
             docs/nexus-demo-overview.png \
             docs/nexus-demo-assets.png \
             docs/nexus-demo-logs.png \
@@ -73,10 +76,11 @@ jobs:
             docs/nexus-scenario-lab-mobile.png \
             docs/nexus-demo-mobile.png \
             docs/screenshots-manifest.json
+          git add -A docs/screenshots
           if git diff --cached --quiet; then
             echo "No screenshot changes"
           else
-            git commit -m "docs(visual): capture current NEXUS eight-gate demo in Chromium"
+            git commit -m "docs(visual): refresh eleven synthetic NEXUS screenshots and SHA-256 manifest"
             git push origin "HEAD:$GITHUB_REF_NAME"
           fi
 
@@ -85,5 +89,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plantlog-visual-capture-failure
-          path: docs/nexus-demo-*.png
+          path: docs/screenshots/*.png
           if-no-files-found: ignore

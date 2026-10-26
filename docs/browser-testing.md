@@ -49,7 +49,7 @@ actual headless Google Chrome browser at 1440 × 900 and 390 × 844 viewport siz
 Tests confirmed that the production route returned HTTP 200, the official logo
 had non-zero natural image dimensions, navigation to Assets and Maintenance Log
 worked, and the browser emitted no JavaScript page errors. The resulting
-[current screenshots](nexus-demo-overview.png) are included in this repository.
+[current screenshots](screenshots/nexus-demo-overview.png) are included in this repository.
 These checks were run against the publicly hosted Vercel frontend and do not
 represent live industrial system testing.
 
@@ -70,8 +70,8 @@ history. This is a descriptive snapshot, not a real maintenance KPI.
 
 The updated build passed 13 demo/brand tests, 11 registry/session tests and
 the Vite/TypeScript build. Full-page screenshots were captured for
-[1440 px](nexus-demo-insights.png) and
-[390 px](nexus-demo-insights-mobile.png) viewports after verifying
+[1440 px](screenshots/nexus-demo-insights.png) and
+[390 px](screenshots/nexus-demo-insights-mobile.png) viewports after verifying
 `document.documentElement.scrollWidth === innerWidth` at both sizes.
 Screenshots were taken from the production-equivalent local guest-only build.
 
@@ -83,8 +83,8 @@ The browser test verified the temporary 13-entry analytics summary and
 the restored 12-entry baseline. No REST API calls are performed.
 
 Additional visual checks captured
-[desktop](nexus-scenario-lab-desktop.png) and
-[mobile](nexus-scenario-lab-mobile.png) at 1440/390 px respectively,
+[desktop](screenshots/nexus-scenario-lab-desktop.png) and
+[mobile](screenshots/nexus-scenario-lab-mobile.png) at 1440/390 px respectively,
 confirming the document width matched each viewport. These are fictional
 demonstration interactions, not persisted incident operations.
 
@@ -99,7 +99,7 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
-## Intentional failed-module browser recovery (development branch)
+## Intentional failed-module browser recovery (published guest demo)
 
 The Chrome guest smoke now opens a **fresh browser context** and deliberately
 aborts the `TemporalBoundaryLab` JavaScript request. It confirms that the
@@ -181,7 +181,7 @@ mobile sizes. The full suite now expects **18 scans**: five normal views
 plus four selected lab states at each viewport. This automated rule coverage
 does not constitute manual assistive-technology certification.
 
-## Laboratory interaction and accessibility regression (development branch)
+## Laboratory interaction and accessibility regression (published guest demo)
 
 The guest-only Playwright smoke suite now inspects the **three scientific
 panels** as real DOM interactions rather than trusting unit tests alone:
