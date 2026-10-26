@@ -162,7 +162,10 @@ async function run() {
     }
 }
 
-run().catch(() => {
-    process.stderr.write('Synthetic restore verification FAILED (details suppressed)\n');
+run().catch(err => {
+    // Report only the stage and generic code; raw DB errors may contain URIs.
+    process.stderr.write('Synthetic restore verification FAILED at phase=' +
+        phase + ' type=' + (err?.name || 'Unknown') +
+        ' code=' + (err?.code || 'unknown') + '\n');
     process.exitCode = 1;
 });
