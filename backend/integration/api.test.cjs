@@ -219,8 +219,10 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
         'MongoDB, not a racy HTTP preflight, must enforce serial identity');
     assert.equal(rawCollision.filter(result =>
         result.status === 'rejected' && result.reason.code === 11000).length, 1);
-    assert.equal(await Asset.countDocuments({
-        serialNumber: { $regex: '^RACE-' + suffix + '
+    assert.equal(await Asset.countDocuments({ serialNumber: 'race-' + suffix })
+        .collation({ locale: 'en', strength: 2 }), 1);
+    await Asset.deleteMany({ serialNumber: 'RACE-' + suffix })
+        .collation({ locale: 'en', strength: 2 });
 
     for (const injected of [
         { createdBy: registrationB.data._id },
