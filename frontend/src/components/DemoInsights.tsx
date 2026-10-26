@@ -1,15 +1,24 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 'lucide-react';
 import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
 import { assessLifecycleTraceability } from '../demo/traceability';
-import ControlledComparisons from './ControlledComparisons';
-import EligibilitySensitivityLab from './EligibilitySensitivityLab';
-import LifecycleFaultLab from './LifecycleFaultLab';
-import TemporalBoundaryLab from './TemporalBoundaryLab';
-import EvidenceMatrixLab from './EvidenceMatrixLab';
-import EvidenceReviewWorkbench from './EvidenceReviewWorkbench';
+
+
+
+
+
+
+
+// Keep all six fictional experiment modules out of the initial guest bundle.
+// Loading one module never authenticates, changes source data or starts an API call.
+const ControlledComparisons = lazy(() => import('./ControlledComparisons'));
+const EligibilitySensitivityLab = lazy(() => import('./EligibilitySensitivityLab'));
+const LifecycleFaultLab = lazy(() => import('./LifecycleFaultLab'));
+const TemporalBoundaryLab = lazy(() => import('./TemporalBoundaryLab'));
+const EvidenceMatrixLab = lazy(() => import('./EvidenceMatrixLab'));
+const EvidenceReviewWorkbench = lazy(() => import('./EvidenceReviewWorkbench'));
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -330,6 +339,11 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
             </section>
             <div id="selected-synthetic-laboratory" role="region"
                 aria-label="Selected synthetic evidence laboratory" aria-live="off">
+                <Suspense fallback={
+                    <p role="status" className="nexus-card p-5 text-sm text-slate-700">
+                        Loading selected fictional laboratory…
+                    </p>
+                }>
                 {selectedLaboratory === 'comparisons' &&
                     <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />}
                 {selectedLaboratory === 'sensitivity' &&
@@ -342,6 +356,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                     <EvidenceMatrixLab assets={assets} logs={logs} snapshot={snapshot} />}
                 {selectedLaboratory === 'review-workbench' &&
                     <EvidenceReviewWorkbench assets={assets} logs={logs} snapshot={snapshot} />}
+                </Suspense>
             </div>
         </div>
     );
