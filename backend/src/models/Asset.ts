@@ -40,7 +40,6 @@ const AssetSchema: Schema = new Schema(
         serialNumber: {
             type: String,
             required: [true, 'Please add a serial number'],
-            unique: true,
             trim: true,
         },
         category: {
