@@ -5,8 +5,11 @@
 The frontend and backend use npm lockfile v3. Both lockfiles must resolve
 packages **exclusively** from the canonical `https://registry.npmjs.org/`
 endpoint and declare SHA-512 tarball integrity metadata. The earlier
-third-party `registry.npmmirror.com` lockfile URLs were replaced without
-changing the locked versions or existing integrity digests. This reduces
+third-party `registry.npmmirror.com` lockfile URLs were initially replaced
+without changing their versions or integrity digests. Next, compatible
+security-patch versions were updated with npm's non-force audit remediation;
+all new tarballs still use the canonical registry with SHA-512 integrity.
+This reduces
 registry provenance ambiguity; the original downloaded tarballs have **not**
 been independently compared to upstream source code.
 
@@ -37,6 +40,21 @@ The report's `fullDependencyAudit` is **not** an assertion that
 development/build tooling is secure. Any findings should be triaged for their
 impact on CI, static build artifacts and transitive tooling. A green scan
 does not demonstrate absence of unreported vulnerabilities.
+
+## Observed PR validation (26 October 2026)
+
+After the compatible remediation, runtime **HIGH/CRITICAL counts are zero**
+in both projects. The npm audit report still identifies **one moderate**
+backend runtime advisory (`qs`), **two moderate** frontend runtime
+advisories (`react-router` and `react-router-dom`), and **one high**
+frontend full-tree/build-tool advisory. These results are time-sensitive;
+refer to the latest attached CI `supply-chain-report.json` rather than
+assuming the counts remain current.
+
+Any unresolved developer-tool warning is **not a safe-to-ignore verdict**:
+build-time code executes in CI, even if not shipped to guest browsers.
+Major-version framework/build changes need their own compatibility and
+real-Chromium validation instead of being silently forced into this PR.
 
 ## Non-claims and release gate
 
