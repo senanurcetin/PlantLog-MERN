@@ -22,6 +22,10 @@ does not mean the industrial application was released to production.**
 | Network exposure | Docker host port binding restricted to 127.0.0.1 and API loopback-by-default | Safe Internet exposure or hardened reverse proxy ingress |
 | Public NEXUS demo | Vercel static guest-mode UI and browser-tested synthetic datasets | A live production backend, industrial sensors or customer service |
 
+### Database identity controls in the engineering demo
+
+The MongoDB layer now enforces case-insensitive unique equipment serials using a named collated unique index. Local API startup checks that the index exists before accepting requests; existing conflicting fixtures refuse startup rather than being deleted. The User schema's email validation matches API registration, including longer modern domain suffixes. CI additionally tests concurrent MongoDB inserts and long-TLD registration against an isolated database. These are **database integrity checks**, not a production release approval. See [MongoDB integrity contract](mongodb-integrity-contract.md).
+
 ## Networking and runtime contract
 
 All three local Compose services publish only to loopback:
