@@ -118,8 +118,14 @@ test('public synthetic demo has no serious/critical automated accessibility viol
                     }).click();
                     await workbench.getByRole('combobox', {
                         name: 'Filter by documentary review category',
-                    }).selectOption('history-conflict');
-                    await scan('insights-review-filtered', viewport);
+                    }).selectOption('basic-data');
+                    await workbench.getByRole('combobox', {
+                        name: 'Filter by original history assessment',
+                    }).selectOption('invalid');
+                    await workbench.getByRole('combobox', {
+                        name: 'Filter by independent diagnostic',
+                    }).selectOption('INVALID_TRANSITION');
+                    await scan('insights-review-intersection', viewport);
                 }
             }
         }
