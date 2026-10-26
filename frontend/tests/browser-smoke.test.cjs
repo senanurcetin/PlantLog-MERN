@@ -41,6 +41,14 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
     page.on('request', (request) => {
         if (new URL(request.url()).pathname.startsWith('/api/')) apiCalls.push(request.url());
     });
+    const labSelector = page.getByRole('group', { name: 'Select synthetic evidence laboratory' });
+    const selectLab = async (title) => {
+        const button = labSelector.getByRole('button', { name: new RegExp('^' + title) });
+        await button.click();
+        assert.equal(await button.getAttribute('aria-pressed'), 'true');
+        assert.equal(await page.locator('#selected-synthetic-laboratory > section').count(), 1,
+            'Exactly one scientific laboratory may be mounted at a time');
+    };
 
     try {
         const response = await page.goto(base + '/demo', { waitUntil: 'networkidle' });
@@ -112,6 +120,14 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.getByText('4', { exact: true }).count() > 0, true);
         // Sensitivity analysis is in-memory and recomputes quality-filtered
         // workload separately from raw fictional activity, on mobile too.
+        assert.equal(await labSelector.getByRole('button').count(), 6);
+        assert.equal(await labSelector.getByRole('button', {
+            name: /^Controlled comparisons/,
+        }).getAttribute('aria-pressed'), 'true');
+        await selectLab('Eligibility sensitivity');
+        assert.equal(await page.getByRole('heading', {
+            name: 'Controlled fictional case comparisons',
+        }).count(), 0, 'Inactive comparison panel must not execute or render');
         const lab = page.locator('section[aria-labelledby="eligibility-lab-heading"]');
         assert.equal(await lab.getByRole('heading', {
             name: 'Scientific sensitivity lab: raw versus eligible records',
@@ -134,6 +150,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         // Recent evidence panels require real browser coverage as well as
         // isolated TypeScript checks: select deliberately malformed timelines,
         // confirm independent eligibility, and restore the original view.
+        await selectLab('History contradictions');
         const fault = page.locator('section[aria-labelledby="lifecycle-fault-heading"]');
         const faultSelect = fault.getByRole('combobox', { name: 'Fictional experiment' });
         assert.equal(await faultSelect.locator('option').count(), 11);
@@ -151,6 +168,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await faultSelect.selectOption('baseline');
         await fault.getByText('0 / 9', { exact: true }).waitFor();
 
+        await selectLab('UTC boundary cases');
         const chronology = page.locator('section[aria-labelledby="temporal-boundary-heading"]');
         const chronologySelect = chronology.getByRole('combobox', {
             name: 'Synthetic UTC edge case',
@@ -168,6 +186,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await chronology.getByText('verified', { exact: true }).waitFor();
         await chronologySelect.selectOption('ordinary');
 
+        await selectLab('Six-cell evidence matrix');
         const matrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
         const populations = {
             fixture: matrix.getByRole('button', { name: 'Current fictional records' }),
@@ -209,6 +228,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
             'Mobile panels should scroll internally without document overflow');
         // Document-review categories use the existing matrix diagnostics,
         // never an operational risk estimate or an approval action.
+        await selectLab('Document review workbench');
         const review = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
         const reviewFilter = review.getByRole('combobox', {
             name: 'Filter by documentary review category',
@@ -277,8 +297,16 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         // fictional fixture; no persisted fault experiment is replayed.
         await page.reload({ waitUntil: 'networkidle' });
         await page.getByRole('button', { name: 'Demo insights' }).click();
+        assert.equal(await labSelector.getByRole('button', {
+            name: /^Controlled comparisons/,
+        }).getAttribute('aria-pressed'), 'true',
+        'A page reload must restore the lightweight default laboratory');
+        assert.equal(await page.locator('#lifecycle-fault-case').count(), 0);
+        await selectLab('History contradictions');
         assert.equal(await page.locator('#lifecycle-fault-case').inputValue(), 'baseline');
+        await selectLab('UTC boundary cases');
         assert.equal(await page.locator('#temporal-boundary-case').inputValue(), 'ordinary');
+        await selectLab('Six-cell evidence matrix');
         assert.equal(await page.locator('section[aria-labelledby="evidence-matrix-heading"]')
             .getByRole('button', { name: 'Current fictional records' })
             .getAttribute('aria-pressed'), 'true');
@@ -303,12 +331,14 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await logTotal.getByText('13', { exact: true }).isVisible(), true);
         // The matrix follows the temporary in-memory simulation while the
         // six controlled example cells remain independent and unchanged.
+        await selectLab('Six-cell evidence matrix');
         const activeMatrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
         assert.equal(await activeMatrix.getByText('Rows assessed').locator('..')
             .getByText('13', { exact: true }).isVisible(), true);
         assert.deepEqual(await activeMatrix.getByRole('region', {
             name: 'Synthetic evidence by basic eligibility and lifecycle status',
         }).locator('tbody tr').first().locator('td').allTextContents(), ['4','9','0','13']);
+        await selectLab('Document review workbench');
         const activeReview = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
         await activeReview.getByText('Rows assessed').locator('..')
             .getByText('13', { exact: true }).waitFor();
@@ -319,9 +349,11 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await page.getByRole('button', { name: 'Demo insights' }).click();
         const originalTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
         assert.equal(await originalTotal.getByText('12', { exact: true }).isVisible(), true);
+        await selectLab('Six-cell evidence matrix');
         assert.equal(await page.locator('section[aria-labelledby="evidence-matrix-heading"]')
             .getByText('Rows assessed').locator('..').getByText('12', { exact: true })
             .isVisible(), true);
+        await selectLab('Document review workbench');
         const restoredReview = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
         await restoredReview.getByText('Rows assessed').locator('..')
             .getByText('12', { exact: true }).waitFor();
