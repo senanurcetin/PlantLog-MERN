@@ -42,13 +42,20 @@ The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not 
 **Lifecycle evidence verification:** the synthetic Demo Insights screen now
 includes 11 independently reconstructed status-history fault examples.
 An exhaustive, fixed-depth reference-model test inspects 19,531 fictional
-action prefixes, and the deterministic schema-v3 audit keeps these results
+action prefixes, and the deterministic audit (initially schema v3) kept these results
 separate from maintenance workload and real industrial reliability claims.
 See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
 
+**Dual-axis synthetic evidence:** the guest Demo Insights now has a
+six-cell eligibility-versus-history matrix, a row-position-only audit
+ledger and six controlled contradictions. Scientific evidence **schema v5**
+contains the reconciled counts and anonymized per-row classifications.
+Nothing changes real maintenance systems, public APIs or production gates.
+See [evidence matrix methodology](docs/lifecycle-traceability.md).
+
 **UTC chronology laboratory (development only):** an additional synthetic
 read-only Demo Insights panel presents 12 deterministic date/timestamp
-boundary cases. The scientific report schema v4 records expected versus
+boundary cases. The report first recorded expected versus
 observed classifications; no industrial data, live API or runtime is
 introduced. See [event chronology limitations](docs/lifecycle-traceability.md).
 
