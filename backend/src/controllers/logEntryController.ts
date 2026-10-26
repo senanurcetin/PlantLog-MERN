@@ -7,6 +7,7 @@ import { pickLogUpdate, sanitizeLogCreation } from '../utils/inputPolicy';
 import { canEditLog } from '../utils/authorization';
 import { statusTransition, LogStatus } from '../utils/logLifecycle';
 import { InvalidPayloadError } from '../utils/inputPolicy';
+import { parseExpectedRevision, revisionEtag } from '../utils/revisionPolicy';
 
 // @desc    Get all log entries (optionally filtered by asset inside query)
 // @route   GET /api/logs
@@ -76,6 +77,7 @@ export const createLogEntry = async (req: AuthRequest, res: Response, next: Next
         });
 
         res.locals.auditResourceId = logEntry._id.toString();
+        res.setHeader('ETag', revisionEtag(logEntry.__v));
         res.status(201).json(logEntry);
     } catch (error) {
         next(error);
@@ -102,6 +104,12 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
         if (!canEditLog(req.user?.role, log.author.toString(), req.user?.id)) {
             res.status(403);
             throw new Error('Not authorized to update this log entry');
+        }
+
+        const expectedVersion = parseExpectedRevision(req.headers['if-match']);
+        if (expectedVersion !== null && log.__v !== expectedVersion) {
+            res.status(412);
+            throw new Error('Maintenance record revision changed; reload before updating');
         }
 
         // Resolution closes the evidence record. Corrections require a new
@@ -144,6 +152,7 @@ export const updateLogEntry = async (req: AuthRequest, res: Response, next: Next
             throw new Error('Log was updated by another user; refresh and try again');
         }
 
+        res.setHeader('ETag', revisionEtag(updatedLog.__v));
         res.status(200).json(updatedLog);
     } catch (error) {
         next(error);
