@@ -54,6 +54,13 @@ noncanonical JSON and incompatible schemas without uploading records or
 starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
 The SHA-256 output is a checksum, **not an authenticated signature**.
 
+**Progressive experiment navigation:** the Demo Insights overview now
+keeps its workload and quality summaries always visible while mounting
+only the selected one of six fictional research laboratories. This
+reduces default interactive complexity without dropping data checks,
+and does not change the hosted `main` build. See the
+[guest demo protocol](docs/demo-guide.md).
+
 **Independent reviewer filters:** the workbench supports simultaneous
 documentary category, original history and diagnostic-code filtering,
 including defects that overlap across the separate quality and lifecycle
