@@ -226,7 +226,7 @@ both excluded and eligible rows. Therefore, do not add issue totals to
 estimate unique rows. The six controlled examples expose three
 `UNLINKED` rows, two `INVALID_TRANSITION` rows and two
 `MISSING_HISTORY` rows; these seven diagnostic occurrences refer to
-just six source rows, including one row with no diagnostic. The display
+five affected source rows, while the sixth has no diagnostic. The display
 does not reveal names, equipment IDs or real event data.
 
 The [filter regression tests](../frontend/tests/demo-review-filters.test.cjs)
