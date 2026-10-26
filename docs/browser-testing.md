@@ -99,6 +99,28 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
+## Laboratory code-splitting and request inspection
+
+The static production build emits six lazily imported experiment bundles,
+not merely six conditionally visible React panels. The build test checks
+all six file identities, verifies that initial HTML does not preload them,
+and enforces an initial-entry gzip ceiling in addition to the overall
+bundle budget.
+
+The Chrome smoke test records JavaScript requests in the guest demo.
+It checks that **no experiment module** is downloaded when the user opens
+the ordinary dashboard, that the first **Demo insights** selection loads
+only **ControlledComparisons**, and that subsequent laboratory choices
+load each of the other five modules exactly once. The test confirms
+the six selected views still work and observes no authenticated API calls.
+A loading message covers the module-fetch interval without pretending
+that a fixture verification or network-backed analysis occurred.
+
+This is a reproducible local build and network request test, not a
+production real-user performance measurement. Browser HTTP cache and Vite
+chunk hashes are implementation details; the tests identify the
+experiment names rather than relying on exact hashes.
+
 ## Single-panel scientific laboratory navigation
 
 The local Chromium smoke asserts that the selectable research group
