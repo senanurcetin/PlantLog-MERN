@@ -54,7 +54,11 @@ async function main() {
     let browser;
     try {
         await waitForServer();
-        browser = await chromium.launch({ headless: true });
+        browser = await chromium.launch({
+            headless: true,
+            ...(process.env.PLANTLOG_BROWSER_CHANNEL
+                ? { channel: process.env.PLANTLOG_BROWSER_CHANNEL } : {}),
+        });
         const manifest = {
             captureDateUTC: new Date().toISOString().slice(0, 10),
             sourceCommit: process.env.GITHUB_SHA || 'local-development',
