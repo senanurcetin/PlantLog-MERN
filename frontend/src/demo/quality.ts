@@ -1,5 +1,18 @@
 import type { DemoInsightAsset, DemoInsightLog } from './insights';
 
+export type QualityFindingCode =
+    | 'UNLINKED' | 'INVALID_DATE' | 'FUTURE_VS_SNAPSHOT'
+    | 'DUPLICATE_ASSETS' | 'DUPLICATE_LOGS' | 'MISSING_LOG_ID'
+    | 'UNKNOWN_TYPE' | 'UNKNOWN_STATUS';
+
+export interface QualityRowAssessment {
+    /** Index in the input array, not a database identifier. */
+    index: number;
+    eligible: boolean;
+    /** Per-row reasons; may not numerically match dataset-level duplicate counters. */
+    codes: QualityFindingCode[];
+}
+
 export interface QualityFinding {
     code: string;
     severity: 'error' | 'warning';
@@ -12,6 +25,8 @@ export interface QualityReport {
     eligibleRecords: number;
     /** Zero-based record indices retained by all quality gates; immutable audit view. */
     eligibleRecordIndices: number[];
+    /** Same input order; no names, identifiers, or timestamp values are emitted. */
+    rowAssessments: QualityRowAssessment[];
     outsideSnapshot: number;
     unlinkedRecords: number;
     invalidDates: number;
@@ -100,23 +115,32 @@ export const assessDemoDataQuality = (
         { code: 'UNKNOWN_STATUS', severity: 'error', count: unknownStatuses,
             meaning: 'Log lifecycle statuses outside the documented state model' },
     ];
-    // Collect excluded record indices, rather than summing overlapping findings.
-    const excluded = new Set<number>();
-    logs.forEach((entry, index) => {
-        if (!knownAssets.has(entry.assetId) ||
-            duplicateAssetIds.has(entry.assetId) ||
-            typeof entry.id !== 'string' || !entry.id.trim() ||
-            duplicateLogIdValues.has(entry.id) ||
-            !types.has(entry.type) || !statuses.has(entry.status) ||
-            !isCanonicalDemoTimestamp(entry.date) || Date.parse(entry.date) > end) {
-            excluded.add(index);
+    // Derive row membership and its reasons from one ordered diagnostic
+    // path. Duplicate-ID counters above count excess duplicates, whereas a
+    // duplicate-ID row finding marks ALL ambiguous rows for exclusion.
+    const rowAssessments: QualityRowAssessment[] = logs.map((entry, index) => {
+        const codes: QualityFindingCode[] = [];
+        if (!knownAssets.has(entry.assetId)) codes.push('UNLINKED');
+        if (!isCanonicalDemoTimestamp(entry.date)) codes.push('INVALID_DATE');
+        else if (Date.parse(entry.date) > end) codes.push('FUTURE_VS_SNAPSHOT');
+        if (duplicateAssetIds.has(entry.assetId)) codes.push('DUPLICATE_ASSETS');
+        if (typeof entry.id !== 'string' || !entry.id.trim()) {
+            codes.push('MISSING_LOG_ID');
+        } else if (duplicateLogIdValues.has(entry.id)) {
+            codes.push('DUPLICATE_LOGS');
         }
+        if (!types.has(entry.type)) codes.push('UNKNOWN_TYPE');
+        if (!statuses.has(entry.status)) codes.push('UNKNOWN_STATUS');
+        return { index, eligible: codes.length === 0, codes };
     });
+    const eligibleRecordIndices = rowAssessments
+        .filter(row => row.eligible).map(row => row.index);
 
     return {
         assessedRecords: logs.length, assessedAssets: assets.length,
-        eligibleRecords: logs.length - excluded.size,
-        eligibleRecordIndices: logs.flatMap((_, index) => excluded.has(index) ? [] : [index]),
+        eligibleRecords: eligibleRecordIndices.length,
+        eligibleRecordIndices,
+        rowAssessments,
         outsideSnapshot, unlinkedRecords, invalidDates, duplicateAssets,
         duplicateLogIds, missingLogIds, unknownTypes, unknownStatuses, findings,
         caveat: 'These synthetic-data checks are not operational reliability or external scientific validation. Entries with missing/repeated log identifiers, ambiguous equipment IDs, invalid UTC timestamps or unknown event types/states are excluded from quality eligibility; findings may overlap. Descriptive workload charts still show raw fixture counts.',
