@@ -135,6 +135,16 @@ for the small synthetic case universe. Claims of external validity require
 separate, legally shareable historical observations, domain expert review,
 and a different evaluation design.
 
+## Offline verification of the archived report
+
+The additional `npm run evidence:verify` command (from `frontend/`)
+checks an existing, saved schema-v5 report against a fresh local
+source-derived reconstruction. It does not regenerate, silently repair,
+publish or certify the inspected artifact. The
+[verification protocol](offline-evidence-verification.md)
+specifies canonical JSON, content mismatches, adversarial tests and the
+limitations of SHA-256 without a trusted signer or independent original.
+
 ## Visual evidence
 
 The [full-page Chromium screenshots](screenshots-manifest.json) include the
