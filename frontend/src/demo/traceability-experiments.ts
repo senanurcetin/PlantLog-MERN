@@ -91,12 +91,13 @@ export const buildLifecycleFaultExperiments = (
             result.verifiedHistory + result.missingHistory + result.invalidHistory !== 1) {
             throw new Error('Synthetic fault experiment failed category reconciliation');
         }
+        const classification: LifecycleFaultCase['classification'] = result.verifiedHistory
+            ? 'verified' : result.missingHistory ? 'unrecorded' : 'invalid';
         return {
             id: design.id,
             title: design.title,
             assumption: design.assumption,
-            classification: result.verifiedHistory ? 'verified'
-                : result.missingHistory ? 'unrecorded' : 'invalid',
+            classification,
             eligibleByIndependentQualityGates: quality.eligibleRecords,
             observedTransitions: result.observedHistoryEvents,
             issues: result.issues.filter(issue => issue.count > 0),
