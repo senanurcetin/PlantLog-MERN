@@ -52,47 +52,6 @@ jobs:
             test-artifacts/supply-chain/frontend-runtime.cdx.json
           if-no-files-found: warn
 
-  supply-chain-remediation-candidate:
-    # Temporary same-repository PR-only commit; REMOVE before merging.
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.head_ref == 'security/supply-chain-sbom-official-registry-20261026' &&
-      github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.head_ref }}
-          persist-credentials: true
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-      - name: Calculate non-force package-lock-only remediations
-        run: |
-          npm audit fix --package-lock-only --ignore-scripts --prefix backend || true
-          npm audit fix --package-lock-only --ignore-scripts --prefix frontend || true
-      - name: Assert lockfiles remain canonical and manifests unchanged
-        run: |
-          node --test scripts/verify-supply-chain.test.cjs
-          git diff --exit-code -- backend/package.json frontend/package.json
-      - name: Commit reviewed candidate locks to current feature branch only
-        env:
-          HEAD_BRANCH: ${{ github.head_ref }}
-        run: |
-          test "$HEAD_BRANCH" = "security/supply-chain-sbom-official-registry-20261026"
-          git add backend/package-lock.json frontend/package-lock.json
-          if git diff --cached --quiet; then
-            echo "No additional lock changes"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "fix(deps): apply reviewed semver-compatible npm audit lock updates"
-          git push origin "HEAD:refs/heads/$HEAD_BRANCH"
-
   frontend:
     runs-on: ubuntu-latest
     defaults:
