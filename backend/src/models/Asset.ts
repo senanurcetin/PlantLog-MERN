@@ -73,6 +73,15 @@ const AssetSchema: Schema = new Schema(
 );
 
 // Indexes to speed up text searches and filtering
+// Case-insensitive unique equipment identities are enforced by MongoDB,
+// including under concurrent creates/updates. A preflight findOne alone
+// cannot guarantee uniqueness across racing requests. Collation is explicit
+// so the uniqueness policy does not depend on a deployment's default locale.
+AssetSchema.index({ serialNumber: 1 }, {
+    unique: true,
+    name: 'serial_number_unique_casefold',
+    collation: { locale: 'en', strength: 2 },
+});
 AssetSchema.index({ name: 'text', serialNumber: 'text', location: 'text' });
 AssetSchema.index({ status: 1, category: 1 });
 
