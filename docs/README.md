@@ -36,6 +36,6 @@ This index describes the **published, synthetic NEXUS demo** and the separately 
 
 ## Repository policy
 
-[Contributing](../CONTRIBUTING.md) · [Security](../SECURITY.md) · [License](../LICENSE.md)
+[Contributing](../CONTRIBUTING.md) · [Security](../SECURITY.md) · [License](../LICENSE)
 
 **Documentation hygiene:** screenshots live only in `docs/screenshots/`, with a capture-specific SHA-256 manifest. Historical, superseded screenshot results are not kept as current release claims. CI test evidence remains attached to its corresponding GitHub Actions run rather than copied into the root README.
