@@ -61,12 +61,45 @@ The three category counts always reconcile to `assessedRecords`.
   [demo-traceability.test.cjs](../frontend/tests/demo-traceability.test.cjs).
 - `npm run test:demo` runs those tests alongside existing scientific checks.
 - The deterministic `scientific-evidence.json` artifact uses
-  `schemaVersion: 2` and adds `lifecycleTraceability`: category totals,
+  `schemaVersion: 3` and adds `lifecycleTraceability`: category totals,
   observed event count and all nine issue counters. It retains the fixture
   SHA-256, workload cohort and existing comparative experiments.
 - CI checks that the generated artifact is byte-identical between runs.
   GitHub Actions archives the sanitized JSON; source fixture contents,
   hypothetical personnel names and credentials are not uploaded as evidence.
+
+## Deterministic lifecycle model and fault-injection evidence
+
+A bounded reference-model check explores **all action-attempt prefixes of
+length 0–6** using five actions (`report`, `acknowledge`, `start`,
+`resolve`, `reset`): `1 + 5 + 25 + 125 + 625 + 3125 + 15625 =
+19,531` inspected prefixes. Its independent transition oracle checks
+expected state, rejection of invalid inputs, preservation of the active asset,
+reset semantics and immutability of the caller's state. Every active
+fictional state must also produce a timeline that passes the traceability
+checker and remain eligible under the separate eight data-quality rules.
+The bound is fixed: this is not mathematical proof of arbitrary-length traces
+or verification of the authenticated backend's transactional behavior.
+
+The [fault experiment module](../frontend/src/demo/traceability-experiments.ts)
+starts independently from the already documented fictitious log `L007`.
+Eleven cases cover its unchanged baseline, removed history, wrong array shape,
+incorrect opening, broken transition, impossible timestamp, backwards event,
+after-snapshot event, missing actor, final-state mismatch, and four overlapping
+contradictions in the **same** row. Together they trigger all nine history
+diagnostic codes. Experiments are clones and never rewrite the fixture; every
+case remains eligible under the *separate* base quality rules, showing why
+basic row validity cannot imply timeline evidence validity.
+
+The [interactive fault lab](../frontend/src/components/LifecycleFaultLab.tsx)
+lets a reviewer select these bounded experiments on the public **guest-only**
+Demo Insights page. A selection does not create a real incident or persist
+data. Regression checks live in
+[demo-exhaustive-lifecycle.test.cjs](../frontend/tests/demo-exhaustive-lifecycle.test.cjs)
+and run within `npm run test:demo`. The deterministic scientific report
+(schema v3) now includes `scenarioModelCheck` and
+`lifecycleFaultExperiments` as additional sections, alongside the unchanged
+cohort and original sensitivity experiments.
 
 ## Explicit non-claims
 
