@@ -8,6 +8,7 @@ import EligibilitySensitivityLab from './EligibilitySensitivityLab';
 import LifecycleFaultLab from './LifecycleFaultLab';
 import TemporalBoundaryLab from './TemporalBoundaryLab';
 import EvidenceMatrixLab from './EvidenceMatrixLab';
+import EvidenceReviewWorkbench from './EvidenceReviewWorkbench';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -272,6 +273,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
             <LifecycleFaultLab assets={assets} logs={logs} snapshot={snapshot} />
             <TemporalBoundaryLab assets={assets} />
             <EvidenceMatrixLab assets={assets} logs={logs} snapshot={snapshot} />
+            <EvidenceReviewWorkbench assets={assets} logs={logs} snapshot={snapshot} />
         </div>
     );
 };
