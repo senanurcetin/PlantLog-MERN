@@ -1,5 +1,7 @@
 # Current synthetic NEXUS screenshot gallery
 
+**Gallery generation is versioned and repeatable.**
+
 These screenshots are produced by `frontend/scripts/capture-doc-screenshots.cjs` in **headless Chromium** against an isolated local Vite preview built with `VITE_PUBLIC_DEMO_ONLY=true`. This is the *same guest-only build mode* used for the hosted site, but **not** a screenshot of the external Vercel URL. The canonical image provenance, source revision, UTC capture date, selected laboratory, viewport and PNG SHA-256 are in [manifest.json](manifest.json).
 
 The gallery contains only fictional equipment and maintenance records (8 fictional assets, 12 logs), with an optional in-memory SIM-001 example for the scenario views. No authentication token, customer data, database, plant access or API request is involved.
