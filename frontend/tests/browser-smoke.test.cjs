@@ -36,6 +36,8 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
     t.after(async () => { await browser.close(); });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     const apiCalls = [];
+    const pageErrors = [];
+    page.on('pageerror', error => { pageErrors.push(error.message); });
     page.on('request', (request) => {
         if (new URL(request.url()).pathname.startsWith('/api/')) apiCalls.push(request.url());
     });
@@ -207,6 +209,18 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
             document.documentElement.scrollWidth <= window.innerWidth), true,
             'Mobile panels should scroll internally without document overflow');
         assert.deepEqual(apiCalls, [], 'All three evidence labs must stay offline');
+        assert.deepEqual(pageErrors, [], 'Synthetic lab controls must not throw in the browser');
+
+        // A reload discards local-only select states and reopens the original
+        // fictional fixture; no persisted fault experiment is replayed.
+        await page.reload({ waitUntil: 'networkidle' });
+        await page.getByRole('button', { name: 'Demo insights' }).click();
+        assert.equal(await page.locator('#lifecycle-fault-case').inputValue(), 'baseline');
+        assert.equal(await page.locator('#temporal-boundary-case').inputValue(), 'ordinary');
+        assert.equal(await page.locator('section[aria-labelledby="evidence-matrix-heading"]')
+            .getByRole('button', { name: 'Current fictional records' })
+            .getAttribute('aria-pressed'), 'true');
+        assert.equal(await page.getByText('12 / 12 eligible rows').isVisible(), true);
 
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
@@ -259,6 +273,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
             assert.equal(await page.getByRole('alert').getByText('Passwords do not match.').isVisible(), true);
         }
         assert.deepEqual(apiCalls, [], 'Static browser walk-through must not send API requests');
+        assert.deepEqual(pageErrors, [], 'Browser navigation must not emit JavaScript exceptions');
     } catch (error) {
         mkdirSync(path.join(frontendRoot, 'test-artifacts'), { recursive: true });
         await page.screenshot({
