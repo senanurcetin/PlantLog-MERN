@@ -147,7 +147,7 @@ limitations of SHA-256 without a trusted signer or independent original.
 
 ## Visual evidence
 
-The [full-page Chromium screenshots](screenshots-manifest.json) include the
+The [full-page Chromium screenshots](screenshots/manifest.json) include the
 interactive sensitivity section at its **Baseline** selection. The capture
 routine also exercises the **Overlapping defects** selection before resetting
 the page to the baseline for a deterministic, reviewable screenshot. The
