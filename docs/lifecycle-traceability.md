@@ -181,6 +181,34 @@ also covers selected diagnostic states at desktop and mobile sizes.
 These checks are bounded UI regressions, not a proof of industrial
 maintenance event authenticity or complete accessibility conformance.
 
+## Anonymous synthetic evidence review queue
+
+The [review-queue model](../frontend/src/demo/review-queue.ts) turns the
+existing six-cell matrix into an **exclusive documentary-review worklist**:
+basic data contradictions, contradictory stored transitions, unrecorded
+history, or internally consistent recorded history. This is a document
+checking order, **not** an industrial urgency or safety-risk ranking.
+
+The [interactive workbench](../frontend/src/components/EvidenceReviewWorkbench.tsx)
+shows category counts, row positions and original diagnostic codes. It
+supports both the fixed fictional sample and six controlled matrix cases,
+plus keyboard-accessible filtering. An excluded record retains any independent
+history contradictions; it is counted **only once** in its review category.
+The workbench never changes underlying statuses, approves work, creates a
+ticket or upgrades uncertain history to verified.
+
+The baseline contains **9 rows needing source review** because their status
+history was not recorded, and **3 internally consistent recorded histories**.
+The six synthetic cross-axis probes yield **3 basic-data**, **1 conflicting
+history**, **1 unrecorded history** and **1 internally consistent** case.
+The counts follow a temporary simulated case and revert when it is reset.
+
+The [review queue regression](../frontend/tests/demo-review-queue.test.cjs)
+tests conservation of records, overlapping faults, row reordering,
+missing input, adversarial category inconsistencies and temporary in-memory
+simulation. This queue is **derived from existing schema-v5 evidence**;
+the serialized report format and offline verifier remain unchanged.
+
 ## Explicit non-claims
 
 Internal consistency does **not** independently prove that any transition
