@@ -92,12 +92,13 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
     assert.equal(ready.headers.get('cache-control'), 'no-store');
 
 
-    const api = async (method, path, token, body) => {
+    const api = async (method, path, token, body, extraHeaders = {}) => {
         const result = await fetch(base + path, {
             method,
             headers: {
                 ...(token ? { Authorization: 'Bearer ' + token } : {}),
                 ...(body ? { 'Content-Type': 'application/json' } : {}),
+                ...extraHeaders,
             },
             ...(body ? { body: JSON.stringify(body) } : {}),
         });
@@ -559,5 +560,67 @@ test('authenticated registry lifecycle with MongoDB', { timeout: 60000 }, async 
         expiresIn: '1h', issuer: 'plantlog-local-demo', audience: 'another-api',
     });
     assert.equal((await api('GET', '/assets', wrongAudience)).status, 401);
+
+
+    // An independent synthetic fixture tests conditional writes without
+    // changing the incident counts/assertions used earlier in this suite.
+    const revisionAsset = await api('POST', '/assets', relogin.data.token, {
+        name: 'Synthetic revision comparison', serialNumber: 'CAS-' + suffix,
+        category: 'equipment', location: 'Test-only bay',
+    });
+    assert.equal(revisionAsset.status, 201, JSON.stringify(revisionAsset.data));
+    const revisionAssetId = revisionAsset.data._id;
+    const revGet = await fetch(base + '/assets/' + revisionAssetId, {
+        headers: { Authorization: 'Bearer ' + reviewer },
+    });
+    assert.equal(revGet.headers.get('etag'), '"0"');
+    const firstVersion = await api('PUT', '/assets/' + revisionAssetId, reviewer,
+        { status: 'maintenance' }, { 'If-Match': '"0"' });
+    assert.equal(firstVersion.status, 200, JSON.stringify(firstVersion.data));
+    assert.equal(firstVersion.data.__v, 1);
+    const staleVersion = await api('PUT', '/assets/' + revisionAssetId, reviewer,
+        { status: 'operational' }, { 'If-Match': '"0"' });
+    assert.equal(staleVersion.status, 412);
+    const invalidRevision = await api('PUT', '/assets/' + revisionAssetId, reviewer,
+        { location: 'Poisoned' }, { 'If-Match': 'W/"1"' });
+    assert.equal(invalidRevision.status, 400);
+    const currentVersion = await api('PUT', '/assets/' + revisionAssetId, reviewer,
+        { status: 'operational' }, { 'If-Match': '"1"' });
+    assert.equal(currentVersion.status, 200);
+    assert.equal(currentVersion.data.__v, 2);
+    assert.equal(currentVersion.data.statusHistory.length, 3);
+    const revisionLog = await api('POST', '/logs', relogin.data.token, {
+        assetId: revisionAssetId, type: 'incident', title: 'Synthetic CAS comparison',
+        description: 'No physical event, only an ephemeral concurrency test',
+    });
+    assert.equal(revisionLog.status, 201, JSON.stringify(revisionLog.data));
+    const revisionLogId = revisionLog.data._id;
+    assert.equal(revisionLog.data.__v, 0);
+    const acknowledgedCas = await api('PUT', '/logs/' + revisionLogId, relogin.data.token,
+        { status: 'acknowledged' }, { 'If-Match': '"0"' });
+    assert.equal(acknowledgedCas.status, 200, JSON.stringify(acknowledgedCas.data));
+    assert.equal(acknowledgedCas.data.__v, 1);
+    assert.equal((await api('PUT', '/logs/' + revisionLogId, relogin.data.token,
+        { status: 'resolved' }, { 'If-Match': '"0"' })).status, 412);
+
+    // Both requests are based on exactly the same verified revision.
+    // At most one mutation may win; whether the loser sees 409 (DB CAS)
+    // or 412 (HTTP precondition) depends on scheduling.
+    const rivals = await Promise.all([
+        api('PUT', '/logs/' + revisionLogId, relogin.data.token,
+            { status: 'in_progress' }, { 'If-Match': '"1"' }),
+        api('PUT', '/logs/' + revisionLogId, relogin.data.token,
+            { status: 'resolved' }, { 'If-Match': '"1"' }),
+    ]);
+    assert.equal(rivals.filter(x => x.status === 200).length, 1,
+        JSON.stringify(rivals.map(x => x.status)));
+    assert.ok(rivals.every(x => [200, 409, 412].includes(x.status)));
+    const afterRace = await api('GET', '/logs?assetId=' + revisionAssetId, reviewer);
+    assert.equal(afterRace.status, 200);
+    const persisted = afterRace.data.find(x => x._id === revisionLogId);
+    assert.equal(persisted.__v, 2, 'Only one revision can be committed');
+    assert.equal(persisted.statusHistory.length, 3,
+        'A rejected contender must not append an extra lifecycle event');
+    assert.ok(['in_progress', 'resolved'].includes(persisted.status));
 
 });
