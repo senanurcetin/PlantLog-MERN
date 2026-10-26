@@ -207,6 +207,43 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.evaluate(() =>
             document.documentElement.scrollWidth <= window.innerWidth), true,
             'Mobile panels should scroll internally without document overflow');
+        // Document-review categories use the existing matrix diagnostics,
+        // never an operational risk estimate or an approval action.
+        const review = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
+        const reviewFilter = review.getByRole('combobox', {
+            name: 'Filter by documentary review category',
+        });
+        const reviewRows = review.getByRole('region', {
+            name: 'Filtered fictional documentary evidence review rows',
+        }).locator('tbody tr');
+        await review.getByRole('heading', { name: 'Synthetic evidence review workbench' }).waitFor();
+        assert.equal(await reviewFilter.locator('option').count(), 5);
+        assert.equal(await reviewRows.count(), 12);
+        await reviewFilter.selectOption('history-unrecorded');
+        assert.equal(await reviewRows.count(), 9);
+        await reviewFilter.selectOption('recorded-consistent');
+        assert.equal(await reviewRows.count(), 3);
+        await review.getByRole('button', { name: 'Six controlled cases' }).click();
+        assert.equal(await reviewFilter.inputValue(), 'all');
+        assert.equal(await reviewRows.count(), 6);
+        await reviewFilter.selectOption('basic-data');
+        assert.equal(await reviewRows.count(), 3);
+        await reviewFilter.selectOption('history-conflict');
+        assert.equal(await reviewRows.count(), 1);
+        await reviewRows.first().getByText('INVALID_TRANSITION', { exact: true }).waitFor();
+        await review.getByRole('button', { name: 'Current fictional sample' }).click();
+        assert.equal(await reviewRows.count(), 12);
+        assert.equal(await reviewFilter.inputValue(), 'all');
+        await review.getByRole('region', {
+            name: 'Filtered fictional documentary evidence review rows',
+        }).focus();
+        assert.equal(await review.getByRole('region', {
+            name: 'Filtered fictional documentary evidence review rows',
+        }).evaluate(element => element === document.activeElement), true);
+        assert.equal(await page.evaluate(() =>
+            document.documentElement.scrollWidth <= window.innerWidth), true);
+        assert.deepEqual(apiCalls, [], 'Document review is browser-only');
+
         assert.deepEqual(apiCalls, [], 'All three evidence labs must stay offline');
         assert.deepEqual(pageErrors, [], 'Synthetic lab controls must not throw in the browser');
 
@@ -246,6 +283,11 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.deepEqual(await activeMatrix.getByRole('region', {
             name: 'Synthetic evidence by basic eligibility and lifecycle status',
         }).locator('tbody tr').first().locator('td').allTextContents(), ['4','9','0','13']);
+        const activeReview = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
+        await activeReview.getByText('Rows assessed').locator('..')
+            .getByText('13', { exact: true }).waitFor();
+        await activeReview.getByText('Internally consistent only').locator('..')
+            .getByText('4', { exact: true }).waitFor();
         await page.getByRole('button', { name: 'Scenario lab' }).click();
         await page.getByRole('button', { name: 'Reset simulation' }).click();
         await page.getByRole('button', { name: 'Demo insights' }).click();
@@ -254,6 +296,9 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await page.locator('section[aria-labelledby="evidence-matrix-heading"]')
             .getByText('Rows assessed').locator('..').getByText('12', { exact: true })
             .isVisible(), true);
+        const restoredReview = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
+        await restoredReview.getByText('Rows assessed').locator('..')
+            .getByText('12', { exact: true }).waitFor();
         assert.deepEqual(apiCalls, [], 'Scenario interactions must never call the API');
 
         // Standalone public builds intentionally redirect registration to
