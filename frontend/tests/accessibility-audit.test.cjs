@@ -97,21 +97,33 @@ test('public synthetic demo has no serious/critical automated accessibility viol
                     // Automated accessibility must cover changed states as
                     // well as the defaults: fault diagnostics, date boundaries,
                     // and the six-cell controlled matrix.
+                    const laboratoryGroup = page.getByRole('group', {
+                        name: 'Select synthetic evidence laboratory',
+                    });
+                    const activate = async title => {
+                        await laboratoryGroup.getByRole('button', {
+                            name: new RegExp('^' + title),
+                        }).click();
+                    };
+                    await activate('History contradictions');
                     const fault = page.locator('section[aria-labelledby="lifecycle-fault-heading"]');
                     await fault.getByRole('combobox', {
                         name: 'Fictional experiment',
                     }).selectOption('overlap');
                     await scan('insights-history-fault', viewport);
+                    await activate('UTC boundary cases');
                     const temporal = page.locator('section[aria-labelledby="temporal-boundary-heading"]');
                     await temporal.getByRole('combobox', {
                         name: 'Synthetic UTC edge case',
                     }).selectOption('non-leap-day');
                     await scan('insights-utc-boundary', viewport);
+                    await activate('Six-cell evidence matrix');
                     const matrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
                     await matrix.getByRole('button', {
                         name: 'Six controlled contradictions',
                     }).click();
                     await scan('insights-six-cell-matrix', viewport);
+                    await activate('Document review workbench');
                     const workbench = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
                     await workbench.getByRole('button', {
                         name: 'Six controlled cases',
