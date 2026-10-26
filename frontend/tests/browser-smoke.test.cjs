@@ -213,12 +213,26 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         const reviewFilter = review.getByRole('combobox', {
             name: 'Filter by documentary review category',
         });
+        const historyFilter = review.getByRole('combobox', {
+            name: 'Filter by original history assessment',
+        });
+        const diagnosticFilter = review.getByRole('combobox', {
+            name: 'Filter by independent diagnostic',
+        });
         const reviewRows = review.getByRole('region', {
             name: 'Filtered fictional documentary evidence review rows',
         }).locator('tbody tr');
         await review.getByRole('heading', { name: 'Synthetic evidence review workbench' }).waitFor();
         assert.equal(await reviewFilter.locator('option').count(), 5);
         assert.equal(await reviewRows.count(), 12);
+        assert.equal(await diagnosticFilter.locator('option').count(), 2);
+        await diagnosticFilter.selectOption('MISSING_HISTORY');
+        assert.equal(await reviewRows.count(), 9);
+        await historyFilter.selectOption('verified');
+        assert.equal(await reviewRows.count(), 0);
+        await review.getByText(/No fictional row matches all selected documentary checks/).waitFor();
+        await historyFilter.selectOption('all');
+        await diagnosticFilter.selectOption('all');
         await reviewFilter.selectOption('history-unrecorded');
         assert.equal(await reviewRows.count(), 9);
         await reviewFilter.selectOption('recorded-consistent');
@@ -228,12 +242,24 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await reviewRows.count(), 6);
         await reviewFilter.selectOption('basic-data');
         assert.equal(await reviewRows.count(), 3);
+        assert.equal(await diagnosticFilter.locator('option').count(), 4);
+        await historyFilter.selectOption('invalid');
+        assert.equal(await reviewRows.count(), 1);
+        await diagnosticFilter.selectOption('INVALID_TRANSITION');
+        assert.equal(await reviewRows.count(), 1);
+        await reviewRows.first().getByText('Row 6', { exact: true }).waitFor();
+        await diagnosticFilter.selectOption('MISSING_HISTORY');
+        assert.equal(await reviewRows.count(), 0);
+        await historyFilter.selectOption('all');
+        await diagnosticFilter.selectOption('all');
         await reviewFilter.selectOption('history-conflict');
         assert.equal(await reviewRows.count(), 1);
         await reviewRows.first().getByText('INVALID_TRANSITION', { exact: true }).waitFor();
         await review.getByRole('button', { name: 'Current fictional sample' }).click();
         assert.equal(await reviewRows.count(), 12);
         assert.equal(await reviewFilter.inputValue(), 'all');
+        assert.equal(await historyFilter.inputValue(), 'all');
+        assert.equal(await diagnosticFilter.inputValue(), 'all');
         await review.getByRole('region', {
             name: 'Filtered fictional documentary evidence review rows',
         }).focus();
