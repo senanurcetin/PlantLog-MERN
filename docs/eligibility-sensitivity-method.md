@@ -95,11 +95,17 @@ of the eight log-eligibility gates. See the
 [lifecycle traceability protocol](lifecycle-traceability.md) for
 the 3 / 9 / 0 documented / missing / invalid reference split.
 
-The deterministic evidence format is **schema version 3**. In addition to
+The deterministic evidence format is **schema version 4**. In addition to
 base eligibility and status-history traceability, the artifact records
 19,531 exhaustive fictional action-attempt prefixes and 11 independent
 status-history fault cases. These are bounded software-consistency checks,
 not time-to-repair estimates, field validation or external scientific evidence.
+Twelve fixed UTC boundary experiments now retain explicit expected versus
+observed timeline and base-eligibility classifications without changing the
+source fixture. Failed expectations remain recorded as discrepancies rather
+than silently passing; the [chronology protocol](lifecycle-traceability.md)
+documents the finite scope.
+
 For the complete scope, see [lifecycle traceability](lifecycle-traceability.md).
 
 The ordinary `npm run test:demo` run asserts the baseline arithmetic and
