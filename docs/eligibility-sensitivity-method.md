@@ -95,7 +95,7 @@ of the eight log-eligibility gates. See the
 [lifecycle traceability protocol](lifecycle-traceability.md) for
 the 3 / 9 / 0 documented / missing / invalid reference split.
 
-The deterministic evidence format is **schema version 4**. In addition to
+The deterministic evidence format is **schema version 5**. In addition to
 base eligibility and status-history traceability, the artifact records
 19,531 exhaustive fictional action-attempt prefixes and 11 independent
 status-history fault cases. These are bounded software-consistency checks,
@@ -105,6 +105,13 @@ observed timeline and base-eligibility classifications without changing the
 source fixture. Failed expectations remain recorded as discrepancies rather
 than silently passing; the [chronology protocol](lifecycle-traceability.md)
 documents the finite scope.
+
+A new `evidenceIntersection` section partitions every row by basic
+eligibility (eligible/excluded) and timeline history classification
+(internally consistent/unrecorded/invalid). It also records a six-row
+controlled experiment covering all six possible cells. Per-row diagnostics
+reference **positions only**, not names or IDs; duplicate identifiers may
+exclude more rows than the number of extra copies counted by a basic gate.
 
 For the complete scope, see [lifecycle traceability](lifecycle-traceability.md).
 
