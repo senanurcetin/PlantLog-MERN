@@ -36,16 +36,27 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
     t.after(async () => { await browser.close(); });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     const apiCalls = [];
+    const experimentChunks = [];
+    const chunkLabels = ['ControlledComparisons', 'EligibilitySensitivityLab',
+        'LifecycleFaultLab', 'TemporalBoundaryLab', 'EvidenceMatrixLab',
+        'EvidenceReviewWorkbench'];
+    const loadedExperiments = () => [...new Set(experimentChunks)];
     const pageErrors = [];
     page.on('pageerror', error => { pageErrors.push(error.message); });
     page.on('request', (request) => {
-        if (new URL(request.url()).pathname.startsWith('/api/')) apiCalls.push(request.url());
+        const url = new URL(request.url());
+        if (url.pathname.startsWith('/api/')) apiCalls.push(request.url());
+        for (const label of chunkLabels) {
+            if (url.pathname.startsWith('/assets/' + label + '-') &&
+                url.pathname.endsWith('.js')) experimentChunks.push(label);
+        }
     });
     const labSelector = page.getByRole('group', { name: 'Select synthetic evidence laboratory' });
     const selectLab = async (title) => {
         const button = labSelector.getByRole('button', { name: new RegExp('^' + title) });
         await button.click();
         assert.equal(await button.getAttribute('aria-pressed'), 'true');
+        await page.locator('#selected-synthetic-laboratory > section').waitFor();
         assert.equal(await page.locator('#selected-synthetic-laboratory > section').count(), 1,
             'Exactly one scientific laboratory may be mounted at a time');
     };
@@ -53,6 +64,8 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
     try {
         const response = await page.goto(base + '/demo', { waitUntil: 'networkidle' });
         assert.equal(response.status(), 200);
+        assert.deepEqual(loadedExperiments(), [],
+            'Overview should not download any of six on-demand experiment bundles');
         assert.equal(await page.getByRole('heading', { name: 'Know what needs attention.' }).isVisible(), true);
         assert.equal(await page.getByText('READ-ONLY PUBLIC DEMONSTRATION').isVisible(), true);
         // Keyboard users can skip the brand/header/nav before entering content.
@@ -90,6 +103,9 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         // Demo insights must use the same static data and drill into the
         // existing read-only log filter, including on compact viewports.
         await page.getByRole('button', { name: 'Demo insights' }).click();
+        await page.getByRole('heading', { name: 'Controlled fictional case comparisons' }).waitFor();
+        assert.deepEqual(loadedExperiments(), ['ControlledComparisons'],
+            'First Insights visit must download only the default comparison experiment');
         assert.equal(await page.getByRole('heading', { name: 'Recorded activity at a glance' }).isVisible(), true);
         assert.equal(await page.getByRole('heading', { name: 'Equipment with unresolved cases' }).isVisible(), true);
         const openCountCard = page.getByRole('heading', { name: 'Open maintenance cases' }).locator('..');
@@ -99,8 +115,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await page.setViewportSize({width: 390, height: 844});
         await page.getByRole('button', { name: 'Demo insights' }).click();
         assert.equal(await page.getByRole('heading', { name: 'Recorded intake by UTC date' }).isVisible(), true);
-        assert.equal(await page.getByRole('heading', { name: 'Controlled fictional case comparisons' })
-            .isVisible(), true);
+        await page.getByRole('heading', { name: 'Controlled fictional case comparisons' }).waitFor();
         const comparative = page.getByRole('region', {
             name: 'Controlled example comparison table, scroll horizontally',
         });
@@ -288,6 +303,12 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         }).evaluate(element => element === document.activeElement), true);
         assert.equal(await page.evaluate(() =>
             document.documentElement.scrollWidth <= window.innerWidth), true);
+        assert.deepEqual(new Set(loadedExperiments()), new Set(chunkLabels),
+            'Every experiment should download at most once, only after its selection');
+        for (const label of chunkLabels) {
+            assert.equal(experimentChunks.filter(item => item === label).length, 1,
+                label + ' should not be downloaded twice');
+        }
         assert.deepEqual(apiCalls, [], 'Document review is browser-only');
 
         assert.deepEqual(apiCalls, [], 'All three evidence labs must stay offline');
