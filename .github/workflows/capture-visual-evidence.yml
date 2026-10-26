@@ -17,13 +17,14 @@ permissions:
 jobs:
   capture:
     if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
         working-directory: frontend
     env:
       VITE_PUBLIC_DEMO_ONLY: "true"
+      PLANTLOG_BROWSER_CHANNEL: chrome
 
     steps:
       - name: Check out documentation branch
@@ -50,8 +51,8 @@ jobs:
       - name: Install temporary Playwright tooling
         run: npm install --no-save --no-package-lock playwright@1.56.1
 
-      - name: Install headless Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Verify runner-provided Chrome
+        run: google-chrome --version
 
       - name: Capture and validate eleven current NEXUS views
         run: node scripts/capture-doc-screenshots.cjs
