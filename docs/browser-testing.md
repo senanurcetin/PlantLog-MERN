@@ -99,6 +99,16 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
+## Reviewer cross-filter browser regression
+
+Playwright now checks the combined documentary category, history and
+diagnostic dropdowns on the 390 px guest-only demo. It verifies overlapping
+`INVALID_TRANSITION` on a basic-data-excluded case, a valid empty-result
+intersection, population-switch resets and no document-level horizontal
+overflow or API calls. The existing **18 automated axe scans** include
+one fully intersected review state at both desktop and mobile sizes.
+The tests do not certify screen-reader operation or production plant data.
+
 ## Documentary-review workbench browser checks
 
 The local Chromium smoke additionally exercises the new read-only reviewer
