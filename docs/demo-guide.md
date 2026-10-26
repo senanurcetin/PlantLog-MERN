@@ -200,6 +200,18 @@ basic eligibility rules. A separate exhaustive model check enumerates
 in-memory timeline invariants; it does not exercise the production system.
 See [model and fault-injection methodology](lifecycle-traceability.md).
 
+## Synthetic evidence review workbench
+
+The new reviewer workbench organizes the same fictional evidence matrix into
+four **exclusive document-check categories**: base data inconsistencies,
+contradictory histories, unrecorded histories and internally consistent
+histories. The initial sample has nine unrecorded and three internally
+consistent histories; six controlled cases exercise every matrix intersection.
+A filter exposes anonymous row positions and overlapping issue codes without
+creating records, storing review decisions or attributing actual maintenance
+work. Filtering is local and has **no API access**. This is not a safety or
+dispatch priority queue. See the [review protocol](lifecycle-traceability.md).
+
 ## Cross-axis evidence and eligibility explorer
 
 The Demo Insights screen additionally exposes a **2 × 3 synthetic evidence
