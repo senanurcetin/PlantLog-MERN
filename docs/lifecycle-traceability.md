@@ -160,6 +160,15 @@ certification or a probability of failure. Regression tests reside in
 [demo-evidence-matrix.test.cjs](../frontend/tests/demo-evidence-matrix.test.cjs).
 This development remains isolated from production release gates.
 
+## Offline evidence artifact checks
+
+The [read-only offline verifier](offline-evidence-verification.md) checks
+the canonical, schema-v5 scientific artifact against an independent
+reconstruction from the checked-out synthetic source and fixture.
+Mismatches and truncation are rejected rather than repaired.
+Its SHA-256 digest only labels the reproducible local bytes; it cannot
+prove the historical authenticity of an industrial maintenance event.
+
 ## Explicit non-claims
 
 Internal consistency does **not** independently prove that any transition
