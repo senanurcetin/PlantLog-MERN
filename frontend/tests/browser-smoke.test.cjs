@@ -406,7 +406,6 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         const failureContext = await browser.newContext({
             viewport: { width: 390, height: 844 },
         });
-        t.after(async () => { await failureContext.close(); });
         const broken = await failureContext.newPage();
         let blockedChunks = 0;
         const failedApi = [];
@@ -469,6 +468,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.deepEqual(failedApi, [], 'Failed module and recovery must remain guest-only');
         assert.equal(await broken.evaluate(() =>
             document.documentElement.scrollWidth <= window.innerWidth), true);
+        await failureContext.close();
     } catch (error) {
         mkdirSync(path.join(frontendRoot, 'test-artifacts'), { recursive: true });
         await page.screenshot({
