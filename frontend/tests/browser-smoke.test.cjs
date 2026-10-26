@@ -159,13 +159,13 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         await chronologySelect.selectOption('post-snapshot-transition');
         await chronology.getByText('AFTER_SNAPSHOT', { exact: true }).waitFor();
         assert.equal(await chronology.getByText('Eligible', { exact: true }).isVisible(), true);
-        assert.equal(await chronology.getByText('Invalid', { exact: true }).isVisible(), true);
+        assert.equal(await chronology.getByText('invalid', { exact: true }).isVisible(), true);
         assert.equal(await chronology.getByText('Expected behavior', { exact: true }).isVisible(), true);
         await chronologySelect.selectOption('non-leap-day');
         assert.equal(await chronology.getByText('Excluded', { exact: true }).isVisible(), true);
         await chronology.getByText('INVALID_EVENT_TIMESTAMP', { exact: true }).waitFor();
         await chronologySelect.selectOption('leap-day');
-        await chronology.getByText('Verified', { exact: true }).waitFor();
+        await chronology.getByText('verified', { exact: true }).waitFor();
         await chronologySelect.selectOption('ordinary');
 
         const matrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
