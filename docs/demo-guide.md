@@ -200,6 +200,16 @@ basic eligibility rules. A separate exhaustive model check enumerates
 in-memory timeline invariants; it does not exercise the production system.
 See [model and fault-injection methodology](lifecycle-traceability.md).
 
+## Combined review facets
+
+The workbench now also filters **simultaneously** by its exclusive
+documentary review group, original history classification, and observed
+diagnostic code. This distinguishes a basic-data exclusion from a timeline
+contradiction even if both occur in one fictional row. Issue counts overlap,
+so the number of filtered rows is computed from unique positions, not from
+adding diagnostic frequencies. Filters are local, reset upon changing the
+example population, and do not save an investigation outcome.
+
 ## Synthetic evidence review workbench
 
 The new reviewer workbench organizes the same fictional evidence matrix into
