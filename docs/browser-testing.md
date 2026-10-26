@@ -99,7 +99,7 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
-## Intentional failed-module browser recovery (development branch)
+## Intentional failed-module browser recovery (published guest demo)
 
 The Chrome guest smoke now opens a **fresh browser context** and deliberately
 aborts the `TemporalBoundaryLab` JavaScript request. It confirms that the
@@ -181,7 +181,7 @@ mobile sizes. The full suite now expects **18 scans**: five normal views
 plus four selected lab states at each viewport. This automated rule coverage
 does not constitute manual assistive-technology certification.
 
-## Laboratory interaction and accessibility regression (development branch)
+## Laboratory interaction and accessibility regression (published guest demo)
 
 The guest-only Playwright smoke suite now inspects the **three scientific
 panels** as real DOM interactions rather than trusting unit tests alone:
