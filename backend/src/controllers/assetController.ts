@@ -60,7 +60,8 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('User not authenticated');
         }
 
-        const assetExists = await Asset.findOne({ serialNumber });
+        const assetExists = await Asset.findOne({ serialNumber })
+            .collation({ locale: 'en', strength: 2 });
         if (assetExists) {
             res.status(400);
             throw new Error('Asset with this serial number already exists');
