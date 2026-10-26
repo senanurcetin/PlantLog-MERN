@@ -46,6 +46,14 @@ action prefixes, and the deterministic audit (initially schema v3) kept these re
 separate from maintenance workload and real industrial reliability claims.
 See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
 
+**Offline scientific evidence verification:** the version-5 report can now
+be checked independently against its source and fixture by running
+`cd frontend && npm run evidence:verify` after `npm run test:demo`.
+Read-only validation rejects stale/tampered numbers, changed fixture hashes,
+noncanonical JSON and incompatible schemas without uploading records or
+starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
+The SHA-256 output is a checksum, **not an authenticated signature**.
+
 **Dual-axis synthetic evidence:** the guest Demo Insights now has a
 six-cell eligibility-versus-history matrix, a row-position-only audit
 ledger and six controlled contradictions. Scientific evidence **schema v5**
