@@ -209,6 +209,33 @@ missing input, adversarial category inconsistencies and temporary in-memory
 simulation. This queue is **derived from existing schema-v5 evidence**;
 the serialized report format and offline verifier remain unchanged.
 
+## Intersection filters and non-additive diagnostic counts
+
+The [pure review-filter module](../frontend/src/demo/review-filters.ts)
+adds three **combined** criteria to the existing read-only workbench:
+the exclusive documentary category, the *original* history classification,
+and the independent diagnostic code. Unlike a category-only view, this
+allows reviewers to find an excluded base-data row that **also** has an
+invalid recorded transition. Nothing is reclassified or approved by
+selecting a filter.
+
+Diagnostic facet counts denote **unique affected input positions per
+diagnostic**. They are not a partition: one row can produce both
+`UNLINKED` and `INVALID_TRANSITION`, and a diagnostic may appear in
+both excluded and eligible rows. Therefore, do not add issue totals to
+estimate unique rows. The six controlled examples expose three
+`UNLINKED` rows, two `INVALID_TRANSITION` rows and two
+`MISSING_HISTORY` rows; these seven diagnostic occurrences refer to
+just six source rows, including one row with no diagnostic. The display
+does not reveal names, equipment IDs or real event data.
+
+The [filter regression tests](../frontend/tests/demo-review-filters.test.cjs)
+cover multiple simultaneous criteria, empty intersections, duplicate
+diagnostic membership, immutable original classifications, invalid options,
+zero-row fixtures and one temporary simulated entry. Browser and axe
+checks cover combinations at mobile and desktop viewport sizes.
+The scientific JSON artifact remains schema v5 and is unaffected.
+
 ## Explicit non-claims
 
 Internal consistency does **not** independently prove that any transition
