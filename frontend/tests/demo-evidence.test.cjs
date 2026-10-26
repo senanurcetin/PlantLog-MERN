@@ -14,7 +14,7 @@ test('scientific evidence is reproducible, auditable and follows actual fixture 
     assert.match(firstResult, /Scientific evidence: PASS/);
     const first = readFileSync(artifact);
     const report = JSON.parse(first.toString('utf8'));
-    assert.equal(report.schemaVersion, 2);
+    assert.equal(report.schemaVersion, 3);
     assert.match(report.source.fixtureSHA256, /^[a-f0-9]{64}$/);
     assert.equal(report.source.fictionalAssetCount, 8);
     assert.equal(report.source.fictionalEventCount, 12);
@@ -29,6 +29,20 @@ test('scientific evidence is reproducible, auditable and follows actual fixture 
         events: report.lifecycleTraceability.recordedTransitionEvents,
     }, { assessed: 12, verified: 3, missing: 9, invalid: 0, events: 7 });
     assert.equal(report.lifecycleTraceability.issueCounts.length, 9);
+    assert.equal(report.scenarioModelCheck.maximumSequenceLength, 6);
+    assert.equal(report.scenarioModelCheck.exploredPrefixes, 19531);
+    assert.equal(report.scenarioModelCheck.distinctPhases.length, 5);
+    assert.equal(report.scenarioModelCheck.acceptedActions +
+        report.scenarioModelCheck.rejectedActions +
+        report.scenarioModelCheck.resetActions, 19530);
+    assert.equal(report.lifecycleFaultExperiments.referenceRecordId, 'L007');
+    assert.equal(report.lifecycleFaultExperiments.cases.length, 11);
+    assert.deepEqual(report.lifecycleFaultExperiments.cases.map(x => x.classification), [
+        'verified', 'unrecorded', 'invalid', 'invalid', 'invalid',
+        'invalid', 'invalid', 'invalid', 'invalid', 'invalid', 'invalid',
+    ]);
+    assert.equal(report.lifecycleFaultExperiments.cases.at(-1).triggeredHistoryChecks.length, 4);
+    assert.equal(report.lifecycleFaultExperiments.cases.every(x => x.qualityEligibleRows === 1), true);
     assert.deepEqual(report.lifecycleTraceability.issueCounts
         .filter(item => item.count > 0), [{ code: 'MISSING_HISTORY', count: 9 }]);
     assert.deepEqual(report.additiveCases.map(x => x.qualityEligibleRows),

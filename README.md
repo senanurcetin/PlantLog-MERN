@@ -39,6 +39,13 @@ synthetic-data validation, not industrial reliability validation.
 
 The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not a workflow for real incidents. Visitors can try one deterministic, fictional maintenance incident through `open → acknowledged → in progress → resolved`, inspect its temporary impact on Demo Insights, and reset without changing any original fixture. No persistent user state, backend writes, real plant connectivity, account creation, billing or productized service is provided by the hosted demo.
 
+**Lifecycle evidence verification:** the synthetic Demo Insights screen now
+includes 11 independently reconstructed status-history fault examples.
+An exhaustive, fixed-depth reference-model test inspects 19,531 fictional
+action prefixes, and the deterministic schema-v3 audit keeps these results
+separate from maintenance workload and real industrial reliability claims.
+See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
+
 ## Problem and approach
 
 In many facilities, asset lists, shift handovers and maintenance histories live in separate spreadsheets or paper registers. PlantLog demonstrates a unified web workflow for tracking equipment and operational events, with a REST API backed by MongoDB.
