@@ -52,6 +52,30 @@ jobs:
             test-artifacts/supply-chain/frontend-runtime.cdx.json
           if-no-files-found: warn
 
+  supply-chain-remediation-candidate:
+    # Temporary PR-only evidence generator. It NEVER commits changes.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Calculate non-force lockfile remediation candidates
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts --prefix backend || true
+          npm audit fix --package-lock-only --ignore-scripts --prefix frontend || true
+      - name: Upload candidate locks without committing or merging
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-review-only-updated-lockfiles
+          path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
