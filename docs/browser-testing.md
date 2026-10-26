@@ -98,3 +98,41 @@ or external scientific validity are asserted.
 
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
+
+## Laboratory interaction and accessibility regression (development branch)
+
+The guest-only Playwright smoke suite now inspects the **three scientific
+panels** as real DOM interactions rather than trusting unit tests alone:
+
+- **Lifecycle fault-injection:** select overlapping faults (four diagnostics),
+  unknown status history and reset to the original valid example.
+- **UTC chronology:** move from a future event to an impossible leap date,
+  and then a valid leap day, checking both basic eligibility and independent
+  history diagnostics.
+- **Six-cell evidence matrix:** verify 12 source rows, switch to six controlled
+  contradictions (one per matrix cell), check the anonymous decision ledger,
+  restore the source, and confirm the matrix follows the temporary 13th
+  scenario row before returning to 12 after reset.
+
+At **390 px** the two tabular regions must remain keyboard focusable and
+scroll within the panel, without document-level horizontal overflow. Browser
+network interception checks there are no requests to the authenticated
+`/api/` path.
+
+The automated axe-core test now scans all five normal views **plus three
+selected diagnostic states**, on both 1280 px desktop and 390 px mobile:
+**16 scans** in all. All WCAG 2/2.1 A/AA checks remain enabled, and
+serious/critical findings fail the test. Results are not full accessibility
+certification; manual assistive technology review is still outstanding.
+
+For local use only, run `npm ci`, `npm run build`, install the pinned
+`playwright@1.56.1` and `@axe-core/playwright@4.14.0` test packages,
+then set `PLANTLOG_BROWSER_CHANNEL=chrome` and execute
+`node --test tests/browser-smoke.test.cjs` followed by
+`node --test tests/accessibility-audit.test.cjs`. This does not create a
+pull request, deploy anything, or require any database.
+
+The new interactions remain strictly illustrative, synthetic, and
+in-memory; their success does not demonstrate industrial safety or
+production reliability.
+
