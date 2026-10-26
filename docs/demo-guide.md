@@ -210,6 +210,29 @@ so the number of filtered rows is computed from unique positions, not from
 adding diagnostic frequencies. Filters are local, reset upon changing the
 example population, and do not save an investigation outcome.
 
+## On-demand research laboratory navigation (development branch)
+
+The Demo Insights screen now separates its fixed summary from **six
+individually selectable scientific panels**: controlled comparisons,
+eligibility sensitivity, lifecycle fault injection, UTC boundaries,
+evidence matrix and document review. Only **one experimental panel** is
+mounted and calculated at a time; the overview's quality, lifecycle and
+workload summaries always remain present.
+
+The selector is a keyboard-operated button group with explicit
+`aria-pressed` state, rather than an unimplemented tab-widget keyboard
+pattern. Switching panels discards only that panel's transient selection,
+never edits records, and never caches, stores or uploads review choices.
+Returning from another demonstration section or reloading restores
+controlled comparisons as the initial panel. This is **progressive UI
+disclosure**, not fewer quality checks or a change to scientific evidence
+criteria.
+
+The dated screenshots in this document were captured from earlier code
+and are **not** evidence that this unmerged branch is deployed. The new
+navigation is verified with a local guest-only Chrome build; the publicly
+hosted demo remains unchanged.
+
 ## Synthetic evidence review workbench
 
 The new reviewer workbench organizes the same fictional evidence matrix into
