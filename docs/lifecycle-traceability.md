@@ -236,6 +236,16 @@ zero-row fixtures and one temporary simulated entry. Browser and axe
 checks cover combinations at mobile and desktop viewport sizes.
 The scientific JSON artifact remains schema v5 and is unaffected.
 
+## Presentation-layer failure semantics
+
+The optional scientific laboratory interface is guarded by an accessible
+local error boundary. A module download or panel render failure shows
+**unavailable**, not `verified`, `passed`, or another diagnostic result.
+Core synthetic quality and traceability summaries remain independent of the
+optional selected laboratory. An error recovery cannot certify maintenance
+work or change the signed-off deterministic schema-v5 evidence fixture.
+The local browser test intentionally blocks a chunk to verify these limits.
+
 ## Explicit non-claims
 
 Internal consistency does **not** independently prove that any transition
