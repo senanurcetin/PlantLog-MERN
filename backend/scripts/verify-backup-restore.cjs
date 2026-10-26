@@ -98,12 +98,13 @@ async function run() {
         // Run database tools in MongoDB 6 service, NOT on a user workstation.
         docker('mongodump', '--host=127.0.0.1:27017',
             '--db=' + originalName, '--archive=' + archive, '--gzip');
+        // Mark the destination for cleanup even if restore fails halfway.
+        target = true;
         docker('mongorestore', '--host=127.0.0.1:27017',
             '--archive=' + archive, '--gzip',
             '--nsFrom=' + originalName + '.*', '--nsTo=' + restoredName + '.*');
         const destDb = mongoose.connection.useDb(restoredName, { useCache: true }).db;
         assert.ok(destDb, 'Restored database is not available');
-        target = true;
         const after = await fingerprint(destDb);
         assert.deepEqual(after, before, 'Restore must preserve all data and indexes');
 
