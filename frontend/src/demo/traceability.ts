@@ -89,7 +89,8 @@ export const assessLifecycleTraceability = (
                 if (typeof event.changedBy !== 'string' || !event.changedBy.trim()) {
                     issues.add('MISSING_ACTOR');
                 }
-                const changedAt = isCanonicalDemoTimestamp(event.changedAt)
+                const changedAt = typeof event.changedAt === 'string' &&
+                    isCanonicalDemoTimestamp(event.changedAt)
                     ? Date.parse(event.changedAt) : null;
                 if (changedAt === null) {
                     issues.add('INVALID_EVENT_TIMESTAMP');
