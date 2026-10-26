@@ -186,6 +186,17 @@ basic eligibility rules. A separate exhaustive model check enumerates
 in-memory timeline invariants; it does not exercise the production system.
 See [model and fault-injection methodology](lifecycle-traceability.md).
 
+## UTC chronology boundary lab
+
+The synthetic insights panel includes **12 fixed UTC boundary experiments**
+for day-end millisecond equality, leap days, year rollover, timezone
+format enforcement, reversed transitions and missing history. Basic
+log eligibility is distinguished from the validity of a status-event
+timeline; a case can be an eligible descriptive log but have an invalid
+stored history. Every case shows the declared expected and observed
+result without modifying any fixture record or calling an API.
+See the [temporal boundary methodology](lifecycle-traceability.md).
+
 ## Controlled synthetic comparison examples
 
 The live Demo Insights section also compares five deterministic
