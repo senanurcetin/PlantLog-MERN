@@ -61,7 +61,7 @@ The three category counts always reconcile to `assessedRecords`.
   [demo-traceability.test.cjs](../frontend/tests/demo-traceability.test.cjs).
 - `npm run test:demo` runs those tests alongside existing scientific checks.
 - The deterministic `scientific-evidence.json` artifact uses
-  `schemaVersion: 3` and adds `lifecycleTraceability`: category totals,
+  `schemaVersion: 4` and adds `lifecycleTraceability`: category totals,
   observed event count and all nine issue counters. It retains the fixture
   SHA-256, workload cohort and existing comparative experiments.
 - CI checks that the generated artifact is byte-identical between runs.
@@ -100,6 +100,35 @@ and run within `npm run test:demo`. The deterministic scientific report
 (schema v3) now includes `scenarioModelCheck` and
 `lifecycleFaultExperiments` as additional sections, alongside the unchanged
 cohort and original sensitivity experiments.
+
+## UTC chronology boundary laboratory (development branch)
+
+The [independent temporal experiment module](../frontend/src/demo/temporal-boundaries.ts)
+constructs **12 separate fictional event histories** rather than mutating the
+committed 12-row dataset. Its fixed cases test the inclusive
+`23:59:59.999Z` observation endpoint, the first millisecond after the
+snapshot, reversed event times, a valid 2024 leap day, an impossible 2025
+leap day, noncanonical `+03:00` offsets, missing timezone suffixes,
+year rollover, future-dated openings, missing histories and simultaneous
+recorded event timestamps.
+
+For each case the module retains an **explicit expected classification**
+and the **observed classification** under two different assessors:
+the eight base-data eligibility checks and the nine history checks.
+A `matchesExpected=false` result remains visible as an unresolved
+discrepancy; it is never silently converted to a passing result.
+
+The [interactive UTC lab](../frontend/src/components/TemporalBoundaryLab.tsx)
+is a client-only read-only view with no persistence or API calls. The
+[boundary tests](../frontend/tests/demo-temporal-boundaries.test.cjs) exercise
+each expectation, dual-classification differences, leap-year rules and
+immutable fixture behavior. The deterministic
+`scientific-evidence.json` **schema v4** adds sanitized
+`temporalBoundaryExperiments` beside the prior evidence sections.
+
+These checks prove only bounded consistency of declared UTC timestamp
+semantics; they do not validate event provenance, technician response
+times, PLC behavior, equipment uptime or a production SLA.
 
 ## Explicit non-claims
 
