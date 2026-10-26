@@ -101,7 +101,7 @@ and run within `npm run test:demo`. The deterministic scientific report
 `lifecycleFaultExperiments` as additional sections, alongside the unchanged
 cohort and original sensitivity experiments.
 
-## UTC chronology boundary laboratory (development branch)
+## UTC chronology boundary laboratory (published guest demo)
 
 The [independent temporal experiment module](../frontend/src/demo/temporal-boundaries.ts)
 constructs **12 separate fictional event histories** rather than mutating the
