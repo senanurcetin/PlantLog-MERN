@@ -95,6 +95,15 @@ test('missing opening provenance, missing actor and malformed structure are fail
     assert.equal(codes(report).MISSING_HISTORY, 1);
 });
 
+test('prototype-looking states never execute inherited object properties', () => {
+    const bad = clone(fixture.logs.find(item => item.id === 'L007'));
+    bad.statusHistory[1].to = '__proto__';
+    bad.statusHistory[2].from = '__proto__';
+    const result = assessLifecycleTraceability([bad], snapshot);
+    assert.equal(result.invalidHistory, 1);
+    assert.equal(codes(result).INVALID_TRANSITION, 1);
+});
+
 test('empty population remains empty and invalid snapshot fails loudly', () => {
     const result = assessLifecycleTraceability([], snapshot);
     assert.equal(result.assessedRecords, 0);
