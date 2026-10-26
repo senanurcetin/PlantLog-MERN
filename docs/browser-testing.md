@@ -99,6 +99,22 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
+## Single-panel scientific laboratory navigation
+
+The local Chromium smoke asserts that the selectable research group
+exposes six keyboard-accessible, pressed-state buttons and that **only
+the chosen laboratory is mounted in the DOM**. It switches among all six,
+checks mobile region focus, and confirms that a reload reselects the
+controlled-comparisons panel rather than replaying previous experimental
+choices. Scenario counts continue to reconcile when reviewers open
+the evidence matrix and document review workbench one at a time.
+
+The accessibility runner explicitly activates each desired experiment
+before conducting its existing 18 axe scans (desktop 1280 px, mobile
+390 px). This is not a claim of full keyboard or screen-reader
+certification, and the panel selection never calls an API or persists
+any fixture data.
+
 ## Reviewer cross-filter browser regression
 
 Playwright now checks the combined documentary category, history and
