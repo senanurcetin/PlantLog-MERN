@@ -98,6 +98,17 @@ restricted, paginated event feed. Persistence occurs after each HTTP response
 and is **best-effort, not atomic with mutations**; a durable legal/industrial
 audit system would need failover, tamper-evidence, operations and privacy review.
 
+## Recovery and competing-write engineering evidence
+
+The [pre-production recovery/concurrency protocol](preproduction-recovery-concurrency.md)
+documents a CI-only logical `mongodump` → isolated `mongorestore` exercise
+of fabricated account, asset, log and audit data, verifying SHA-256
+document fingerprints, index metadata, links and status history. The real
+backup archive is deleted and **never** uploaded. Conditional `If-Match`
+revision headers and MongoDB atomic CAS are also exercised via API
+integration tests. Neither exercise substitutes for real disaster recovery,
+offsite backup security or load/soak certification.
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
@@ -106,8 +117,8 @@ audit system would need failover, tamper-evidence, operations and privacy review
 | G02 | TLS, restricted ingress, distributed abuse prevention and WAF policy | **HOLD — local process limits only** |
 | G03 | Session security: isolated storage, session revocation, recovery, key rotation | **HOLD — tab-scoped JS-readable bearer storage; no recovery, device-specific revocation or verified rotation** |
 | G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — minimal 30-day TTL prototype implemented, but unreviewed retention, deletion and legal compliance** |
-| G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — no verified restore exercise** |
-| G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — functional CI is not capacity evidence** |
+| G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — synthetic same-container logical restore tested in CI; real recovery, RTO/RPO and key rotation unverified** |
+| G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — revision precondition and two-writer CAS invariants tested; no capacity/soak/availability evidence** |
 | G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
 | G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — full enforcement not independently verified** |
 | G09 | Real operational data permissions, domain expert review and safety sign-off | **HOLD — synthetic fixture only** |
