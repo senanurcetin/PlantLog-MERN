@@ -4,12 +4,7 @@ import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
 import { assessLifecycleTraceability } from '../demo/traceability';
-
-
-
-
-
-
+import { SyntheticLabErrorBoundary } from './SyntheticLabErrorBoundary';
 
 // Keep all six fictional experiment modules out of the initial guest bundle.
 // Loading one module never authenticates, changes source data or starts an API call.
@@ -339,6 +334,11 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
             </section>
             <div id="selected-synthetic-laboratory" role="region"
                 aria-label="Selected synthetic evidence laboratory" aria-live="off">
+                <SyntheticLabErrorBoundary key={selectedLaboratory}
+                    label={laboratoryOptions.find(option =>
+                        option.id === selectedLaboratory)!.title}
+                    onChooseAnother={selectedLaboratory === 'comparisons'
+                        ? undefined : () => setSelectedLaboratory('comparisons')}>
                 <Suspense fallback={
                     <p role="status" className="nexus-card p-5 text-sm text-slate-700">
                         Loading selected fictional laboratory…
@@ -357,6 +357,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                 {selectedLaboratory === 'review-workbench' &&
                     <EvidenceReviewWorkbench assets={assets} logs={logs} snapshot={snapshot} />}
                 </Suspense>
+                </SyntheticLabErrorBoundary>
             </div>
         </div>
     );
