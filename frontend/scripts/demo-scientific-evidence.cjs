@@ -34,6 +34,7 @@ const fixtureBytes = readFileSync(path.join(sourceDir, 'fixture.json'));
 const fixture = JSON.parse(fixtureBytes.toString('utf8'));
 const { buildDemoInsights } = load('insights.ts');
 const { assessDemoDataQuality } = load('quality.ts');
+const { assessLifecycleTraceability } = load('traceability.ts');
 const { compareDemoCases } = load('comparisons.ts');
 const { buildEligibilitySensitivity } = load('sensitivity.ts');
 
@@ -41,6 +42,7 @@ function buildReport() {
     const { assets, logs, context } = fixture;
     const snapshot = context.snapshot;
     const audit = assessDemoDataQuality(assets, logs, snapshot);
+    const traceability = assessLifecycleTraceability(logs, snapshot);
     const workload = buildDemoInsights(assets, logs, snapshot);
     const comparisons = compareDemoCases(assets, logs, snapshot);
     const sensitivity = buildEligibilitySensitivity(assets, logs, snapshot);
@@ -51,6 +53,13 @@ function buildReport() {
     assert.equal(audit.findings.length, 8, 'Every published data-quality gate must run');
     assert.ok(audit.findings.every(gate => gate.count === 0),
         'Reference fixture unexpectedly violates a data-quality gate');
+    assert.equal(traceability.verifiedHistory, 3);
+    assert.equal(traceability.missingHistory, 9);
+    assert.equal(traceability.invalidHistory, 0);
+    assert.equal(traceability.observedHistoryEvents, 7);
+    assert.equal(traceability.issues.length, 9);
+    assert.equal(traceability.verifiedHistory + traceability.missingHistory +
+        traceability.invalidHistory, logs.length);
     assert.equal(workload.totalRecords, logs.length);
     assert.equal(workload.openMaintenanceCases, 4);
     assert.equal(workload.dailyIntake.reduce((sum, day) => sum + day.total, 0) +
@@ -76,7 +85,7 @@ function buildReport() {
         .reduce((sum, gate) => sum + gate.count, 0), 3);
 
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         reportType: 'PlantLog synthetic data and quality sensitivity audit',
         source: {
             fixturePath: 'frontend/src/demo/fixture.json',
@@ -97,6 +106,15 @@ function buildReport() {
             unlinkedOpenIncidentMaintenanceEvents: workload.unlinkedOpenCases,
             dailyRecordedIntake: workload.dailyIntake,
             recordedOutsideDisplayedWindow: workload.outsideWindow,
+        },
+        lifecycleTraceability: {
+            assessedRows: traceability.assessedRecords,
+            internallyConsistentHistories: traceability.verifiedHistory,
+            unrecordedHistories: traceability.missingHistory,
+            invalidHistories: traceability.invalidHistory,
+            recordedTransitionEvents: traceability.observedHistoryEvents,
+            issueCounts: traceability.issues.map(({ code, count }) => ({ code, count })),
+            interpretation: 'Only internal consistency of fictional status histories; missing timelines are unverified. Separate from descriptive workload eligibility.',
         },
         additiveCases: comparisons.map(row => ({
             id: row.id,
@@ -122,6 +140,7 @@ function buildReport() {
             unit: 'one fictional event row; not equipment exposure time',
             experiment: 'independently reconstructed deterministic synthetic alterations',
             gateOverlap: 'finding counts may overlap; excluded rows are counted once',
+            historyVerification: 'timeline integrity is measured separately; absent statusHistory is unverified rather than imputed',
             claimLimits: 'No causal identification, predictive ability, uncertainty interval, MTTR, MTBF, downtime or safety certification',
         },
     };
@@ -134,7 +153,7 @@ function main() {
     const outputPath = path.join(outputDir, 'scientific-evidence.json');
     writeFileSync(outputPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
     process.stdout.write('Scientific evidence: PASS; 8 gates, 5 additive cases, ' +
-        '5 integrity cases; output=test-artifacts/scientific-evidence.json\n');
+        '5 integrity cases, 9 lifecycle checks; output=test-artifacts/scientific-evidence.json\n');
 }
 
 if (require.main === module) main();

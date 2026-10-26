@@ -2,6 +2,7 @@ import { Activity, AlertCircle, BarChart3, ClipboardList, Layers, Wrench } from 
 import { buildDemoInsights } from '../demo/insights';
 import type { DemoInsightAsset, DemoInsightLog } from '../demo/insights';
 import { assessDemoDataQuality } from '../demo/quality';
+import { assessLifecycleTraceability } from '../demo/traceability';
 import ControlledComparisons from './ControlledComparisons';
 import EligibilitySensitivityLab from './EligibilitySensitivityLab';
 
@@ -19,6 +20,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
 }) => {
     const summary = buildDemoInsights(assets, logs, snapshot);
     const quality = assessDemoDataQuality(assets, logs, snapshot);
+    const traceability = assessLifecycleTraceability(logs, snapshot);
     const highest = Math.max(1, ...summary.dailyIntake.map(day => day.total));
     return (
         <div className="space-y-5" aria-label="Synthetic maintenance analytics">
@@ -83,6 +85,46 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
                     Overlapping findings must not be added together to infer a count of unique bad rows.
                     {quality.caveat}
                 </p>
+            </section>
+
+            <section className="nexus-card p-5 sm:p-6" aria-labelledby="lifecycle-trace-heading">
+                <h2 id="lifecycle-trace-heading" className="text-lg font-bold text-slate-900">
+                    Lifecycle timeline traceability
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                    A separate verification of the fictional status-event chains. This does not
+                    change the record-quality denominator or any workload chart.
+                </p>
+                <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {([
+                        { label: 'Internally consistent history', count: traceability.verifiedHistory },
+                        { label: 'History not recorded', count: traceability.missingHistory },
+                        { label: 'Contradictory or invalid history', count: traceability.invalidHistory },
+                    ] as const).map(item => (
+                        <div key={item.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <dt className="text-xs font-medium text-slate-700">{item.label}</dt>
+                            <dd className="mt-2 text-2xl font-extrabold tabular-nums text-slate-900">{item.count}</dd>
+                        </div>
+                    ))}
+                </dl>
+                <p className="mt-3 text-xs text-slate-600">
+                    {traceability.assessedRecords} total fictional entries;
+                    {' '}{traceability.observedHistoryEvents} recorded status events.
+                    Missing history is unknown, not a passed or failed timeline.
+                    Issue counts may overlap across the same record.
+                </p>
+                {traceability.invalidHistory > 0 && (
+                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950" role="status">
+                        <p className="font-semibold">Review synthetic timeline contradictions</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5">
+                            {traceability.issues.filter(issue => issue.count > 0 &&
+                                issue.code !== 'MISSING_HISTORY').map(issue => (
+                                <li key={issue.code}>{issue.code.replace(/_/g, ' ').toLowerCase()}: {issue.count} record(s)</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                <p className="mt-3 text-xs text-slate-500">{traceability.caveat}</p>
             </section>
 
             <section aria-labelledby="insights-summary-title">

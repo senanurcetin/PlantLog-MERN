@@ -150,6 +150,16 @@ byte-identical JSON; see the [complete scientific protocol](eligibility-sensitiv
 Controlled added records have valid unique synthetic IDs, except the
 intentionally broken asset-link example is explicitly ineligible.
 
+## Independent lifecycle-history traceability
+
+The public Demo Insights view also counts documented, absent and contradictory
+synthetic status histories. The unchanged fixture has **3 internally
+consistent timelines, 9 histories not recorded and 0 invalid histories**.
+These results come from a separate nine-diagnostic consistency checker and
+are not used to exclude records from the eight basic quality gates or to
+estimate downtime. The scenario lab adds only a temporary fictional history.
+See the [lifecycle traceability protocol](lifecycle-traceability.md).
+
 ## Data-eligibility sensitivity laboratory
 
 A separate interactive panel compares **raw descriptive** and **quality-eligible**
