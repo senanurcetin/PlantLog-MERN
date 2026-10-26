@@ -108,7 +108,7 @@ export const assessLifecycleTraceability = (
                     }
                 } else if (event.from !== previousState ||
                     typeof event.to !== 'string' ||
-                    !nextStates[previousState ?? '']?.includes(event.to)) {
+                    !nextStates[previousState ?? '']?.includes(event.to as string)) {
                     issues.add('INVALID_TRANSITION');
                 }
                 previousState = typeof event.to === 'string' ? event.to : null;
