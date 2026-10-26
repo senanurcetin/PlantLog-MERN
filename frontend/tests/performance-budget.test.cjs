@@ -35,7 +35,7 @@ test('six scientific labs are separate production chunks, not embedded in initia
         'LifecycleFaultLab', 'TemporalBoundaryLab',
         'EvidenceMatrixLab', 'EvidenceReviewWorkbench',
     ];
-    const entry = files.filter(name => /^index-[\\w-]+\\.js$/.test(name));
+    const entry = files.filter(name => /^index-[\w-]+\.js$/.test(name));
     assert.equal(entry.length, 1, 'Vite must emit one entry JavaScript bundle');
     const emitted = [];
     for (const name of names) {
