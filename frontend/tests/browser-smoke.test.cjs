@@ -129,6 +129,82 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await eligibleMetric.getByText('12', { exact: true }).isVisible(), true);
         assert.deepEqual(apiCalls, [], 'Sensitivity lab must stay entirely offline');
 
+        // Recent evidence panels require real browser coverage as well as
+        // isolated TypeScript checks: select deliberately malformed timelines,
+        // confirm independent eligibility, and restore the original view.
+        const fault = page.locator('section[aria-labelledby="lifecycle-fault-heading"]');
+        const faultSelect = fault.getByRole('combobox', { name: 'Fictional experiment' });
+        assert.equal(await faultSelect.locator('option').count(), 11);
+        await faultSelect.selectOption('overlap');
+        assert.equal(await fault.getByText('4 / 9', { exact: true }).isVisible(), true);
+        for (const code of ['INVALID_TRANSITION', 'AFTER_SNAPSHOT',
+            'MISSING_ACTOR', 'FINAL_STATE_MISMATCH']) {
+            assert.equal(await fault.getByText(code, { exact: true }).isVisible(), true);
+        }
+        assert.equal(await fault.getByText('1 / 1', { exact: true }).isVisible(), true,
+            'Faulted timeline may still pass separate basic data checks');
+        await faultSelect.selectOption('unrecorded');
+        assert.equal(await fault.getByText('Unrecorded history', { exact: true }).isVisible(), true);
+        assert.equal(await fault.getByText('MISSING_HISTORY', { exact: true }).isVisible(), true);
+        await faultSelect.selectOption('baseline');
+        assert.equal(await fault.getByText('0 / 9', { exact: true }).isVisible(), true);
+
+        const chronology = page.locator('section[aria-labelledby="temporal-boundary-heading"]');
+        const chronologySelect = chronology.getByRole('combobox', {
+            name: 'Synthetic UTC edge case',
+        });
+        assert.equal(await chronologySelect.locator('option').count(), 12);
+        await chronologySelect.selectOption('post-snapshot-transition');
+        assert.equal(await chronology.getByText('AFTER_SNAPSHOT', { exact: true }).isVisible(), true);
+        assert.equal(await chronology.getByText('Eligible', { exact: true }).isVisible(), true);
+        assert.equal(await chronology.getByText('Invalid', { exact: true }).isVisible(), true);
+        assert.equal(await chronology.getByText('Expected behavior', { exact: true }).isVisible(), true);
+        await chronologySelect.selectOption('non-leap-day');
+        assert.equal(await chronology.getByText('Excluded', { exact: true }).isVisible(), true);
+        assert.equal(await chronology.getByText('INVALID_EVENT_TIMESTAMP',
+            { exact: true }).isVisible(), true);
+        await chronologySelect.selectOption('leap-day');
+        assert.equal(await chronology.getByText('Verified', { exact: true }).isVisible(), true);
+        await chronologySelect.selectOption('ordinary');
+
+        const matrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
+        const populations = {
+            fixture: matrix.getByRole('button', { name: 'Current fictional records' }),
+            probes: matrix.getByRole('button', { name: 'Six controlled contradictions' }),
+        };
+        const cells = matrix.getByRole('region', {
+            name: 'Synthetic evidence by basic eligibility and lifecycle status',
+        }).locator('tbody tr');
+        const ledger = matrix.getByRole('region', {
+            name: 'Individual fictional row classifications and diagnostic reasons',
+        }).locator('tbody tr');
+        assert.equal(await populations.fixture.getAttribute('aria-pressed'), 'true');
+        assert.equal(await cells.count(), 2);
+        assert.deepEqual(await cells.nth(0).locator('td').allTextContents(),
+            ['3', '9', '0', '12']);
+        assert.deepEqual(await cells.nth(1).locator('td').allTextContents(),
+            ['0', '0', '0', '0']);
+        assert.equal(await ledger.count(), 12);
+        await populations.probes.click();
+        assert.equal(await populations.probes.getAttribute('aria-pressed'), 'true');
+        assert.deepEqual(await cells.nth(0).locator('td').allTextContents(),
+            ['1', '1', '1', '3']);
+        assert.deepEqual(await cells.nth(1).locator('td').allTextContents(),
+            ['1', '1', '1', '3']);
+        assert.equal(await ledger.count(), 6);
+        assert.equal(await ledger.filter({hasText:'INVALID_TRANSITION'}).count(), 2);
+        await populations.fixture.click();
+        assert.equal(await ledger.count(), 12);
+        for (const region of matrix.getByRole('region')) {
+            await region.focus();
+            assert.equal(await region.evaluate(node => node === document.activeElement), true,
+                'Both matrix tables remain keyboard focusable at 390px');
+        }
+        assert.equal(await page.evaluate(() =>
+            document.documentElement.scrollWidth <= window.innerWidth), true,
+            'Mobile panels should scroll internally without document overflow');
+        assert.deepEqual(apiCalls, [], 'All three evidence labs must stay offline');
+
         assert.deepEqual(apiCalls, [], 'Insights must remain offline and fixture-only');
 
         // Guided scenario can advance one fictional case, update the same
@@ -146,11 +222,22 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         assert.equal(await afterResolve.getByText('4', { exact: true }).isVisible(), true);
         const logTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
         assert.equal(await logTotal.getByText('13', { exact: true }).isVisible(), true);
+        // The matrix follows the temporary in-memory simulation while the
+        // six controlled example cells remain independent and unchanged.
+        const activeMatrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
+        assert.equal(await activeMatrix.getByText('Rows assessed').locator('..')
+            .getByText('13', { exact: true }).isVisible(), true);
+        assert.deepEqual(await activeMatrix.getByRole('region', {
+            name: 'Synthetic evidence by basic eligibility and lifecycle status',
+        }).locator('tbody tr').first().locator('td').allTextContents(), ['4','9','0','13']);
         await page.getByRole('button', { name: 'Scenario lab' }).click();
         await page.getByRole('button', { name: 'Reset simulation' }).click();
         await page.getByRole('button', { name: 'Demo insights' }).click();
         const originalTotal = page.getByRole('heading', { name: 'Total log entries' }).locator('..');
         assert.equal(await originalTotal.getByText('12', { exact: true }).isVisible(), true);
+        assert.equal(await page.locator('section[aria-labelledby="evidence-matrix-heading"]')
+            .getByText('Rows assessed').locator('..').getByText('12', { exact: true })
+            .isVisible(), true);
         assert.deepEqual(apiCalls, [], 'Scenario interactions must never call the API');
 
         // Standalone public builds intentionally redirect registration to
