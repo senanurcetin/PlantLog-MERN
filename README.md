@@ -54,6 +54,12 @@ noncanonical JSON and incompatible schemas without uploading records or
 starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
 The SHA-256 output is a checksum, **not an authenticated signature**.
 
+**Independent reviewer filters:** the workbench supports simultaneous
+documentary category, original history and diagnostic-code filtering,
+including defects that overlap across the separate quality and lifecycle
+audits. It counts unique fictional row positions and changes no data;
+see [review filter methodology](docs/lifecycle-traceability.md).
+
 **Synthetic evidence review workbench:** four read-only documentary categories
 organize the anonymous matrix without treating missing evidence as proof of
 work or assigning industrial risk scores. Review filters are ephemeral;
