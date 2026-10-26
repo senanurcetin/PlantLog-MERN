@@ -464,7 +464,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
             name: 'Select synthetic evidence laboratory',
         }).getByRole('button', { name: /^UTC boundary cases/ }).click();
         await broken.getByRole('heading', {
-            name: 'Synthetic UTC boundary experiments',
+            name: 'UTC boundary & chronology laboratory',
         }).waitFor();
         assert.deepEqual(failedApi, [], 'Failed module and recovery must remain guest-only');
         assert.equal(await broken.evaluate(() =>
