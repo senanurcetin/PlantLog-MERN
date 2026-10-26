@@ -178,6 +178,13 @@ frontend/backend runtime CycloneDX SBOMs. High/critical runtime advisories
 fail CI; full development-advisory risk remains subject to review. See
 [supply-chain protocol](docs/preproduction-supply-chain.md).
 
+**Build-tool and accessibility checks:** frontend Vite 6.4.5 replaces
+the older vulnerable build-tool line, and CI audits the synthetic guest
+demo with axe-core in real Chromium at desktop/mobile widths. Serious or
+critical automated WCAG findings block CI; all findings are reported.
+Manual screen reader/accessibility review remains unverified. See
+[accessibility evidence protocol](docs/preproduction-accessibility.md).
+
 ## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
