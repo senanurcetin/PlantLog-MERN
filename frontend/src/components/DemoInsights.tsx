@@ -6,6 +6,7 @@ import { assessLifecycleTraceability } from '../demo/traceability';
 import ControlledComparisons from './ControlledComparisons';
 import EligibilitySensitivityLab from './EligibilitySensitivityLab';
 import LifecycleFaultLab from './LifecycleFaultLab';
+import TemporalBoundaryLab from './TemporalBoundaryLab';
 
 const typeDetails = [
     {key: 'incident', label: 'Incidents', color: 'bg-rose-500', text: 'text-rose-700'},
@@ -268,6 +269,7 @@ const DemoInsights = ({ assets, logs, snapshot, onOpenHistory }: {
             <ControlledComparisons assets={assets} logs={logs} snapshot={snapshot} />
             <EligibilitySensitivityLab assets={assets} logs={logs} snapshot={snapshot} />
             <LifecycleFaultLab assets={assets} logs={logs} snapshot={snapshot} />
+            <TemporalBoundaryLab assets={assets} />
         </div>
     );
 };
