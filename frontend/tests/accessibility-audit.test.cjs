@@ -59,6 +59,7 @@ test('public synthetic demo has no serious/critical automated accessibility viol
         });
     }
 
+    let scanError;
     try {
         for (const width of [1280, 390]) {
             const viewport = width === 390 ? 'mobile-390' : 'desktop-1280';
@@ -75,6 +76,8 @@ test('public synthetic demo has no serious/critical automated accessibility viol
                 await scan(view, viewport);
             }
         }
+    } catch (error) {
+        scanError = error;
     } finally {
         mkdirSync(artifactDir, { recursive: true });
         const violations = scans.flatMap(scan => scan.violations.map(v => ({
@@ -97,6 +100,7 @@ test('public synthetic demo has no serious/critical automated accessibility viol
             certification: false,
             manualScreenReaderAndKeyboardReviewComplete: false,
         }, null, 2) + '\n');
+        if (scanError) throw scanError; // Preserve original axe/navigation failure.
         assert.deepEqual(apiCalls, [], 'Public synthetic demo must never contact an API');
         assert.equal(scans.length, 10, 'Must audit five views at desktop and mobile');
         assert.equal(blockers.length, 0,
