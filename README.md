@@ -54,6 +54,12 @@ noncanonical JSON and incompatible schemas without uploading records or
 starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
 The SHA-256 output is a checksum, **not an authenticated signature**.
 
+**Synthetic evidence review workbench:** four read-only documentary categories
+organize the anonymous matrix without treating missing evidence as proof of
+work or assigning industrial risk scores. Review filters are ephemeral;
+the fixture and schema-v5 audit stay unchanged. Details are in the
+[lifecycle and documentary review protocol](docs/lifecycle-traceability.md).
+
 **Dual-axis synthetic evidence:** the guest Demo Insights now has a
 six-cell eligibility-versus-history matrix, a row-position-only audit
 ledger and six controlled contradictions. Scientific evidence **schema v5**
