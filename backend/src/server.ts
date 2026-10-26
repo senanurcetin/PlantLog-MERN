@@ -63,8 +63,15 @@ const startServer = async (): Promise<void> => {
             void mongoose.disconnect();
         });
     } catch {
-        // Avoid printing connection strings, signing secrets or credentials.
-        console.error('PlantLog API startup refused: verify local demo configuration');
+        // Index initialization may fail after MongoDB connected (for example,
+        // pre-existing casefold duplicate serials). Never leave a connected
+        // idle process pretending to be a healthy API.
+        console.error('PlantLog API startup refused: verify local demo configuration and database indexes');
+        try {
+            await mongoose.disconnect();
+        } catch {
+            console.error('PlantLog API could not close the rejected database connection');
+        }
         process.exitCode = 1;
     }
 };
