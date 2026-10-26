@@ -32,7 +32,10 @@ test('public synthetic demo has no serious/critical automated accessibility viol
     t.after(() => { vite.kill(); });
     await waitForServer();
 
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+        headless: true,
+        ...(process.env.PLANTLOG_BROWSER_CHANNEL ? { channel: process.env.PLANTLOG_BROWSER_CHANNEL } : {}),
+    });
     t.after(async () => { await browser.close(); });
     // axe-core opens a collector frame in the explicit Playwright context;
     // browser.newPage() creates an implicit owned context and is unsupported.
