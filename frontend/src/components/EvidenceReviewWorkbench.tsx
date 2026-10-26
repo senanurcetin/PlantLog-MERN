@@ -140,7 +140,7 @@ const EvidenceReviewWorkbench = ({ assets, logs, snapshot }: {
                 {filtered.matched} of {filtered.assessed} fictional rows match
                 the combined filters. Original classifications are unchanged.
             </p>
-            <div className="mt-4 w-full overflow-x-auto" role="region" tabIndex={0>
+            <div className="mt-4 w-full overflow-x-auto" role="region" tabIndex={0}
                 aria-label="Filtered fictional documentary evidence review rows">
                 <table className="w-full min-w-[580px] text-left text-sm">
                     <caption className="mb-2 text-left text-sm font-semibold text-slate-800">
