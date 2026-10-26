@@ -7,6 +7,7 @@ import { pickAssetUpdate, sanitizeAssetCreation } from '../utils/inputPolicy';
 import { canManageAssets } from '../utils/authorization';
 import { validateAssetStatusTransition, AssetStatus } from '../utils/assetLifecycle';
 import { InvalidPayloadError } from '../utils/inputPolicy';
+import { parseExpectedRevision, revisionEtag } from '../utils/revisionPolicy';
 
 // @desc    Get all assets
 // @route   GET /api/assets
@@ -39,6 +40,7 @@ export const getAsset = async (req: AuthRequest, res: Response, next: NextFuncti
             throw new Error('Asset not found');
         }
 
+        res.setHeader('ETag', revisionEtag(asset.__v));
         res.status(200).json(asset);
     } catch (error) {
         next(error);
@@ -79,6 +81,7 @@ export const createAsset = async (req: AuthRequest, res: Response, next: NextFun
         });
 
         res.locals.auditResourceId = asset._id.toString();
+        res.setHeader('ETag', revisionEtag(asset.__v));
         res.status(201).json(asset);
     } catch (error) {
         next(error);
@@ -105,6 +108,11 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('Asset not found');
         }
 
+        const expectedVersion = parseExpectedRevision(req.headers['if-match']);
+        if (expectedVersion !== null && asset.__v !== expectedVersion) {
+            res.status(412);
+            throw new Error('Asset revision changed; reload before updating');
+        }
         const fields = pickAssetUpdate(req.body);
         const patch: Record<string, unknown> = { $set: fields, $inc: { __v: 1 } };
         if (fields.status !== undefined) {
@@ -137,6 +145,7 @@ export const updateAsset = async (req: AuthRequest, res: Response, next: NextFun
             throw new Error('Asset changed since it was loaded; refresh and retry');
         }
 
+        res.setHeader('ETag', revisionEtag(updatedAsset.__v));
         res.status(200).json(updatedAsset);
     } catch (error) {
         next(error);
