@@ -150,6 +150,20 @@ byte-identical JSON; see the [complete scientific protocol](eligibility-sensitiv
 Controlled added records have valid unique synthetic IDs, except the
 intentionally broken asset-link example is explicitly ineligible.
 
+## Independently verify an archived synthetic evidence report
+
+The guest-only synthetic JSON report can also be verified **offline and
+without CI**. First generate it using `npm run test:demo`, then run
+`npm run evidence:verify` inside `frontend/`; alternatively pass the
+path of an archived JSON report to
+`node scripts/verify-scientific-evidence.cjs saved-report.json`.
+The independent verifier enforces schema version 5, canonical JSON bytes,
+a 1 MiB input limit and complete reconstruction from the local fixture
+and checked-out source. It returns a nonzero exit code on altered or stale
+evidence and never writes the inspected file. This is not a digital signature
+or external event-provenance verification. Full methodology:
+[offline evidence verification](offline-evidence-verification.md).
+
 ## Independent lifecycle-history traceability
 
 The public Demo Insights view also counts documented, absent and contradictory
