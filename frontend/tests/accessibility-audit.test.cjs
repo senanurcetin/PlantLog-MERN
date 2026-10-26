@@ -51,6 +51,10 @@ test('public synthetic demo has no serious/critical automated accessibility viol
         // The overview hero is deliberately absent in other demo views.
         // The shared accessible main landmark stays present in all five views.
         await page.locator('#main-demo-content').waitFor();
+        // Navigation buttons use a 200ms Tailwind color transition. Scanning
+        // an intermediate frame produces false low-contrast mixtures not
+        // present in the settled UI. Keep every WCAG rule enabled.
+        await page.waitForTimeout(350);
         const report = await new AxeBuilder({ page }).withTags([
             'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa',
         ]).analyze();
