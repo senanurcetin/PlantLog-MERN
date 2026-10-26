@@ -15,6 +15,8 @@
 > The architecture diagram illustrates the workflow. The NEXUS screenshots below are captured in real Chromium from the **production-equivalent, guest-only frontend build**. They are not plant telemetry or authenticated production screens. Exact capture assumptions, viewports and commit are listed in [the screenshot manifest](docs/screenshots-manifest.json); the [verification report](docs/demo-verification-2026-10-21.md) states the remaining limits.
 
 
+**MongoDB data integrity:** case-insensitive unique equipment serials, verified at local API startup; long-domain email validation aligned between HTTP and the database. These checks include concurrent synthetic insert tests in disposable MongoDB. See [MongoDB integrity contract](docs/mongodb-integrity-contract.md). The public Vercel demo continues to use read-only fictional data; no Mongo credentials or private API endpoints are shipped.
+
 **React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
 
 A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
