@@ -112,6 +112,14 @@ test('public synthetic demo has no serious/critical automated accessibility viol
                         name: 'Six controlled contradictions',
                     }).click();
                     await scan('insights-six-cell-matrix', viewport);
+                    const workbench = page.locator('section[aria-labelledby="evidence-workbench-heading"]');
+                    await workbench.getByRole('button', {
+                        name: 'Six controlled cases',
+                    }).click();
+                    await workbench.getByRole('combobox', {
+                        name: 'Filter by documentary review category',
+                    }).selectOption('history-conflict');
+                    await scan('insights-review-filtered', viewport);
                 }
             }
         }
@@ -126,7 +134,7 @@ test('public synthetic demo has no serious/critical automated accessibility viol
             v.impact === 'critical' || v.impact === 'serious');
         writeFileSync(path.join(artifactDir, 'accessibility-audit.json'), JSON.stringify({
             schemaVersion: 1,
-            scope: 'Static synthetic guest demo; axe WCAG 2/2.1 A/AA heuristic; includes three changed lab states',
+            scope: 'Static synthetic guest demo; axe WCAG 2/2.1 A/AA heuristic; includes four changed lab states',
             viewports: ['desktop-1280', 'mobile-390'],
             scans,
             summary: {
@@ -141,8 +149,8 @@ test('public synthetic demo has no serious/critical automated accessibility viol
         }, null, 2) + '\n');
         if (scanError) throw scanError; // Preserve original axe/navigation failure.
         assert.deepEqual(apiCalls, [], 'Public synthetic demo must never contact an API');
-        assert.equal(scans.length, 16,
-            'Must audit five views and three changed lab states at desktop and mobile');
+        assert.equal(scans.length, 18,
+            'Must audit five views and four changed lab states at desktop and mobile');
         assert.equal(blockers.length, 0,
             'Automated serious/critical accessibility defects: ' +
             JSON.stringify(blockers.slice(0, 20)));
