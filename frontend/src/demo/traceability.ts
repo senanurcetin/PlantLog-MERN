@@ -17,8 +17,17 @@ export interface TraceabilityIssue {
     count: number;
 }
 
+export interface TraceabilityRowAssessment {
+    /** Stable index within this input array, never a personal identifier. */
+    index: number;
+    classification: 'verified' | 'unrecorded' | 'invalid';
+    /** One occurrence of each code per affected row, in diagnostic order. */
+    codes: TraceabilityIssueCode[];
+}
+
 export interface TraceabilityReport {
     assessedRecords: number;
+    rowAssessments: TraceabilityRowAssessment[];
     verifiedHistory: number;
     missingHistory: number;
     invalidHistory: number;
@@ -61,12 +70,15 @@ export const assessLifecycleTraceability = (
     let missingHistory = 0;
     let invalidHistory = 0;
     let observedHistoryEvents = 0;
+    const rowAssessments: TraceabilityRowAssessment[] = [];
 
-    for (const log of logs) {
+    for (const [index, log] of logs.entries()) {
         const history = log.statusHistory;
         if (history == null || (Array.isArray(history) && history.length === 0)) {
             missingHistory++;
             counts.set('MISSING_HISTORY', counts.get('MISSING_HISTORY')! + 1);
+            rowAssessments.push({ index, classification: 'unrecorded',
+                codes: ['MISSING_HISTORY'] });
             continue;
         }
         const issues = new Set<TraceabilityIssueCode>();
@@ -128,15 +140,19 @@ export const assessLifecycleTraceability = (
             }
         }
 
-        if (issues.size > 0) {
+        const codes = issueOrder.filter(code => issues.has(code));
+        if (codes.length > 0) {
             invalidHistory++;
-            for (const code of issues) counts.set(code, counts.get(code)! + 1);
+            for (const code of codes) counts.set(code, counts.get(code)! + 1);
+            rowAssessments.push({ index, classification: 'invalid', codes });
         } else {
             verifiedHistory++;
+            rowAssessments.push({ index, classification: 'verified', codes: [] });
         }
     }
     return {
         assessedRecords: logs.length,
+        rowAssessments,
         verifiedHistory,
         missingHistory,
         invalidHistory,
