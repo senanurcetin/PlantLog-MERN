@@ -52,6 +52,42 @@ jobs:
             test-artifacts/supply-chain/frontend-runtime.cdx.json
           if-no-files-found: warn
 
+  update-vite-lockfile-candidate:
+    # Temporary, restricted PR-only lock regeneration. Deleted before merge.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/a11y-audit-vite6-build-security-20261026' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Generate lockfile for reviewed Vite 6.4.5 upgrade
+        run: npm install --prefix frontend --package-lock-only --ignore-scripts --registry=https://registry.npmjs.org
+      - name: Require unchanged manifest and canonical locked packages
+        run: |
+          git diff --exit-code -- frontend/package.json
+          node --test scripts/verify-supply-chain.test.cjs
+      - name: Commit lockfile to this PR branch only
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          test "$HEAD_BRANCH" = "feat/a11y-audit-vite6-build-security-20261026"
+          git add frontend/package-lock.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(deps): lock patched Vite 6 with verified npm integrity"
+          git push origin "HEAD:refs/heads/$HEAD_BRANCH"
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
