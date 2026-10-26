@@ -54,6 +54,12 @@ noncanonical JSON and incompatible schemas without uploading records or
 starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
 The SHA-256 output is a checksum, **not an authenticated signature**.
 
+**Deferred laboratory JavaScript:** the six fictional research tools
+are loaded as separate chunks only after the corresponding selection,
+rather than being shipped in the guest demo's initial JavaScript.
+Browser-request and gzip-budget regressions protect the change;
+[verification details](docs/browser-testing.md).
+
 **Progressive experiment navigation:** the Demo Insights overview now
 keeps its workload and quality summaries always visible while mounting
 only the selected one of six fictional research laboratories. This
