@@ -14,13 +14,23 @@ test('scientific evidence is reproducible, auditable and follows actual fixture 
     assert.match(firstResult, /Scientific evidence: PASS/);
     const first = readFileSync(artifact);
     const report = JSON.parse(first.toString('utf8'));
-    assert.equal(report.schemaVersion, 1);
+    assert.equal(report.schemaVersion, 2);
     assert.match(report.source.fixtureSHA256, /^[a-f0-9]{64}$/);
     assert.equal(report.source.fictionalAssetCount, 8);
     assert.equal(report.source.fictionalEventCount, 12);
     assert.equal(report.baseline.eligibleRows, 12);
     assert.equal(report.baseline.qualityGateCounts.length, 8);
     assert.equal(report.baseline.rawOpenIncidentMaintenanceEvents, 4);
+    assert.deepEqual({
+        assessed: report.lifecycleTraceability.assessedRows,
+        verified: report.lifecycleTraceability.internallyConsistentHistories,
+        missing: report.lifecycleTraceability.unrecordedHistories,
+        invalid: report.lifecycleTraceability.invalidHistories,
+        events: report.lifecycleTraceability.recordedTransitionEvents,
+    }, { assessed: 12, verified: 3, missing: 9, invalid: 0, events: 7 });
+    assert.equal(report.lifecycleTraceability.issueCounts.length, 9);
+    assert.deepEqual(report.lifecycleTraceability.issueCounts
+        .filter(item => item.count > 0), [{ code: 'MISSING_HISTORY', count: 9 }]);
     assert.deepEqual(report.additiveCases.map(x => x.qualityEligibleRows),
         [12,13,13,13,12]);
     assert.deepEqual(report.integrityPerturbations.map(x => x.excludedRows),
