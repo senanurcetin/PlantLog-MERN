@@ -27,3 +27,35 @@ test('guest-only HTML includes current NEXUS app but not remote runtime scripts'
     assert.doesNotMatch(index,/<script[^>]+src="https?:\/\//i);
     assert.equal(statSync(path.join(root,'nexus-mark.svg')).isFile(),true);
 });
+
+
+test('six scientific labs are separate production chunks, not embedded in initial entry', () => {
+    const names = [
+        'ControlledComparisons', 'EligibilitySensitivityLab',
+        'LifecycleFaultLab', 'TemporalBoundaryLab',
+        'EvidenceMatrixLab', 'EvidenceReviewWorkbench',
+    ];
+    const entry = files.filter(name => /^index-[\\w-]+\\.js$/.test(name));
+    assert.equal(entry.length, 1, 'Vite must emit one entry JavaScript bundle');
+    const emitted = [];
+    for (const name of names) {
+        const chunks = files.filter(file =>
+            new RegExp('^' + name + '-[\\w-]+\\.js$').test(file));
+        assert.equal(chunks.length, 1, name + ' must be a standalone lazy module');
+        emitted.push({ name, compressedBytes: gzipSync(
+            readFileSync(path.join(js, chunks[0])), {level: 9}).length });
+    }
+    const initialGzip = gzipSync(readFileSync(path.join(js, entry[0])), {level: 9}).length;
+    // A total-bundle budget alone would hide accidental reintroduction of
+    // eager code. The formerly monolithic guest build was ~104 KiB gzipped.
+    assert.ok(initialGzip <= 95 * 1024,
+        'Initial guest entry unexpectedly contains heavy laboratory code: ' + initialGzip);
+    const html = readFileSync(path.join(root, 'index.html'), 'utf8');
+    for (const name of names) {
+        assert.doesNotMatch(html, new RegExp(name + '-[\\w-]+\\.js'),
+            'HTML must not eagerly preload the ' + name + ' laboratory');
+    }
+    console.log('PUBLIC_DEMO_LAZY_CHUNKS ' + JSON.stringify({
+        initialEntryGzipBytes: initialGzip, experiments: emitted,
+    }));
+});
