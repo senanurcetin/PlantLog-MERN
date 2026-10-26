@@ -99,6 +99,24 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
+## Intentional failed-module browser recovery (development branch)
+
+The Chrome guest smoke now opens a **fresh browser context** and deliberately
+aborts the `TemporalBoundaryLab` JavaScript request. It confirms that the
+failure is bounded by the selected laboratory: the static quality metrics and
+workload overview remain accessible; no successful experiment or verified
+maintenance record is claimed; the internal import exception is not shown;
+the user can select another laboratory without a reload. Since JavaScript
+module-loader import failures are cached for that page session, the fallback
+also offers a clearly named **full-page reload** which discards all temporary
+scenario entries. The test unblocks the module, reloads, and confirms that
+the previously unavailable laboratory can render successfully.
+
+The simulation is a controlled request abort in local real Chrome, not
+evidence of production network reliability, industrial connectivity,
+or availability of a backend. Tests must not turn off React error handling
+to simulate the problem.
+
 ## Laboratory code-splitting and request inspection
 
 The static production build emits six lazily imported experiment bundles,
