@@ -174,6 +174,18 @@ The raw-versus-eligible difference is an arithmetic sensitivity check, not a
 failure model, risk probability, causal estimate or real plant statistic.
 See the [protocol, denominator and limitations](eligibility-sensitivity-method.md).
 
+## Lifecycle fault-injection laboratory
+
+The guest Demo Insights page now offers an **independent, eleven-case
+fictional status-history experiment**. Select a deliberately corrupted version
+of one documented maintenance chain to observe nine diagnostic categories,
+including missing histories versus invalid timelines and overlapping defects.
+The experiment **does not** alter the original records or change the eight
+basic eligibility rules. A separate exhaustive model check enumerates
+19,531 fictional action-attempt prefixes and confirms rejection, reset and
+in-memory timeline invariants; it does not exercise the production system.
+See [model and fault-injection methodology](lifecycle-traceability.md).
+
 ## Controlled synthetic comparison examples
 
 The live Demo Insights section also compares five deterministic
