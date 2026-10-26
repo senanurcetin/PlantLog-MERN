@@ -106,7 +106,7 @@ test('empty input is valid, forged or ambiguous matrix entries fail closed', () 
     const proper = buildEvidenceMatrix(fixture.assets, fixture.logs, snapshot);
     const wrongCount = clone(proper);
     wrongCount.excludedRows++;
-    assert.throws(() => buildSyntheticReviewQueue(wrongCount), /do not reconcile/);
+    assert.throws(() => buildSyntheticReviewQueue(wrongCount), /differ from the independent evidence matrix/);
     const repeatedPosition = clone(proper);
     repeatedPosition.rowAssessments[1].ordinal = repeatedPosition.rowAssessments[0].ordinal;
     assert.throws(() => buildSyntheticReviewQueue(repeatedPosition), /repeated synthetic review row/);
