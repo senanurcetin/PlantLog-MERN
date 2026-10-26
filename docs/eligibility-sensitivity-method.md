@@ -88,12 +88,19 @@ perturbations, and explicit validity limits. It has **no real-time timestamp,
 network input or random seed**, so consecutive executions produce
 byte-identical evidence on the same sources.
 
-The evidence format is now **schema version 2**, retaining the prior
+The evidence format previously added timeline history in schema version 2, retaining the prior
 quality and perturbation sections while adding `lifecycleTraceability`.
 Its nine counters classify recorded status-event consistency independently
 of the eight log-eligibility gates. See the
 [lifecycle traceability protocol](lifecycle-traceability.md) for
 the 3 / 9 / 0 documented / missing / invalid reference split.
+
+The deterministic evidence format is **schema version 3**. In addition to
+base eligibility and status-history traceability, the artifact records
+19,531 exhaustive fictional action-attempt prefixes and 11 independent
+status-history fault cases. These are bounded software-consistency checks,
+not time-to-repair estimates, field validation or external scientific evidence.
+For the complete scope, see [lifecycle traceability](lifecycle-traceability.md).
 
 The ordinary `npm run test:demo` run asserts the baseline arithmetic and
 artifact reproducibility; GitHub Actions publishes the report as the
