@@ -1,5 +1,6 @@
 import { advanceScenario, emptyScenario, scenarioToLog } from './scenario';
-import type { ScenarioAction, ScenarioAsset, ScenarioPhase, ScenarioState } from './scenario';
+import type { ScenarioAction, ScenarioPhase, ScenarioState } from './scenario';
+import type { DemoInsightAsset } from './insights';
 import { assessLifecycleTraceability } from './traceability';
 import { assessDemoDataQuality } from './quality';
 
@@ -32,7 +33,7 @@ const forward: Readonly<Record<ScenarioPhase, Partial<Record<ScenarioAction, Sce
  * No random seed, clock, file I/O, user data, API or browser storage.
  */
 export const runScenarioModelCheck = (
-    assets: ScenarioAsset[], snapshot: string,
+    assets: DemoInsightAsset[], snapshot: string,
 ): ScenarioModelEvidence => {
     const asset = assets.find(item => item.id === 'A03' && item.status !== 'decommissioned');
     if (!asset) throw new Error('Model check needs fictional, in-service A03');
@@ -85,7 +86,7 @@ export const runScenarioModelCheck = (
                     throw new Error('Invalid fictional action unexpectedly accepted');
                 } catch (error) {
                     if (!(error instanceof Error) ||
-                        error.message === 'Invalid fictional action unexpectedly accepted') {
+                        !/^(Reset the example before opening another case|The demonstration lifecycle advances one verified step at a time)$/.test(error.message)) {
                         throw error;
                     }
                     rejectedActions++;
