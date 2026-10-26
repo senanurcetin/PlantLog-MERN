@@ -106,10 +106,15 @@ export const assessLifecycleTraceability = (
                         recordDate === null || changedAt !== recordDate) {
                         issues.add('INVALID_OPEN_EVENT');
                     }
-                } else if (event.from !== previousState ||
-                    typeof event.to !== 'string' ||
-                    !nextStates[previousState ?? '']?.includes(event.to as string)) {
-                    issues.add('INVALID_TRANSITION');
+                } else {
+                    const permitted = previousState !== null &&
+                        Object.prototype.hasOwnProperty.call(nextStates, previousState)
+                        ? nextStates[previousState] : [];
+                    if (event.from !== previousState ||
+                        typeof event.to !== 'string' ||
+                        !permitted.includes(event.to as string)) {
+                        issues.add('INVALID_TRANSITION');
+                    }
                 }
                 previousState = typeof event.to === 'string' ? event.to : null;
             });
