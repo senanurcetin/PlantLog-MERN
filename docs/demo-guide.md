@@ -210,7 +210,7 @@ so the number of filtered rows is computed from unique positions, not from
 adding diagnostic frequencies. Filters are local, reset upon changing the
 example population, and do not save an investigation outcome.
 
-## Failure isolation for lazy experiments (development branch)
+## Failure isolation for lazy experiments (published guest demo)
 
 A `SyntheticLabErrorBoundary` contains dynamic import or panel-render
 errors to the **selected research panel**. The surrounding synthetic
@@ -226,7 +226,7 @@ The reload action explicitly states that temporary fictional cases and
 experiment selections are cleared. Neither recovery action writes
 to the database or sends error telemetry.
 
-## Verified on-demand JavaScript loading (development branch)
+## Verified on-demand JavaScript loading (published guest demo)
 
 The six laboratories now use React `lazy()` and Vite dynamic imports,
 so choosing an experiment downloads its dedicated code chunk only when needed.
@@ -247,7 +247,7 @@ measurements of the published Vercel deployment.
 The synthetic evidence computations, report schema v5, source fixture
 and no-industrial-connectivity claims are unchanged.
 
-## On-demand research laboratory navigation (development branch)
+## On-demand research laboratory navigation (published guest demo)
 
 The Demo Insights screen now separates its fixed summary from **six
 individually selectable scientific panels**: controlled comparisons,
@@ -265,10 +265,11 @@ controlled comparisons as the initial panel. This is **progressive UI
 disclosure**, not fewer quality checks or a change to scientific evidence
 criteria.
 
-The dated screenshots in this document were captured from earlier code
-and are **not** evidence that this unmerged branch is deployed. The new
-navigation is verified with a local guest-only Chrome build; the publicly
-hosted demo remains unchanged.
+The current [screenshot gallery](screenshots/README.md) shows the six-panel
+navigation from the guest-only build at its manifest's exact revision. The
+published Vercel demo uses the same API-free build mode; live-site navigation
+was independently checked in [release verification](release-verification.md).
+Screenshot capture itself remains local Chromium, not a direct live-site capture.
 
 ## Synthetic evidence review workbench
 
