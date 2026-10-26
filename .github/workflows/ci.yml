@@ -157,6 +157,51 @@ jobs:
           path: backend/test-artifacts/restore-verification.json
           if-no-files-found: warn
 
+  backend-load:
+    # Synthetic performance observations, NOT public load testing or SLA.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mongodb:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 8
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Exercise bounded localhost API workload and MongoDB reconnection
+        env:
+          PLANTLOG_CI_MONGO_CONTAINER_ID: ${{ job.services.mongodb.id }}
+        run: npm run test:load:ci
+
+      - name: Archive synthetic measurements only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-synthetic-load-resilience
+          path: backend/test-artifacts/synthetic-load-resilience.json
+          if-no-files-found: warn
+
   frontend-browser:
     # Pinned until the project's Playwright 1.56 runtime supports newer runners.
     runs-on: ubuntu-24.04
