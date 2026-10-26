@@ -170,8 +170,9 @@ It also checks readiness/liveness during a deliberate database disconnection
 and following reconnection. This is *not* production benchmarking or high
 availability. See [load and resilience protocol](docs/preproduction-load-resilience.md).
 
-**Supply-chain verification:** all 495 currently locked transitive packages
-now use the official npm registry with unchanged SHA-512 integrity digests.
+**Supply-chain verification:** the locked transitive packages
+use the official npm registry with verified SHA-512 integrity digests;
+subsequent security fixes may update compatible package versions.
 A dedicated CI job audits runtime and development dependencies and creates
 frontend/backend runtime CycloneDX SBOMs. High/critical runtime advisories
 fail CI; full development-advisory risk remains subject to review. See
