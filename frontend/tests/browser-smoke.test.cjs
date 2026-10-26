@@ -138,7 +138,7 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         const faultSelect = fault.getByRole('combobox', { name: 'Fictional experiment' });
         assert.equal(await faultSelect.locator('option').count(), 11);
         await faultSelect.selectOption('overlap');
-        assert.equal(await fault.getByText('4 / 9', { exact: true }).isVisible(), true);
+        await fault.getByText('4 / 9', { exact: true }).waitFor();
         for (const code of ['INVALID_TRANSITION', 'AFTER_SNAPSHOT',
             'MISSING_ACTOR', 'FINAL_STATE_MISMATCH']) {
             assert.equal(await fault.getByText(code, { exact: true }).isVisible(), true);
@@ -147,9 +147,9 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
             'Faulted timeline may still pass separate basic data checks');
         await faultSelect.selectOption('unrecorded');
         assert.equal(await fault.getByRole('heading', { name: 'Unrecorded history' }).isVisible(), true);
-        assert.equal(await fault.getByText('MISSING_HISTORY', { exact: true }).isVisible(), true);
+        await fault.getByText('MISSING_HISTORY', { exact: true }).waitFor();
         await faultSelect.selectOption('baseline');
-        assert.equal(await fault.getByText('0 / 9', { exact: true }).isVisible(), true);
+        await fault.getByText('0 / 9', { exact: true }).waitFor();
 
         const chronology = page.locator('section[aria-labelledby="temporal-boundary-heading"]');
         const chronologySelect = chronology.getByRole('combobox', {
@@ -157,16 +157,15 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         });
         assert.equal(await chronologySelect.locator('option').count(), 12);
         await chronologySelect.selectOption('post-snapshot-transition');
-        assert.equal(await chronology.getByText('AFTER_SNAPSHOT', { exact: true }).isVisible(), true);
+        await chronology.getByText('AFTER_SNAPSHOT', { exact: true }).waitFor();
         assert.equal(await chronology.getByText('Eligible', { exact: true }).isVisible(), true);
         assert.equal(await chronology.getByText('Invalid', { exact: true }).isVisible(), true);
         assert.equal(await chronology.getByText('Expected behavior', { exact: true }).isVisible(), true);
         await chronologySelect.selectOption('non-leap-day');
         assert.equal(await chronology.getByText('Excluded', { exact: true }).isVisible(), true);
-        assert.equal(await chronology.getByText('INVALID_EVENT_TIMESTAMP',
-            { exact: true }).isVisible(), true);
+        await chronology.getByText('INVALID_EVENT_TIMESTAMP', { exact: true }).waitFor();
         await chronologySelect.selectOption('leap-day');
-        assert.equal(await chronology.getByText('Verified', { exact: true }).isVisible(), true);
+        await chronology.getByText('Verified', { exact: true }).waitFor();
         await chronologySelect.selectOption('ordinary');
 
         const matrix = page.locator('section[aria-labelledby="evidence-matrix-heading"]');
