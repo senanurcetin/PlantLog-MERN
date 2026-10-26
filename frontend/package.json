@@ -8,7 +8,7 @@
         "build": "tsc -b && vite build",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
-        "test:demo": "node --test tests/demo-data.test.cjs tests/demo-insights.test.cjs tests/demo-quality.test.cjs tests/demo-comparisons.test.cjs tests/demo-evidence.test.cjs tests/demo-sensitivity.test.cjs tests/demo-traceability.test.cjs tests/demo-exhaustive-lifecycle.test.cjs tests/demo-scenario.test.cjs tests/nexus-brand.test.cjs",
+        "test:demo": "node --test tests/demo-data.test.cjs tests/demo-insights.test.cjs tests/demo-quality.test.cjs tests/demo-comparisons.test.cjs tests/demo-evidence.test.cjs tests/demo-sensitivity.test.cjs tests/demo-traceability.test.cjs tests/demo-exhaustive-lifecycle.test.cjs tests/demo-temporal-boundaries.test.cjs tests/demo-scenario.test.cjs tests/nexus-brand.test.cjs",
         "test:registry": "node --test tests/registry-filters.test.cjs tests/session-store.test.cjs",
         "test:perf": "npm run build && node --test tests/performance-budget.test.cjs"
     },
