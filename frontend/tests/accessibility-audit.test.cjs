@@ -48,7 +48,9 @@ test('public synthetic demo has no serious/critical automated accessibility viol
 
     const scans = [];
     async function scan(view, viewport) {
-        await page.getByRole('heading', { name: 'Know what needs attention.' }).waitFor();
+        // The overview hero is deliberately absent in other demo views.
+        // The shared accessible main landmark stays present in all five views.
+        await page.locator('#main-demo-content').waitFor();
         const report = await new AxeBuilder({ page }).withTags([
             'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa',
         ]).analyze();
