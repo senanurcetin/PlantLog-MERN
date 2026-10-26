@@ -7,6 +7,51 @@ on:
     branches: [main]
 
 jobs:
+  supply-chain:
+    # Public dependency inventories only. No application secrets or live data.
+    # HIGH/CRITICAL production dependency advisories fail CI. Dev-only
+    # advisories remain visible in the report pending separate review.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Verify pinned registry source and audit parser
+        run: node --test scripts/verify-supply-chain.test.cjs
+
+      - name: Install locked backend dependencies from canonical npm
+        run: npm ci --prefix backend --ignore-scripts
+
+      - name: Install locked frontend dependencies from canonical npm
+        run: npm ci --prefix frontend --ignore-scripts
+
+      - name: Audit runtime and full dependency trees and generate CycloneDX SBOMs
+        run: node scripts/verify-supply-chain.cjs
+
+      - name: Archive only non-secret component inventories and advisory summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-supply-chain-evidence
+          path: |
+            test-artifacts/supply-chain/supply-chain-report.json
+            test-artifacts/supply-chain/backend-runtime.cdx.json
+            test-artifacts/supply-chain/frontend-runtime.cdx.json
+          if-no-files-found: warn
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
