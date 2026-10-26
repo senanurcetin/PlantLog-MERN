@@ -170,6 +170,13 @@ It also checks readiness/liveness during a deliberate database disconnection
 and following reconnection. This is *not* production benchmarking or high
 availability. See [load and resilience protocol](docs/preproduction-load-resilience.md).
 
+**Supply-chain verification:** all 495 currently locked transitive packages
+now use the official npm registry with unchanged SHA-512 integrity digests.
+A dedicated CI job audits runtime and development dependencies and creates
+frontend/backend runtime CycloneDX SBOMs. High/critical runtime advisories
+fail CI; full development-advisory risk remains subject to review. See
+[supply-chain protocol](docs/preproduction-supply-chain.md).
+
 ## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
