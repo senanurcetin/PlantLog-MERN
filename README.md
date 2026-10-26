@@ -154,6 +154,15 @@ administrators can review bounded pages at `GET /api/audit`; records use an
 approximately 30-day MongoDB TTL. This is *not* an immutable or guaranteed
 audit ledger. Details and failure modes: [audit trail protocol](docs/audit-trail-protocol.md).
 
+**Synthetic recovery and concurrency checks:** GitHub Actions creates
+test-only MongoDB records, dumps and restores them into a different
+temporary namespace, then validates data/index fingerprints; only an audit
+manifest is kept, never the database archive. The local API supports optional
+strong `If-Match` revision preconditions for asset/log edits and rejects
+stale writes with HTTP 412 while preserving atomic compare-and-swap conflicts
+(409). These are engineering checks, **not** a production backup plan or
+load testing. See [recovery/concurrency protocol](docs/preproduction-recovery-concurrency.md).
+
 ## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.

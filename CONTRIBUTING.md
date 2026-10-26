@@ -24,4 +24,6 @@ Security policy unit tests run alongside the backend build. The separate `npm ru
 
 All authenticated API, environment and Compose networking changes must also preserve the local-only binding and readiness contract in [the pre-production readiness matrix](docs/preproduction-readiness.md). Passing CI does **not** authorize Internet-facing backend deployment.
 
+For any database persistence or lifecycle change, keep the [synthetic restore and competing-write proof](docs/preproduction-recovery-concurrency.md) consistent with the collection schema and \`__v\` behavior. CI only restores fabricated records to short-lived databases; do not use it against personal or live data.
+
 See [SECURITY.md](SECURITY.md) for private vulnerability disclosure.
