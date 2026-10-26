@@ -169,6 +169,18 @@ Mismatches and truncation are rejected rather than repaired.
 Its SHA-256 digest only labels the reproducible local bytes; it cannot
 prove the historical authenticity of an industrial maintenance event.
 
+## Actual-browser review of synthetic laboratory controls
+
+Besides pure fixture tests, [the guest browser smoke](../frontend/tests/browser-smoke.test.cjs)
+checks the fault-lab selectors, UTC chronology distinctions, anonymous
+six-cell matrix, temporary scenario population and reset in Chromium.
+Both matrix tables must be keyboard-focusable at mobile width and all
+simulated interactions must avoid authenticated `/api/` requests.
+The [automated accessibility audit](../frontend/tests/accessibility-audit.test.cjs)
+also covers selected diagnostic states at desktop and mobile sizes.
+These checks are bounded UI regressions, not a proof of industrial
+maintenance event authenticity or complete accessibility conformance.
+
 ## Explicit non-claims
 
 Internal consistency does **not** independently prove that any transition
