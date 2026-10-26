@@ -6,7 +6,24 @@ on:
   pull_request:
     branches: [main]
 
+
 jobs:
+  documentation:
+    # Validate screenshots/images, local Markdown navigation and SHA-256
+    # capture evidence. No browser install, credentials or MongoDB required.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Check curated documentation and eleven screenshot checksums
+        run: node scripts/verify-repository-docs.cjs
   supply-chain:
     # Public dependency inventories only. No application secrets or live data.
     # HIGH/CRITICAL production dependency advisories fail CI. Dev-only
