@@ -35,11 +35,11 @@ export class SyntheticLabErrorBoundary extends Component<Props, State> {
             <section className="nexus-card rounded-xl border border-amber-300
                 bg-amber-50 p-5 text-amber-950"
                 aria-labelledby="synthetic-lab-unavailable-title">
-                <h3 id="synthetic-lab-unavailable-title" role="alert"
+                <h3 id="synthetic-lab-unavailable-title"
                     className="text-base font-bold">
                     Fictional laboratory unavailable
                 </h3>
-                <p className="mt-2 max-w-2xl text-sm">
+                <p className="mt-2 max-w-2xl text-sm" role="alert">
                     The selected laboratory could not be displayed.
                     Your other read-only summaries are unaffected.
                     No analysis was completed and no maintenance record
