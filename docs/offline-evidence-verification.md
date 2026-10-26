@@ -15,7 +15,7 @@ It then applies three distinct rules:
 1. **Parseability and contract:** valid JSON object with known
    `schemaVersion: 5`.
 2. **Canonical representation:** the exact deterministic serialization is
-   `JSON.stringify(report, null, 2) + "\\n"`. Alternate whitespace, key
+   `JSON.stringify(report, null, 2) + '\n'`. Alternate whitespace, key
    order, extra bytes or missing final newline are not the archived format.
 3. **Reconstruction from local sources:** independently call
    `buildReport()` using the currently checked-out fictional fixture and
