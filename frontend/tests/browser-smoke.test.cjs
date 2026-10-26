@@ -397,6 +397,78 @@ test('public portfolio demo works in a browser without API access', { timeout: 9
         }
         assert.deepEqual(apiCalls, [], 'Static browser walk-through must not send API requests');
         assert.deepEqual(pageErrors, [], 'Browser navigation must not emit JavaScript exceptions');
+
+        // A deliberate network failure must not blank the Insights overview,
+        // leave the guest unable to select another lab, leak a stack trace,
+        // or claim that a failed experiment produced validated evidence.
+        // A fresh browser context prevents earlier cached experiment chunks
+        // from masking the abort.
+        const failureContext = await browser.newContext({
+            viewport: { width: 390, height: 844 },
+        });
+        t.after(async () => { await failureContext.close(); });
+        const broken = await failureContext.newPage();
+        let blockedChunks = 0;
+        const failedApi = [];
+        broken.on('request', request => {
+            if (new URL(request.url()).pathname.startsWith('/api/'))
+                failedApi.push(request.url());
+        });
+        const failImport = async route => {
+            blockedChunks++;
+            await route.abort('failed');
+        };
+        await broken.route('**/assets/TemporalBoundaryLab-*.js', failImport);
+        await broken.goto(base + '/demo', { waitUntil: 'networkidle' });
+        await broken.getByRole('button', { name: 'Demo insights' }).click();
+        await broken.getByRole('heading', {
+            name: 'Controlled fictional case comparisons',
+        }).waitFor();
+        await broken.getByRole('group', {
+            name: 'Select synthetic evidence laboratory',
+        }).getByRole('button', { name: /^UTC boundary cases/ }).click();
+        const unavailable = broken.getByRole('heading', {
+            name: 'Fictional laboratory unavailable',
+        });
+        await unavailable.waitFor();
+        assert.equal(blockedChunks, 1, 'Only the selected simulated module was blocked');
+        assert.equal(await broken.getByRole('heading', {
+            name: 'Recorded activity at a glance',
+        }).isVisible(), true, 'Core insights must remain mounted after import failure');
+        assert.equal(await broken.getByText('12 / 12 eligible rows').isVisible(), true);
+        assert.equal(await broken.getByText(
+            'No analysis was completed and no maintenance record',
+            { exact: false }).isVisible(), true);
+        assert.equal(await broken.locator('#selected-synthetic-laboratory')
+            .getByText('Failed to fetch dynamically imported module').count(), 0,
+        'Do not expose internal browser module errors in the guest view');
+        await broken.getByRole('button', { name: 'Open controlled comparisons' }).click();
+        await broken.getByRole('heading', {
+            name: 'Controlled fictional case comparisons',
+        }).waitFor();
+        // Import failure is cached by the browser module loader: retry must
+        // use a complete navigation, not a misleading React-only reset.
+        await broken.getByRole('group', {
+            name: 'Select synthetic evidence laboratory',
+        }).getByRole('button', { name: /^UTC boundary cases/ }).click();
+        await unavailable.waitFor();
+        await broken.unroute('**/assets/TemporalBoundaryLab-*.js', failImport);
+        await broken.getByRole('button', {
+            name: 'Reload demo and clear temporary cases',
+        }).click();
+        await broken.getByRole('heading', {
+            name: 'Know what needs attention.',
+        }).waitFor();
+        await broken.getByRole('button', { name: 'Demo insights' }).click();
+        await broken.getByRole('group', {
+            name: 'Select synthetic evidence laboratory',
+        }).getByRole('button', { name: /^UTC boundary cases/ }).click();
+        await broken.getByRole('heading', {
+            name: 'Synthetic UTC boundary experiments',
+        }).waitFor();
+        assert.deepEqual(failedApi, [], 'Failed module and recovery must remain guest-only');
+        assert.equal(await broken.evaluate(() =>
+            document.documentElement.scrollWidth <= window.innerWidth), true);
     } catch (error) {
         mkdirSync(path.join(frontendRoot, 'test-artifacts'), { recursive: true });
         await page.screenshot({
