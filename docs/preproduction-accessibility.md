@@ -9,7 +9,9 @@ starting the authenticated API or accessing MongoDB.
 ## Automated coverage
 
 The GitHub Actions `frontend-browser` job installs fixed CI-only versions
-of Playwright and `@axe-core/playwright`, then executes
+of Playwright and `@axe-core/playwright`, uses the system Chrome preinstalled
+on the pinned `ubuntu-24.04` GitHub runner (its version is logged by CI),
+then executes
 `frontend/tests/accessibility-audit.test.cjs`. It tests **five** views
 (overview, equipment registry, maintenance log, analytics, scenario) at
 **1280px desktop** and **390px mobile** widths — **ten scans** total.
@@ -45,6 +47,10 @@ supported **Vite 6.4.5** maintenance series. Existing React 18 and
 with the official npm registry; installation, TypeScript build, bundle budget,
 synthetic fixture tests, lint, full Chromium flows and npm advisory/SBOM
 checks must all pass together.
+
+The runner-supplied Chrome is not version-locked: the CI image can change.
+Tests must keep a real browser (not a DOM emulation), and the installed
+browser version must remain visible in the job logs.
 
 This protects the development toolchain from advisories resolved in later
 Vite 6.x releases; it does not authorize Internet-facing development servers,
