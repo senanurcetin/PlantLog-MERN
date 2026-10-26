@@ -99,6 +99,22 @@ or external scientific validity are asserted.
 The eight-day chart has a labelled keyboard-focusable scrolling region.
 The browser test verifies it and the fixture eligibility counts.
 
+## Documentary-review workbench browser checks
+
+The local Chromium smoke additionally exercises the new read-only reviewer
+queue: filtering all 12 fictional rows into nine missing histories or three
+internally consistent timelines, exploring six controlled cases, confirming
+three excluded rows and a separately conflicting history, and restoring the
+original population. It checks the mobile table is keyboard-focusable,
+has no document-level overflow, and never calls the authenticated API.
+It also checks that the temporary 13th recorded scenario raises the
+internally consistent category to four, and reset restores 12 rows.
+
+Automated axe coverage adds one filtered review state at both desktop and
+mobile sizes. The full suite now expects **18 scans**: five normal views
+plus four selected lab states at each viewport. This automated rule coverage
+does not constitute manual assistive-technology certification.
+
 ## Laboratory interaction and accessibility regression (development branch)
 
 The guest-only Playwright smoke suite now inspects the **three scientific
@@ -119,9 +135,9 @@ scroll within the panel, without document-level horizontal overflow. Browser
 network interception checks there are no requests to the authenticated
 `/api/` path.
 
-The automated axe-core test now scans all five normal views **plus three
+The automated axe-core test now scans all five normal views **plus four
 selected diagnostic states**, on both 1280 px desktop and 390 px mobile:
-**16 scans** in all. All WCAG 2/2.1 A/AA checks remain enabled, and
+**18 scans** in all. All WCAG 2/2.1 A/AA checks remain enabled, and
 serious/critical findings fail the test. Results are not full accessibility
 certification; manual assistive technology review is still outstanding.
 
