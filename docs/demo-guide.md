@@ -186,6 +186,20 @@ basic eligibility rules. A separate exhaustive model check enumerates
 in-memory timeline invariants; it does not exercise the production system.
 See [model and fault-injection methodology](lifecycle-traceability.md).
 
+## Cross-axis evidence and eligibility explorer
+
+The Demo Insights screen additionally exposes a **2 × 3 synthetic evidence
+matrix**: eligible/excluded basic rows versus consistent/unrecorded/invalid
+status histories. A switch shows either the same fixed fictitious sample
+or six independently reconstructed, deliberately contradictory rows.
+An anonymous row-position ledger explains the separate reasons for each
+classification without copying log identifiers or actors. Counts reconcile
+to the source population; aggregated duplicate counts may differ from the
+number of excluded rows because all ambiguous copies must be excluded.
+The deterministic `scientific-evidence.json` report uses **schema v5**
+and includes `evidenceIntersection`. See
+[the matrix protocol](lifecycle-traceability.md).
+
 ## UTC chronology boundary lab
 
 The synthetic insights panel includes **12 fixed UTC boundary experiments**
