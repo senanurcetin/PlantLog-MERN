@@ -109,6 +109,17 @@ revision headers and MongoDB atomic CAS are also exercised via API
 integration tests. Neither exercise substitutes for real disaster recovery,
 offsite backup security or load/soak certification.
 
+## Bounded load and connection resilience evidence
+
+The [pre-production synthetic load/resilience protocol](preproduction-load-resilience.md)
+documents a dedicated CI job using a temporary loopback MongoDB database,
+150 HTTP requests at maximum concurrency eight, authenticated analytics/registry
+reads and unauthenticated denial checks. A sanitized JSON artifact reports
+status distributions and observed latency percentiles. The same local test
+disconnects and reconnects MongoDB to exercise HTTP health readiness (503
+during disconnect, 200 after reconnect). **No SLO, multi-node fault tolerance,
+sustained capacity or production monitoring has been established.**
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
@@ -118,11 +129,11 @@ offsite backup security or load/soak certification.
 | G03 | Session security: isolated storage, session revocation, recovery, key rotation | **HOLD — tab-scoped JS-readable bearer storage; no recovery, device-specific revocation or verified rotation** |
 | G04 | Audit retention, privacy, personal-data minimization, GDPR/KVKK review | **HOLD — minimal 30-day TTL prototype implemented, but unreviewed retention, deletion and legal compliance** |
 | G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — synthetic same-container logical restore tested in CI; real recovery, RTO/RPO and key rotation unverified** |
-| G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — revision precondition and two-writer CAS invariants tested; no capacity/soak/availability evidence** |
+| G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — bounded 150-request localhost observation and two-writer CAS tested; no capacity/soak/SLO evidence** |
 | G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
 | G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — full enforcement not independently verified** |
 | G09 | Real operational data permissions, domain expert review and safety sign-off | **HOLD — synthetic fixture only** |
-| G10 | Production monitoring, incident response, on-call ownership and rollback | **HOLD — not provisioned** |
+| G10 | Production monitoring, incident response, on-call ownership and rollback | **HOLD — local readiness disconnect/reconnect checked; no monitored production service or incident response** |
 
 The project is considered **engineering-demo ready** when verified tests
 pass at the exact source commit and all known limitations are clearly

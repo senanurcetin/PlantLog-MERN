@@ -163,6 +163,13 @@ stale writes with HTTP 412 while preserving atomic compare-and-swap conflicts
 (409). These are engineering checks, **not** a production backup plan or
 load testing. See [recovery/concurrency protocol](docs/preproduction-recovery-concurrency.md).
 
+**Local load and resilience evidence:** a dedicated CI job sends 150
+synthetic HTTP requests (concurrency eight) to an ephemeral MongoDB-backed
+loopback API, archiving anonymized latency percentiles and status counts.
+It also checks readiness/liveness during a deliberate database disconnection
+and following reconnection. This is *not* production benchmarking or high
+availability. See [load and resilience protocol](docs/preproduction-load-resilience.md).
+
 ## Security and limitations
 
 - **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
