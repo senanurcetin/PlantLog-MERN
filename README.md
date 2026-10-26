@@ -46,6 +46,12 @@ action prefixes, and the deterministic schema-v3 audit keeps these results
 separate from maintenance workload and real industrial reliability claims.
 See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
 
+**UTC chronology laboratory (development only):** an additional synthetic
+read-only Demo Insights panel presents 12 deterministic date/timestamp
+boundary cases. The scientific report schema v4 records expected versus
+observed classifications; no industrial data, live API or runtime is
+introduced. See [event chronology limitations](docs/lifecycle-traceability.md).
+
 ## Problem and approach
 
 In many facilities, asset lists, shift handovers and maintenance histories live in separate spreadsheets or paper registers. PlantLog demonstrates a unified web workflow for tracking equipment and operational events, with a REST API backed by MongoDB.
