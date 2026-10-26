@@ -66,7 +66,7 @@ async function run() {
         const when = new Date();
         const user = await User.create({
             name: 'Synthetic Recovery Operator',
-            email: 'restore-' + token + '@example.invalid',
+            email: 'restore-' + token + '@example.com',
             password: '$2a$10$synthetic.fixture.value.not.a.login.hash.2026',
             role: 'operator', isActive: true,
         });
