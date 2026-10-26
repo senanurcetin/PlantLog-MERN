@@ -120,6 +120,16 @@ disconnects and reconnects MongoDB to exercise HTTP health readiness (503
 during disconnect, 200 after reconnect). **No SLO, multi-node fault tolerance,
 sustained capacity or production monitoring has been established.**
 
+## Dependency provenance and advisory evidence
+
+The [dependency/SBOM protocol](preproduction-supply-chain.md) defines
+canonical npm registry locks (495 transitive packages with preserved SHA-512
+integrity), automated runtime/high+ advisory blocking, full dependency
+vulnerability reporting and runtime CycloneDX inventories for the frontend
+and backend. CI checks the lockfiles and archives inventory evidence but
+does **not** certify dependency origins, build-tool supply chains or
+artifact signing. All formal release gates remain HOLD.
+
 ## Release gates — ALL HOLD until specifically verified
 
 | Gate | Required before external use | Current assessment |
@@ -131,7 +141,7 @@ sustained capacity or production monitoring has been established.**
 | G05 | Database backup/restore, disaster recovery and credential rotation drill | **HOLD — synthetic same-container logical restore tested in CI; real recovery, RTO/RPO and key rotation unverified** |
 | G06 | Load, soak, availability and concurrency benchmarks, error budgets | **HOLD — bounded 150-request localhost observation and two-writer CAS tested; no capacity/soak/SLO evidence** |
 | G07 | Accessibility audit with manual assistive-technology evaluation | **HOLD — browser smoke tests only** |
-| G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — full enforcement not independently verified** |
+| G08 | Dependency/SBOM scanning, supply chain attestation, branch protections | **HOLD — runtime advisory gate, official npm lock sources and SBOMs added; no provenance signing, dev-tool risk sign-off or independent enforcement review** |
 | G09 | Real operational data permissions, domain expert review and safety sign-off | **HOLD — synthetic fixture only** |
 | G10 | Production monitoring, incident response, on-call ownership and rollback | **HOLD — local readiness disconnect/reconnect checked; no monitored production service or incident response** |
 
