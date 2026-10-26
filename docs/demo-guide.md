@@ -210,6 +210,27 @@ so the number of filtered rows is computed from unique positions, not from
 adding diagnostic frequencies. Filters are local, reset upon changing the
 example population, and do not save an investigation outcome.
 
+## Verified on-demand JavaScript loading (development branch)
+
+The six laboratories now use React `lazy()` and Vite dynamic imports,
+so choosing an experiment downloads its dedicated code chunk only when needed.
+Selecting **Demo insights** initially requests only the default controlled
+comparison code; the other five experimental interfaces and their specific
+dependencies are not eagerly included in that screen's initial bundle.
+Already loaded modules are cached by the browser. A bounded loading message
+is shown while a requested chunk resolves.
+
+The production-bundle regression asserts six named deferred chunks and
+a reduced initial JavaScript budget. Local Playwright network interception
+independently asserts that opening the homepage loads **no** scientific
+laboratory chunks, selecting insights loads **only** the comparison chunk,
+and selecting all six subsequently requests each experiment once.
+These tests are local-only, do not contact a backend, and do not constitute
+measurements of the published Vercel deployment.
+
+The synthetic evidence computations, report schema v5, source fixture
+and no-industrial-connectivity claims are unchanged.
+
 ## On-demand research laboratory navigation (development branch)
 
 The Demo Insights screen now separates its fixed summary from **six
