@@ -1,261 +1,105 @@
-# PlantLog — Industrial Asset & Maintenance Logbook
+# PlantLog — NEXUS Industrial Asset & Maintenance Demonstrator
 
-**PRE-PRODUCTION ENGINEERING DEMONSTRATOR — NOT RELEASED FOR PRODUCTION USE.**
+**Advanced, published, synthetic portfolio demo.** PlantLog is a React/TypeScript and Express/MongoDB engineering project. The **public website is guest-only, read-only and uses fictional fixtures**; it does not connect visitors to the authenticated backend, database, industrial assets or real maintenance operations. Industrial operational deployment remains outside this project's approved release scope.
 
-**A NEXUS 2.0 portfolio project.** The public demo and authenticated screens use the original approved NEXUS SVG logo and the Midnight/Cyan/Blue/Lavender/Violet identity. [Brand source and implementation notes](docs/nexus-brand.md).
+[**Open live NEXUS demo**](https://plantlog-nexus-demo.vercel.app/demo) · [Documentation index](docs/README.md) · [Current test and release evidence](docs/release-verification.md) · [Security boundary](SECURITY.md)
 
-![Official NEXUS 2.0 Midnight wordmark](frontend/src/assets/nexus-midnight.svg)
+![Official NEXUS identity](frontend/src/assets/nexus-midnight.svg)
 
-**Release posture:** [Pre-production engineering readiness and explicit HOLD gates](docs/preproduction-readiness.md).
+![Current NEXUS overview, 1440 px browser capture](docs/screenshots/nexus-demo-overview.png)
 
-**Engineering evidence:** [Demo protocol](docs/demo-guide.md) · [Maintenance metrics](docs/maintenance-metrics.md) · [Browser verification](docs/browser-testing.md).
+## What the demo demonstrates
 
-![PlantLog industrial operations workflow](docs/plantlog-workflow.svg)
+- **Equipment register and maintenance log:** fictional assets, incidents, search, filters and per-asset history.
+- **Evidence-aware insights:** workload and source-quality summaries with explicit exclusions; no invented downtime, failure probabilities, MTTR or MTBF.
+- **Six scientific laboratories:** controlled comparisons, eligibility sensitivity, status-history faults, UTC boundary cases, dual-axis evidence matrix and document review workbench. Only the selected experiment is mounted and its JavaScript module loaded.
+- **Scenario sandbox:** one disposable fictional case can move through an in-memory lifecycle and be reset. No database writes or API requests occur.
+- **Resilience and accessibility:** error isolation for deferred modules, explicit reload behavior, keyboard interaction, real-browser smoke checks and automated accessibility audits.
 
-> The architecture diagram illustrates the workflow. The NEXUS screenshots below are captured in real Chromium from the **production-equivalent, guest-only frontend build**. They are not plant telemetry or authenticated production screens. Exact capture assumptions, viewports and commit are listed in [the screenshot manifest](docs/screenshots-manifest.json); the [verification report](docs/demo-verification-2026-10-21.md) states the remaining limits.
+### Current screenshots
 
+The **11 screenshots** are recreated in isolated Chromium from the same guest-only build configuration used for the public site. They are *application UI evidence*, not images of actual facilities or a claim of live-site browser capture. [Gallery and SHA-256 capture manifest](docs/screenshots/README.md).
 
-**MongoDB data integrity:** case-insensitive unique equipment serials, verified at local API startup; long-domain email validation aligned between HTTP and the database. These checks include concurrent synthetic insert tests in disposable MongoDB. See [MongoDB integrity contract](docs/mongodb-integrity-contract.md). The public Vercel demo continues to use read-only fictional data; no Mongo credentials or private API endpoints are shipped.
+[Equipment register](docs/screenshots/nexus-demo-assets.png) · [Maintenance records](docs/screenshots/nexus-demo-logs.png) · [Insights](docs/screenshots/nexus-demo-insights.png) · [UTC lab](docs/screenshots/nexus-lab-utc.png) · [Evidence matrix](docs/screenshots/nexus-lab-evidence-matrix.png) · [Review workbench](docs/screenshots/nexus-lab-review-workbench.png) · [Scenario desktop](docs/screenshots/nexus-scenario-lab-desktop.png) · [Mobile overview](docs/screenshots/nexus-demo-mobile.png)
 
-**React · TypeScript · Node.js/Express · MongoDB · Docker Compose**
-
-A full-stack industrial operations prototype that organizes asset records, maintenance activities and shift incidents into a single operator-facing workflow.
-
-![NEXUS PlantLog guest-only demo overview — reproducible Chromium capture](docs/nexus-demo-overview.png)
-
-**Launch the public read-only demo:** [plantlog-nexus-demo.vercel.app/demo](https://plantlog-nexus-demo.vercel.app/demo). It contains synthetic data only and requires no API, database or login. For reproduction, see the [demo guide](docs/demo-guide.md).
-
-**Screens:** [Equipment register](docs/nexus-demo-assets.png) · [Maintenance log](docs/nexus-demo-logs.png) · [New insights](docs/nexus-demo-insights.png) · [Insights on mobile](docs/nexus-demo-insights-mobile.png) · [Scenario lab](docs/nexus-scenario-lab-desktop.png) · [Scenario lab mobile](docs/nexus-scenario-lab-mobile.png) · [Mobile demo](docs/nexus-demo-mobile.png).
-
-### Advanced demonstration, intentionally not a product
-
-**Scientific integrity:** Demo Insights includes five controlled, single-record fictional comparisons and exposes eight data-quality gates on fictional records; see the [method notes](docs/demo-guide.md#scientific-data-quality-checks).
-
-**Reproducible evidence:** Each frontend demo test run produces a deterministic
-[scientific-audit JSON artifact](docs/eligibility-sensitivity-method.md#machine-readable-scientific-audit-artifact)
-with the fixture SHA-256, eight integrity gates, five additive cases and five
-data-defect sensitivity cases; CI archives it for inspection. This is
-synthetic-data validation, not industrial reliability validation.
-
-**Data-eligibility sensitivity lab:** An interactive fifth-group science panel independently perturbs one existing fictional record across five cases, including duplicate identities and overlapping invalidities. Reviewers can compare raw versus quality-eligible maintenance workload without assuming causal or reliability effects; see the [reproducible scientific protocol](docs/eligibility-sensitivity-method.md).
-
-The publicly hosted `Scenario lab` is an **in-memory educational sandbox**, not a workflow for real incidents. Visitors can try one deterministic, fictional maintenance incident through `open → acknowledged → in progress → resolved`, inspect its temporary impact on Demo Insights, and reset without changing any original fixture. No persistent user state, backend writes, real plant connectivity, account creation, billing or productized service is provided by the hosted demo.
-
-**Lifecycle evidence verification:** the synthetic Demo Insights screen now
-includes 11 independently reconstructed status-history fault examples.
-An exhaustive, fixed-depth reference-model test inspects 19,531 fictional
-action prefixes, and the deterministic audit (initially schema v3) kept these results
-separate from maintenance workload and real industrial reliability claims.
-See [the lifecycle model and fault-injection protocol](docs/lifecycle-traceability.md).
-
-**Offline scientific evidence verification:** the version-5 report can now
-be checked independently against its source and fixture by running
-`cd frontend && npm run evidence:verify` after `npm run test:demo`.
-Read-only validation rejects stale/tampered numbers, changed fixture hashes,
-noncanonical JSON and incompatible schemas without uploading records or
-starting CI. See the [verification protocol](docs/offline-evidence-verification.md).
-The SHA-256 output is a checksum, **not an authenticated signature**.
-
-**Deferred laboratory JavaScript:** the six fictional research tools
-are loaded as separate chunks only after the corresponding selection,
-rather than being shipped in the guest demo's initial JavaScript.
-Browser-request and gzip-budget regressions protect the change;
-[verification details](docs/browser-testing.md).
-
-**Progressive experiment navigation:** the Demo Insights overview now
-keeps its workload and quality summaries always visible while mounting
-only the selected one of six fictional research laboratories. This
-reduces default interactive complexity without dropping data checks,
-and does not change the hosted `main` build. See the
-[guest demo protocol](docs/demo-guide.md).
-
-**Independent reviewer filters:** the workbench supports simultaneous
-documentary category, original history and diagnostic-code filtering,
-including defects that overlap across the separate quality and lifecycle
-audits. It counts unique fictional row positions and changes no data;
-see [review filter methodology](docs/lifecycle-traceability.md).
-
-**Synthetic evidence review workbench:** four read-only documentary categories
-organize the anonymous matrix without treating missing evidence as proof of
-work or assigning industrial risk scores. Review filters are ephemeral;
-the fixture and schema-v5 audit stay unchanged. Details are in the
-[lifecycle and documentary review protocol](docs/lifecycle-traceability.md).
-
-**Dual-axis synthetic evidence:** the guest Demo Insights now has a
-six-cell eligibility-versus-history matrix, a row-position-only audit
-ledger and six controlled contradictions. Scientific evidence **schema v5**
-contains the reconciled counts and anonymized per-row classifications.
-Nothing changes real maintenance systems, public APIs or production gates.
-See [evidence matrix methodology](docs/lifecycle-traceability.md).
-
-**UTC chronology laboratory (development only):** an additional synthetic
-read-only Demo Insights panel presents 12 deterministic date/timestamp
-boundary cases. The report first recorded expected versus
-observed classifications; no industrial data, live API or runtime is
-introduced. See [event chronology limitations](docs/lifecycle-traceability.md).
-
-## Problem and approach
-
-In many facilities, asset lists, shift handovers and maintenance histories live in separate spreadsheets or paper registers. PlantLog demonstrates a unified web workflow for tracking equipment and operational events, with a REST API backed by MongoDB.
-
-## Features
-
-- **Asset registry:** strictly validated metadata updates, central equipment list, searchable status views, supervisor/admin status updates, and spreadsheet-formula-safe CSV export of only the currently filtered equipment. New equipment status events include server timestamps and the authenticated actor; concurrent updates use revision checks. Decommissioning is terminal; new logs cannot be created for decommissioned equipment, but existing history remains accessible. Older records retain unknown status history rather than invented events. Asset creation accepts only validated equipment metadata, normalizes text and starts with `operational` status; operators cannot self-assign a privileged equipment state.
-- **Maintenance and incident records:** strictly validated typed edits, structured operational logs, forward-only state transitions, server-stamped status history, immutable resolved records (amendments use new entries), and filtered CSV export with formula-safe encoding.
-- **Authentication:** Local API JWTs are issuer/audience bound, carry the current account role and revocation version, and expire after eight hours by default. An authenticated logout invalidates all earlier account bearers; role changes require reauthentication. Browser state uses tab-scoped sessionStorage, not durable localStorage. **The browser token remains JS-readable and external production deployment stays blocked.** JWT-backed API authentication and role-oriented application flows. Session changes synchronously clear browser registry caches; late responses from older sessions and obsolete filtered requests are ignored. Registration shares the login email validator, permits only explicit profile fields, and rejects passwords exceeding bcrypt's 72-byte input limit. Asset/log listing APIs expose actor names and roles but do not include other users' email addresses.
-- **Operator dashboard:** overview interface for operational status and recent activity, with responsive authenticated navigation and accessible mobile links. The open maintenance-case KPI includes unresolved incident/maintenance entries only; routine operations and inspections do not inflate this count. Failed data fetches show unavailable values rather than stale KPI counts.
-- **Evidence-aware analytics:** authenticated `/analytics` view and `/api/analytics/maintenance` endpoint for report-to-resolution timing, with eligibility and exclusion counts, type-level breakdowns, equal-duration intake trends and evidence-qualified unresolved age buckets. The `/api/analytics/equipment` endpoint provides a transparent count of unresolved cases created within the chosen period by equipment, including missing-asset and undisplayed-case totals. Outside-window unresolved cases (older, undated, future-dated) are disclosed separately to prevent confusing a quiet reporting period with zero overall backlog. This is **not** MTTR or equipment uptime. See [metric definitions](docs/maintenance-metrics.md).
-- **Separated services:** React/Vite frontend, Express API and MongoDB database.
-
-## Architecture
+## Architecture and deployment boundary
 
 ```mermaid
 flowchart LR
-    A[React + Vite UI] -->|REST + JWT| B[Express API]
-    B --> C[(MongoDB)]
-    D[Docker Compose] -. runs .-> A
-    D -. runs .-> B
-    D -. runs .-> C
+    A[Public read-only demo] --> B[Local synthetic JSON fixture]
+    C[Authenticated frontend, local only] --> D[Express API, loopback]
+    D --> E[(MongoDB, isolated)]
 ```
 
-| Component | Implementation | Location |
+| Component | Directory | Deployment |
 |---|---|---|
-| Web UI | React 18, TypeScript, Vite, Zustand, Tailwind | `frontend/` |
-| API | Node.js, Express, TypeScript, Mongoose | `backend/` |
-| Persistence | MongoDB 6 | Compose service `mongodb` |
-| Deployment demo | Docker Compose / Nginx | `docker-compose.yml` |
+| React/Vite/TypeScript client | `frontend/` | Guest demo publicly hosted on Vercel |
+| Express/TypeScript REST API | `backend/` | Locally bound / CI only |
+| MongoDB with schema and unique indexes | `backend/src/models/` | Local Docker or disposable CI database |
+| Tests, release automation | `.github/workflows/`, `scripts/` | GitHub Actions |
+| Reproducible screenshots and technical protocols | `docs/` | Repository documentation |
 
-## Public, read-only demo
+The backend provides role-aware local authentication, server-stamped lifecycle histories, validated CRUD, revision checks, audit diagnostics, liveness/readiness, and strict case-insensitive unique equipment serial numbers at the MongoDB index level. **Its existence in source control does not make it a public backend service.** See [MongoDB integrity](docs/mongodb-integrity-contract.md) and [local API readiness](docs/preproduction-readiness.md).
 
-The publicly hosted static frontend runs with `VITE_PUBLIC_DEMO_ONLY=true`, so /, /login, /register and protected routes all lead to the read-only /demo route. The local full-stack configuration keeps the login, registration, dashboard and API screens available. The standalone frontend route `/demo` uses fully synthetic bundled fixtures. It needs **no account, API, MongoDB, credentials or external plant connection**. Visit the route through your hosted frontend or run `cd frontend && npm ci && npm run dev`, then open `http://localhost:5173/demo`. You can inspect KPIs, browse equipment, search/filter logs, drill into per-asset history, use **Demo insights** to inspect synthetic workload counts, and follow a fifth **Scenario lab** tab through a fictional incident lifecycle (report → acknowledge → in progress → resolve → reset). All scenario actions are local and ephemeral; they do not store anything, create accounts, or call the API. Unlike predictive maintenance or reliability reporting, it makes no unsupported MTTR, uptime or failure-probability claims. All interactions are read-only; there is no database persistence. See [demo guide](docs/demo-guide.md).
+## Run the guest demo locally
 
-## Getting started
-
-### Option A — Docker Compose (local demo)
-
-**Requirements:** Docker Engine or Docker Desktop with Compose and loopback ports 8081, 5000 and 27017 available. **All three** services publish to `127.0.0.1` only.
+**Prerequisite:** Node.js 20+ and npm.
 
 ```bash
 git clone https://github.com/senanurcetin/PlantLog-MERN.git
-cd PlantLog-MERN
+cd PlantLog-MERN/frontend
+npm ci
+VITE_PUBLIC_DEMO_ONLY=true npm run dev
+```
 
-# Generate a strong random secret before starting the stack.
-# Linux/macOS (OpenSSL):
+Open `http://localhost:5173/demo`. This path does not need MongoDB or an account. On Windows PowerShell set `$env:VITE_PUBLIC_DEMO_ONLY='true'` before `npm run dev`.
+
+## Run the local full stack (engineering use only)
+
+`docker-compose.yml` binds **all host ports to 127.0.0.1**: frontend 8081, API 5000 and MongoDB 27017. Docker Engine and Compose must be running. Set a **unique JWT_SECRET of at least 32 characters** in the invoking environment; do not commit credentials.
+
+```bash
 export JWT_SECRET="$(openssl rand -hex 32)"
 docker compose up --build -d
+docker compose ps
+docker compose down
 ```
 
-On PowerShell, generate a random key using:
+For manual development, copy `backend/.env.example` and `frontend/.env.example` to their local `.env` files, configure local MongoDB and start each service with `npm run dev`. The authenticated API must **not** be exposed to the Internet without an independent security design and acceptance process.
 
-```powershell
-$bytes = New-Object byte[] 32
-[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
-$env:JWT_SECRET = [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
-```
-
-- Web application: `http://localhost:8081`
-- REST API: `http://localhost:5000/api`
-- MongoDB: `127.0.0.1:27017` (bound to the local machine only)
-
-Stop the stack with `docker compose down`; add `-v` **only** if you intentionally want to delete the database volume.
-
-### Option B — Run services locally
-
-**Requirements:** Node.js 20+, npm, and a running local MongoDB instance.
+## Reproducible verification
 
 ```bash
 cd backend
-npm install
-cp .env.example .env
-# Edit .env and set MONGO_URI and a strong JWT_SECRET
-npm run dev
+npm ci
+npm test
+# Requires disposable localhost MongoDB:
+npm run test:integration
+
+cd ../frontend
+npm ci
+npm run test:demo
+npm run test:registry
+npm run lint
+VITE_PUBLIC_DEMO_ONLY=true npm run test:perf
+npm run evidence:verify
 ```
 
-Start the frontend in a separate terminal from the repository root:
+CI separately exercises actual MongoDB integrations, synthetic backup/restore, bounded local load, security/supply-chain checks, browser onboarding and accessibility. [Release evidence and limits](docs/release-verification.md) · [Screenshot reproducibility](docs/screenshots/README.md).
 
-```bash
-cd frontend
-npm install
-cp .env.example .env
-# VITE_API_URL defaults to http://localhost:5000/api
-npm run dev
-```
+## Repository organization
 
-PowerShell users can replace `cp` with `Copy-Item`.
+- `frontend/src/` — routes, components, fixture-driven guest demo and local authenticated views
+- `frontend/tests/` — scientific, UI, browser and accessibility regressions
+- `frontend/scripts/` — screenshot and scientific verification tooling
+- `backend/src/` — routes, controllers, models, validation, auth and database checks
+- `backend/tests/` and `backend/integration/` — policy tests and disposable MongoDB HTTP test
+- `docs/` — curated engineering protocols; see [documentation index](docs/README.md)
+- `docs/screenshots/` — current browser images, capture script provenance and SHA-256 manifest
+- `.github/workflows/` — CI and reproducible visual evidence
 
-The included Compose configuration binds the frontend (port 8081), API (port 5000) and MongoDB (port 27017) to host `127.0.0.1` only. Within its private network the API explicitly binds `0.0.0.0`; directly started API processes bind loopback by default. Compose explicitly sets `REGISTRATION_ENABLED=true` for this **local demo**. Server startup rejects missing or weak JWT secrets. A production environment outside Compose defaults to registration disabled unless `REGISTRATION_ENABLED=true` is explicitly set; do not enable it on public infrastructure without stronger ingress controls.
+## Limitations and license
 
-Once the backend and MongoDB are running, visit `http://localhost:5173/register` to create an **operator** account (minimum 12-character password). The local Compose frontend uses `http://localhost:8081/register`. Operators can create assets and maintenance records but cannot change asset metadata or delete assets. There is deliberately **no public privilege escalation flow**: supervisor and administrator roles require trusted out-of-band provisioning. Never expose the development registration endpoint publicly without access controls and rate limiting.
+PlantLog is **not** a certified CMMS/EAM, safety system, plant telemetry integration, or production service for genuine operator data. All public records are invented. Passing CI or an automated WCAG check does not certify reliability or compliance. Industrial production acceptance gates G01–G10 remain HOLD.
 
-## Validation
-
-```bash
-cd backend && npm ci && npm test
-cd ../frontend && npm ci && npm run lint && npm run test:demo && npm run test:registry && npm run test:perf
-```
-
-The frontend lint command uses the checked-in ESLint 8 / TypeScript / React Hooks configuration and runs without accessing any backend or CI runner. GitHub Actions also exercises lint and the reproducible compressed-bundle budget; the browser job separately tests the public demo and authenticated local flow. Confirm the current commit's actual job results instead of relying on older screenshots or local reports.
-
-The public demo additionally has a [real Chromium smoke test](docs/browser-testing.md) in GitHub Actions, distinct from the frontend build and fixture unit tests. The backend includes Node built-in policy and lifecycle regression tests for registration roles, write-field allowlists, log metrics and JWT secret configuration. The `backend-integration` GitHub Actions job additionally runs an HTTP/MongoDB lifecycle test covering authentication, role boundaries, asset CRUD rules, history-preserving deletion, lifecycle transitions and analytical exclusions. This is **not** a substitute for browser-level end-to-end testing, load testing or production security assessment.
-
-Run the MongoDB-backed test locally against a local MongoDB server listening on `127.0.0.1:27017` with `cd backend && npm ci && npm run test:integration`. It creates a randomly named **test-only local database** and deletes it after the test. The test does not accept a remote database URI.
-
-**Runtime health checks:** `/api/health/live` signals HTTP process liveness; `/api/health/ready` returns 503 until MongoDB is connected or when the server begins shutdown. The legacy `/api/health` route is liveness only, not readiness. See [operational scope and remaining release gates](docs/preproduction-readiness.md).
-
-**Pre-production audit events:** the authenticated local API tracks a fixed
-set of auth, equipment and maintenance operation outcomes with minimal IDs and
-status codes, never raw requests or bearer tokens. Supervisors and
-administrators can review bounded pages at `GET /api/audit`; records use an
-approximately 30-day MongoDB TTL. This is *not* an immutable or guaranteed
-audit ledger. Details and failure modes: [audit trail protocol](docs/audit-trail-protocol.md).
-
-**Synthetic recovery and concurrency checks:** GitHub Actions creates
-test-only MongoDB records, dumps and restores them into a different
-temporary namespace, then validates data/index fingerprints; only an audit
-manifest is kept, never the database archive. The local API supports optional
-strong `If-Match` revision preconditions for asset/log edits and rejects
-stale writes with HTTP 412 while preserving atomic compare-and-swap conflicts
-(409). These are engineering checks, **not** a production backup plan or
-load testing. See [recovery/concurrency protocol](docs/preproduction-recovery-concurrency.md).
-
-**Local load and resilience evidence:** a dedicated CI job sends 150
-synthetic HTTP requests (concurrency eight) to an ephemeral MongoDB-backed
-loopback API, archiving anonymized latency percentiles and status counts.
-It also checks readiness/liveness during a deliberate database disconnection
-and following reconnection. This is *not* production benchmarking or high
-availability. See [load and resilience protocol](docs/preproduction-load-resilience.md).
-
-**Supply-chain verification:** the locked transitive packages
-use the official npm registry with verified SHA-512 integrity digests;
-subsequent security fixes may update compatible package versions.
-A dedicated CI job audits runtime and development dependencies and creates
-frontend/backend runtime CycloneDX SBOMs. High/critical runtime advisories
-fail CI; full development-advisory risk remains subject to review. See
-[supply-chain protocol](docs/preproduction-supply-chain.md).
-
-**Build-tool and accessibility checks:** frontend Vite 6.4.5 replaces
-the older vulnerable build-tool line, and CI audits the synthetic guest
-demo with axe-core in real Chromium at desktop/mobile widths. Serious or
-critical automated WCAG findings block CI; all findings are reported.
-Manual screen reader/accessibility review remains unverified. See
-[accessibility evidence protocol](docs/preproduction-accessibility.md).
-
-## Security and limitations
-
-- **Request boundaries:** POST/PUT/PATCH API calls accept `Content-Type: application/json` only; non-JSON forms return HTTP 415, malformed JSON HTTP 400, and payloads over 32 KiB HTTP 413. The API does not accept URL-encoded nested objects.
-- **Browser-origin policy:** local demo origins are explicitly allowlisted. `CORS_ORIGINS` may replace the list with comma-separated exact URL origins; remote origins require HTTPS under `NODE_ENV=production`. Wildcards, URL paths and credentialed origins are rejected at startup. CORS is **not authentication or a substitute for TLS**.
-- **Development configuration only:** Compose binds MongoDB to host loopback and requires `JWT_SECRET` to be set. Signing and verification reject known placeholders and keys under 32 characters. API port 5000 is now mapped to loopback only in Compose. Use TLS, trusted proxy configuration, distributed rate limits and explicit network access controls before any external deployment.
-- **Prototype scope:** this repository is not a production CMMS, EAM or validated regulated-industry logbook.
-- **Authentication hardening:** public registration always provisions an `operator`, not an administrator or supervisor. Any authenticated user can add assets or create log entries; only supervisors and administrators may change asset metadata/status or remove assets, and an asset with logs cannot be deleted (decommission it instead). Operators may edit only their own logs. Privileged role assignment requires a trusted administrative action. Protected endpoints reject inactive accounts. Login/signup use bounded single-process, socket-IP attempt limits for the local demo (30 logins/10 minutes and 10 registrations/10 minutes); these **do not** replace distributed edge quotas. Device-scoped token revocation, signing-key rotation, account recovery, JS-readable token/XSS risk assessment, formal access reviews and audit retention still need further work.
-- **Demo assets:** the public demo's fixture is fictional, and screenshots show project interfaces rather than live equipment integration.
-
-## Repository map
-
-- `backend/src/` — API, persistence and authentication
-- `frontend/src/` — user interface and API client
-- `docker-compose.yml` — local three-service orchestration
-- `docs/` — product screenshots and examples
-
-## License
-
-[MIT](LICENSE)
+[MIT License](LICENSE).
