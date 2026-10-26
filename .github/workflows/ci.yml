@@ -284,8 +284,8 @@ jobs:
       - name: Install and build isolated backend
         run: cd ../backend && npm ci && npm run build
 
-      - name: Install browser test tooling in CI only
-        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install browser and accessibility tooling in CI only
+        run: npm install --no-save --no-package-lock playwright@1.56.1 @axe-core/playwright@4.14.0
 
       - name: Install isolated Chromium runtime
         run: npx playwright install --with-deps chromium
@@ -295,6 +295,17 @@ jobs:
 
       - name: Test authenticated operator lifecycle in a real browser
         run: node --test tests/fullstack-onboarding.test.cjs
+
+      - name: Audit static demo accessibility on desktop and mobile
+        run: node --test tests/accessibility-audit.test.cjs
+
+      - name: Archive sanitized accessibility findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantlog-automated-accessibility-evidence
+          path: frontend/test-artifacts/accessibility-audit.json
+          if-no-files-found: warn
 
       - name: Preserve failure screenshot
         if: failure()
