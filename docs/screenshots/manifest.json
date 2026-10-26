@@ -1,0 +1,142 @@
+{
+  "captureDateUTC": "2026-10-26",
+  "sourceCommit": "45152fa4895f818098a0440747eb4ea63c377382",
+  "captureMethod": "isolated local browser from public-demo-only Vite build; not an HTTP screenshot of the live domain",
+  "mode": "VITE_PUBLIC_DEMO_ONLY=true; production-equivalent Vite build; local Chromium",
+  "sourceData": "frontend/src/demo/fixture.json (8 fictional assets, 12 fictional logs)",
+  "liveDeploymentVerified": false,
+  "captures": [
+    {
+      "file": "nexus-demo-overview.png",
+      "tab": "Overview",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": null,
+      "sha256": "6de0ee1f6dff5296c84ee2389ad518598763c48222c3eacb41a1518096b268a5"
+    },
+    {
+      "file": "nexus-demo-assets.png",
+      "tab": "Asset registry",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": null,
+      "sha256": "ca54826c75cd5956bb5ab5331641588ef09e300e8d68653713e42ad7853762c5"
+    },
+    {
+      "file": "nexus-demo-logs.png",
+      "tab": "Maintenance log",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": null,
+      "sha256": "cfb6a567e50373e2f92e96b06596341c86d553dc7f17436d2a861e6005801d76"
+    },
+    {
+      "file": "nexus-demo-insights.png",
+      "tab": "Demo insights",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": "Controlled comparisons",
+      "sha256": "cc20e4eb3653f463c5e8f1b8c4c3820674828fc89126172e1d4911ac95bb561c"
+    },
+    {
+      "file": "nexus-demo-insights-mobile.png",
+      "tab": "Demo insights",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": "Controlled comparisons",
+      "sha256": "38e7e35beff63f9e35153ce77c795938a5420ea086d7cb6b9bf96c97ce6e058a"
+    },
+    {
+      "file": "nexus-lab-utc.png",
+      "tab": "Demo insights",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": "UTC boundary cases",
+      "sha256": "9ea9d7e78a56cec3b65ebc6a200ef2ba625227b9ce0e8758b7fb944b026fec2c"
+    },
+    {
+      "file": "nexus-lab-evidence-matrix.png",
+      "tab": "Demo insights",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": "Six-cell evidence matrix",
+      "sha256": "92a329953680c97089bf08b1332c4dc2afc771e5858ef7aae45133a594d88383"
+    },
+    {
+      "file": "nexus-lab-review-workbench.png",
+      "tab": "Demo insights",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": "Document review workbench",
+      "sha256": "3ecf0c797c5ea90044b0e4f19af3148352fb4d77b109488dd61fb9cef93a89ad"
+    },
+    {
+      "file": "nexus-scenario-lab-desktop.png",
+      "tab": "Scenario lab",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "fullPage": true,
+      "scenarioPhase": "in_progress",
+      "selectedLaboratory": null,
+      "sha256": "36299a945cc43085ff6a1e168760789a4f3b17aee0a69156ee85320576eef0cd"
+    },
+    {
+      "file": "nexus-scenario-lab-mobile.png",
+      "tab": "Scenario lab",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "scenarioPhase": "in_progress",
+      "selectedLaboratory": null,
+      "sha256": "0d4d94c1a52982c9a73eaa1f3477e16542a3fe1c88170c9a3a743c0d72bb360b"
+    },
+    {
+      "file": "nexus-demo-mobile.png",
+      "tab": "Overview",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "scenarioPhase": null,
+      "selectedLaboratory": null,
+      "sha256": "e956d2f23effdc1eb21009014de480581515277e8bd655a16fe4aaeda848baa4"
+    }
+  ]
+}
