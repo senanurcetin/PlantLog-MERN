@@ -123,8 +123,7 @@ sustained capacity or production monitoring has been established.**
 ## Dependency provenance and advisory evidence
 
 The [dependency/SBOM protocol](preproduction-supply-chain.md) defines
-canonical npm registry locks (495 transitive packages with preserved SHA-512
-integrity), automated runtime/high+ advisory blocking, full dependency
+canonical npm registry locks (with SHA-512 tarball integrity), automated runtime/high+ advisory blocking, full dependency
 vulnerability reporting and runtime CycloneDX inventories for the frontend
 and backend. CI checks the lockfiles and archives inventory evidence but
 does **not** certify dependency origins, build-tool supply chains or
