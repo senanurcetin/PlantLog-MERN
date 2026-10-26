@@ -210,6 +210,22 @@ so the number of filtered rows is computed from unique positions, not from
 adding diagnostic frequencies. Filters are local, reset upon changing the
 example population, and do not save an investigation outcome.
 
+## Failure isolation for lazy experiments (development branch)
+
+A `SyntheticLabErrorBoundary` contains dynamic import or panel-render
+errors to the **selected research panel**. The surrounding synthetic
+maintenance workload, data-quality checks, navigation and six lab selectors
+remain available. The fallback gives a short accessible error announcement
+without exposing stack traces, source identifiers or simulated hardware
+conclusions. Users may switch to the default controlled-comparisons panel,
+or reload the entire guest demo to retry a failed import.
+
+JavaScript caches a failed dynamic module import during the page session,
+so simply rerendering the same panel is **not** promised as a retry.
+The reload action explicitly states that temporary fictional cases and
+experiment selections are cleared. Neither recovery action writes
+to the database or sends error telemetry.
+
 ## Verified on-demand JavaScript loading (development branch)
 
 The six laboratories now use React `lazy()` and Vite dynamic imports,
