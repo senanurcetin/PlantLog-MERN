@@ -29,4 +29,11 @@ MongoDB 30-day TTL prototype exist, but event writes are post-response and
 nontransactional. This is not immutable evidence or a verified retention
 policy. See [audit methodology and limitations](docs/audit-trail-protocol.md).
 
+**Dependency provenance:** locked npm package URLs are canonical
+`registry.npmjs.org` with SHA-512 tarball integrity. CI archives CycloneDX
+runtime SBOMs and both runtime/all-dependency audit summaries, blocking
+high/critical **runtime** advisories. Build tooling and deeper software
+supply-chain security still require formal review. See
+[supply-chain verification contract](docs/preproduction-supply-chain.md).
+
 No external PLC or safety-rated control integration is provided.
