@@ -108,3 +108,22 @@ test('timestamp boundary and overlapping findings do not double count exclusions
     assert.equal(r.outsideSnapshot,1);
     assert.equal(r.assessedRecords,4);
 });
+
+
+test('a single invalid fixture timestamp preserves all assessed rows', () => {
+    const target = fixture.logs.findIndex(log => log.id === 'L012');
+    assert.notEqual(target, -1);
+    const reference = assessDemoDataQuality(fixture.assets, fixture.logs, fixture.context.snapshot);
+    const originalDate = fixture.logs[target].date;
+    const logs = fixture.logs.map((log, index) =>
+        index === target ? { ...log, date: originalDate.replace(/Z$/, '') } : log
+    );
+    assert.notEqual(logs[target].date, originalDate);
+
+    const result = assessDemoDataQuality(fixture.assets, logs, fixture.context.snapshot);
+    assert.equal(result.assessedRecords, reference.assessedRecords);
+    assert.equal(result.invalidDates, reference.invalidDates + 1);
+    assert.equal(result.eligibleRecords, reference.eligibleRecords - 1);
+    assert.deepEqual(result.eligibleRecordIndices, reference.eligibleRecordIndices.filter(index => index !== target));
+    assert.equal(fixture.logs[target].date, originalDate);
+});

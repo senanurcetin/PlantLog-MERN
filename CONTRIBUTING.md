@@ -25,6 +25,8 @@ npm ci
 npm run test:demo && npm run test:registry && npm run lint
 VITE_PUBLIC_DEMO_ONLY=true npm run test:perf
 npm run evidence:verify
+cd ..
+node scripts/verify-repository-docs.cjs
 ```
 
 The GitHub CI also runs browser smoke, full-stack onboarding, axe-core accessibility, synthetic database restore/load checks and supply-chain inspection. Use a draft PR when validation remains incomplete. A green CI result does **not** certify real industrial readiness.
