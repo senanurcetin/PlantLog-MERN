@@ -1,6 +1,6 @@
 # PlantLog documentation
 
-This index describes the **published, synthetic NEXUS demo** and the separately verified **local engineering backend**. It replaces accumulated dated status snippets in the root README. Do not interpret a passing test as a production safety certification.
+The public NEXUS demo uses fictional data. The local backend documents authenticated API and MongoDB behavior separately. Use the verification links below to find the applicable test scope and release evidence.
 
 ## Start here
 
