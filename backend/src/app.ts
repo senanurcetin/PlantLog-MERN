@@ -11,10 +11,15 @@ import analyticsRoutes from './routes/analyticsRoutes';
 import healthRoutes from './routes/healthRoutes';
 import auditRoutes from './routes/auditRoutes';
 import { captureAuditTrail } from './middlewares/auditTrail';
+import { resolveTrustProxyHops } from './utils/trustProxy';
 
 dotenv.config();
 
 const app: Application = express();
+
+// Reverse-proxy trust is explicit (#59): with TRUST_PROXY_HOPS unset or 0 the
+// client address is the socket address and X-Forwarded-For is ignored.
+app.set('trust proxy', resolveTrustProxyHops() || false);
 
 // Security and CORS
 app.use(helmet());
