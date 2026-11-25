@@ -1,13 +1,14 @@
 import express from 'express';
 import { registerUser, loginUser, getMe, logoutUser } from '../controllers/authController';
 import { protect } from '../middlewares/authMiddleware';
-import { createLocalAuthRateLimit } from '../middlewares/authRateLimit';
+import { createSharedAuthRateLimit } from '../middlewares/authRateLimit';
 
 const router = express.Router();
 
-// Per-process safeguards for local demos, not distributed production quotas.
-router.post('/register', createLocalAuthRateLimit(10, 10 * 60 * 1000), registerUser);
-router.post('/login', createLocalAuthRateLimit(30, 10 * 60 * 1000), loginUser);
+// Counts are shared through MongoDB across API instances (#59); before the
+// database is connected each process falls back to its own bounded limiter.
+router.post('/register', createSharedAuthRateLimit('register', 10, 10 * 60 * 1000), registerUser);
+router.post('/login', createSharedAuthRateLimit('login', 30, 10 * 60 * 1000), loginUser);
 router.get('/me', protect, getMe);
 router.post('/logout', protect, logoutUser);
 
